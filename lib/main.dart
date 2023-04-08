@@ -1,65 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:macos_ui/macos_ui.dart';
+import 'package:provider/provider.dart';
+import 'package:trax/data/database.dart';
+import 'package:trax/screens/home.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
-  runApp(const TraxApp());
+import 'components/theme.dart';
+import 'model/preferences.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = const WindowOptions(
+    //size: rc.size,
+    //center: true,
+    backgroundColor: Colors.black,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
+  );
+
+  // load some stuff
+  TraxDatabase traxDatabase = TraxDatabase();
+  Preferences preferences = Preferences();
+  await preferences.init();
+  await traxDatabase.init();
+
+  // run
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    Rect rc = preferences.windowBounds;
+    await windowManager.setBounds(rc);
+    await windowManager.show();
+    await windowManager.focus();
+
+    runApp(TraxApp(
+      preferences: preferences,
+      database: traxDatabase,
+    ));
+  });
 }
 
 class TraxApp extends StatelessWidget {
-  const TraxApp({super.key});
+  final Preferences preferences;
+  final TraxDatabase database;
+  const TraxApp({
+    super.key,
+    required this.preferences,
+    required this.database,
+  });
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Trax',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Trax'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Container(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AppTheme(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => preferences,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => database,
+        ),
+      ],
+      builder: (context, _) {
+        final appTheme = context.watch<AppTheme>();
+        return MacosApp(
+          title: 'Trax',
+          theme: MacosThemeData.light(),
+          darkTheme: MacosThemeData.dark(),
+          themeMode: appTheme.mode,
+          debugShowCheckedModeBanner: false,
+          color: Colors.black,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en', ''),
+            Locale('fr', ''),
+          ],
+          home: const TraxHomePage(),
+        );
+      },
     );
   }
 }

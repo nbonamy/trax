@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   async_task: ^1.0.20
   cupertino_icons: ^1.0.2
   macos_ui:
@@ -19,8 +21,10 @@ dependencies:
   provider: ^6.0.2
   shared_preferences: ^2.0.15
   sqlite3: ^1.10.1
-  taglib_ffi: 0.0.1
+  taglib_ffi:
+    path: ../taglib_ffi
   window_manager: ^0.3.2
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -28,6 +32,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

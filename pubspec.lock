@@ -102,6 +102,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  flutter_localizations:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -112,6 +117,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  intl:
+    dependency: "direct main"
+    description:
+      name: intl
+      sha256: "910f85bce16fb5c6f614e117efa303e85a1731bb0081edf3604a2ae6e9a3cc91"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.17.0"
   js:
     dependency: transitive
     description:
@@ -369,10 +382,9 @@ packages:
   taglib_ffi:
     dependency: "direct main"
     description:
-      name: taglib_ffi
-      sha256: "15ba68d259d6be92b2bd9f35f5041c9f8bf457417fc8f223280337fc10c62a08"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../taglib_ffi"
+      relative: true
+    source: path
     version: "0.0.1"
   term_glyph:
     dependency: transitive
