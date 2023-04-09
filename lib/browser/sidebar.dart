@@ -34,14 +34,41 @@ class _BrowserSidebarState extends State<BrowserSidebar> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: artists.length,
-      itemBuilder: (context, index) => ArtistWidget(
-        name: artists[index],
-        selected: widget.artist != null && artists[index] == widget.artist,
-        onSelectArtist: widget.onSelectArtist,
-      ),
-      controller: widget.scrollController,
+    return Column(
+      children: [
+        Expanded(
+          child: ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              controller: widget.scrollController,
+              child: Column(
+                children: artists
+                    .map<Widget>(
+                      (artist) => ArtistWidget(
+                        name: artist,
+                        selected:
+                            widget.artist != null && artist == widget.artist,
+                        onSelectArtist: widget.onSelectArtist,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ),
+        ),
+        if (true)
+          Column(
+            children: const [
+              Divider(),
+              SizedBox(height: 4),
+              Text(
+                'Scanning audio files...',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
+      ],
     );
   }
 
