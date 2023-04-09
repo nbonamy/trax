@@ -175,7 +175,7 @@ class TraxDatabase extends ChangeNotifier {
 
   void _updateSchema(int currentVersion) {
     if (currentVersion == _latestSchemaVersion) return;
-    // TODO: update schema
+    // no update yet
     _updateVersion(currentVersion + 1);
     _updateSchema(currentVersion + 1);
   }

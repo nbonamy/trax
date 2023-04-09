@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/consts.dart';
+
 class HeaderAlbumWidget extends StatelessWidget {
   final String title;
   final String genre;
@@ -28,7 +30,7 @@ class HeaderAlbumWidget extends StatelessWidget {
           '${genre.toUpperCase()} · $year',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withOpacity(Consts.fadedOpacity),
             fontSize: 12,
           ),
         ),

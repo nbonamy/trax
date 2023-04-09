@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/components/artwork.dart';
 import 'package:trax/components/header_album.dart';
-import 'package:trax/components/track.dart';
+import 'package:trax/components/track_list.dart';
 
 import '../model/track.dart';
 
@@ -74,23 +74,10 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                     year: widget.tracks.first.safeTags.year,
                   ),
                   const SizedBox(height: 24),
-                  ListView.separated(
-                    shrinkWrap: true,
+                  TrackListWidget(
+                    tracks: widget.tracks,
+                    onSelect: widget.onSelect,
                     primary: false,
-                    itemCount: widget.tracks.length + 2,
-                    itemBuilder: (context, index) {
-                      if (index == 0 || index > widget.tracks.length) {
-                        return Container();
-                      } else {
-                        return TrackWidget(
-                          track: widget.tracks[index - 1],
-                          onSelect: widget.onSelect,
-                        );
-                      }
-                    },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const Divider(height: 0.5);
-                    },
                   ),
                 ],
               ),

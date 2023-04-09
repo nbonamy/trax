@@ -4,6 +4,7 @@ import 'package:trax/utils/time_utils.dart';
 
 import '../model/selection.dart';
 import '../model/track.dart';
+import '../utils/consts.dart';
 
 class TrackWidget extends StatelessWidget {
   final Track track;
@@ -22,7 +23,8 @@ class TrackWidget extends StatelessWidget {
         bool selected = selectionModel.contains(track);
         Color bgColor = selected ? Colors.blue : Colors.transparent;
         Color fgColor = selected ? Colors.white : Colors.black;
-        Color fgColor2 = selected ? fgColor : fgColor.withOpacity(0.4);
+        Color fgColor2 =
+            selected ? fgColor : fgColor.withOpacity(Consts.fadedOpacity);
         return GestureDetector(
           onTap: () => onSelect(track),
           child: Container(
@@ -33,7 +35,7 @@ class TrackWidget extends StatelessWidget {
                 Text(
                   track.trackIndex.toString(),
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: fgColor2,
                     fontSize: 13,
                   ),

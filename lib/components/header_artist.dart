@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/consts.dart';
+
 class HeaderArtistWidget extends StatelessWidget {
   final String artist;
   final int albumCount;
@@ -34,7 +36,7 @@ class HeaderArtistWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withOpacity(Consts.fadedOpacity),
             ),
           ),
         ],

@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../utils/consts.dart';
+
 class ArtworkWidget extends StatelessWidget {
   final double size;
   final Uint8List bytes;
@@ -39,7 +41,7 @@ class ArtworkWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(0.4),
+                    color: Colors.black.withOpacity(Consts.fadedOpacity),
                   ),
                 ),
               ],
