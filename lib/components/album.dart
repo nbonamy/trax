@@ -50,7 +50,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
         .toInt();
 
     return Container(
-      margin: const EdgeInsets.only(top: 16, bottom: 32),
+      margin: const EdgeInsets.symmetric(vertical: 48),
       child: LayoutBuilder(
         builder: (context, constraints) => Row(
           mainAxisSize: MainAxisSize.max,
