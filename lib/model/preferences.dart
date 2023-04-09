@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../utils/path.dart';
+import '../utils/path_utils.dart';
 
 class Preferences extends ChangeNotifier {
   static Preferences of(BuildContext context) {

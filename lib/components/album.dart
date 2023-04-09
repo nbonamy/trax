@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
+import 'package:trax/components/artwork.dart';
+import 'package:trax/components/header_album.dart';
 import 'package:trax/components/track.dart';
 
 import '../model/track.dart';
@@ -37,88 +39,70 @@ class _AlbumWidgetState extends State<AlbumWidget> {
 
   @override
   Widget build(BuildContext context) {
+    int trackCount = widget.tracks.length;
+    int playtimeMinutes = (widget.tracks
+                .fold(0, (time, track) => time + track.safeTags.duration) /
+            60)
+        .round()
+        .toInt();
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 64),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 350,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.memory(
-                    _artworkBytes,
-                    width: 350,
-                    height: 350,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${widget.tracks.length.toString()} SONGS',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(0.4),
-                  ),
-                ),
-              ],
+      margin: const EdgeInsets.only(top: 16, bottom: 32),
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ArtworkWidget(
+              size: _artworkSize(constraints),
+              bytes: _artworkBytes,
+              trackCount: trackCount,
+              playtime: playtimeMinutes,
             ),
-          ),
-          const SizedBox(width: 48),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+            SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  HeaderAlbumWidget(
+                    title: widget.title,
+                    genre: widget.tracks.first.safeTags.genre,
+                    year: widget.tracks.first.safeTags.year,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '${widget.tracks.first.safeTags.genre.toUpperCase()} · ${widget.tracks.first.safeTags.year}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(0.4),
-                    fontSize: 12,
+                  const SizedBox(height: 24),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    primary: false,
+                    itemCount: widget.tracks.length + 2,
+                    itemBuilder: (context, index) {
+                      if (index == 0 || index > widget.tracks.length) {
+                        return Container();
+                      } else {
+                        return TrackWidget(
+                          track: widget.tracks[index - 1],
+                        );
+                      }
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Divider(height: 0.5);
+                    },
                   ),
-                ),
-                const SizedBox(height: 24),
-                ListView.separated(
-                  shrinkWrap: true,
-                  primary: false,
-                  //physics: ScrollPhysics.,
-                  //controller: widget.controller,
-                  itemCount: widget.tracks.length + 2,
-                  itemBuilder: (context, index) {
-                    if (index == 0 || index > widget.tracks.length) {
-                      //<= here is problem
-                      return Container();
-                    } else {
-                      return TrackWidget(
-                        track: widget.tracks[index - 1],
-                      );
-                    }
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const Divider(height: 0.5);
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  double _artworkSize(BoxConstraints constraints) {
+    return constraints.maxWidth > 800
+        ? 350.0
+        : constraints.maxWidth > 400
+            ? 150.0
+            : 0.0;
   }
 
   void _getArtwork() {

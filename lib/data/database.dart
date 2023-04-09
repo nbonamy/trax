@@ -4,9 +4,9 @@ import 'package:flutter/widgets.dart' hide Row;
 import 'package:provider/provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
-import 'package:trax/utils/path.dart';
 
 import '../model/track.dart';
+import '../utils/path_utils.dart';
 
 class TraxDatabase extends ChangeNotifier {
   static const int _latestSchemaVersion = 1;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trax/utils/time_utils.dart';
 
 import '../model/track.dart';
 
@@ -29,7 +30,7 @@ class TrackWidget extends StatelessWidget {
             ),
           ),
           Text(
-            track.tags?.duration.toString() ?? '',
+            track.tags?.duration.formatDuration(skipHours: true) ?? '',
             style: TextStyle(
               color: Colors.black.withOpacity(0.4),
               fontSize: 13,

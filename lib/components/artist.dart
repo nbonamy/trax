@@ -30,14 +30,25 @@ class _ArtistWidgetState extends State<ArtistWidget> {
         behavior: HitTestBehavior.translucent,
         onTap: () => widget.onSelectArtist(widget.name),
         child: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Icon(
-                CupertinoIcons.person_alt_circle,
-                size: 32,
-                color: Colors.black.withOpacity(
-                  0.7,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: Colors.black.withOpacity(
+                    0.25,
+                  )),
+                  color: Colors.black.withOpacity(
+                    0.2,
+                  ),
+                ),
+                child: Icon(
+                  CupertinoIcons.music_mic,
+                  size: 24,
+                  color: Colors.black.withOpacity(0.7),
                 ),
               ),
               const SizedBox(width: 16),
