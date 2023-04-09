@@ -1,7 +1,12 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:trax/data/database.dart';
+import 'package:trax/scanner/scanner.dart';
 
 import '../browser/browser.dart';
+import '../model/menu_actions.dart';
+import '../model/preferences.dart';
 
 class TraxHomePage extends StatefulWidget {
   const TraxHomePage({super.key});
@@ -36,21 +41,16 @@ class _TraxHomePageState extends State<TraxHomePage> {
           ),
         ],
       ),
-      // PlatformMenu(
-      //   label: t.menuFile,
-      //   menus: [
-      //     // PlatformMenuItem(
-      //     //   label: t.menuFileRefresh,
-      //     //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR),
-      //     //   onSelected: () => _onMenu(MenuAction.fileRefresh),
-      //     // ),
-      //     // PlatformMenuItem(
-      //     //   label: t.menuFileRename,
-      //     //   //shortcut: const SingleActivator(LogicalKeyboardKey.enter),
-      //     //   onSelected: () => _onMenu(MenuAction.fileRename),
-      //     // ),
-      //   ],
-      // ),
+      PlatformMenu(
+        label: t.menuFile,
+        menus: [
+          PlatformMenuItem(
+            label: t.menuFileRefresh,
+            shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR),
+            onSelected: () => _onMenu(MenuAction.fileRefresh),
+          ),
+        ],
+      ),
       // PlatformMenu(
       //   label: t.menuEdit,
       //   menus: [
@@ -139,5 +139,11 @@ class _TraxHomePageState extends State<TraxHomePage> {
       //   ],
       // ),
     ];
+  }
+
+  void _onMenu(MenuAction action) async {
+    if (action == MenuAction.fileRefresh) {
+      runScan(Preferences.of(context).musicFolder, TraxDatabase.of(context));
+    }
   }
 }

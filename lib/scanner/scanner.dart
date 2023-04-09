@@ -1,86 +1,58 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:async_task/async_task.dart';
+import 'dart:isolate';
+import 'package:easy_isolate/easy_isolate.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/data/database.dart';
 
 import '../model/track.dart';
 
-// This top-level function returns the tasks types that will be registered
-// for execution. Task instances are returned, but won't be executed and
-// will be used only to identify the task type:
-List<AsyncTask> _taskTypeRegister() => [Scanner('')];
-
-void runScan(String rootFolder) async {
-  var task = Scanner(rootFolder);
-  var asyncExexcutor = AsyncExecutor(
-    taskTypeRegister: _taskTypeRegister,
+void runScan(String rootFolder, TraxDatabase database) async {
+  final Worker worker = Worker();
+  await worker.init(
+    (data, isolateSendPort) {
+      if (data is Map && data.containsKey('command')) {
+        String command = data['command'];
+        if (command == 'insert') {
+          Track track = data['track'] as Track;
+          database.insert(track);
+        } else if (command == 'delete') {
+          String filename = data['filename'] as String;
+          database.delete(filename);
+        }
+      }
+    },
+    isolateHandler,
   );
-  asyncExexcutor.logger.enabled = true;
-  var execution = asyncExexcutor.execute(task);
-  //var channel = await task.channel();
-  // while (!channel.isClosed) {}
-  //await execution;
-  // while (true) {
-  //   var message = await channel!.waitMessage();
-  //   print(message);
-  // }
+
+  // now send data
+  worker.sendMessage({
+    'rootFolder': rootFolder,
+    'files': database.files(),
+    //'databaseFile': databaseFile,
+  });
 }
 
-final AsyncTaskChannelMessageHandler messageHandler =
-    (dynamic message, bool fromExecutingContext) {
-  if (message != null) {
-    print(message);
-  }
-};
-
-class Message {
-  final int totalFiles;
-  final int processedFiles;
-
-  Message(this.totalFiles, this.processedFiles);
-}
-
-class Scanner extends AsyncTask<String, void> {
-  final String rootFolder;
-  late TraxDatabase _database;
-  late TagLib _tagLib;
+void isolateHandler(
+    dynamic data, SendPort mainSendPort, SendErrorFunction onSendError) async {
+  // we need a taglib
   TagLib tagLib = TagLib();
 
-  Scanner(this.rootFolder) {
-    _tagLib = TagLib();
-    _database = TraxDatabase();
+  // first check given files
+  List<String> files = data['files'];
+  for (String filename in files) {
+    File f = File(filename);
+    if ((await f.exists()) == false) {
+      mainSendPort.send({'command': 'delete', 'filename': filename});
+    }
   }
 
-  @override
-  AsyncTaskChannel? channelInstantiator() {
-    return AsyncTaskChannel(messageHandler: messageHandler);
-  }
-
-  @override
-  AsyncTask<String, void> instantiate(String parameters,
-      [Map<String, SharedData>? sharedData]) {
-    return Scanner(parameters);
-  }
-
-  @override
-  String parameters() {
-    return rootFolder;
-  }
-
-  @override
-  FutureOr<void> run() {
-    // get the resolved channel:
-    //var channel = channelResolved()!;
-
-    // list directories
-    Directory dir = Directory(rootFolder);
-    var lister = dir.list(recursive: true);
-    lister.listen((file) {
-      if (file is File && Track.isTrack(file.path)) {
-        Track t = Track(file.path);
-        t.parse(_tagLib);
-      }
-    });
-  }
+  // list directories
+  Directory dir = Directory(data['rootFolder']);
+  var lister = dir.list(recursive: true);
+  lister.listen((file) {
+    if (file is File && Track.isTrack(file.path)) {
+      Track t = Track.parse(file.path, tagLib);
+      mainSendPort.send({'command': 'insert', 'track': t});
+    }
+  });
 }
