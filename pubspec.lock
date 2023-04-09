@@ -152,12 +152,11 @@ packages:
   macos_ui:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: d1e5682c002283fdc042240b98666d46a5c26bc7
-      url: "https://github.com/nbonamy/macos_ui"
-    source: git
-    version: "1.4.1+1"
+      name: macos_ui
+      sha256: "57208eec8180656acd379e1c754e9b6d8830f32a020b94571ae2188f8112075b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.12.2"
   matcher:
     dependency: transitive
     description:

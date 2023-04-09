@@ -32,6 +32,7 @@ void main() async {
   // run
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     Rect rc = preferences.windowBounds;
+    await windowManager.setBackgroundColor(Colors.white);
     await windowManager.setBounds(rc);
     await windowManager.show();
     await windowManager.focus();
@@ -78,7 +79,7 @@ class TraxApp extends StatelessWidget {
           darkTheme: MacosThemeData.dark(),
           themeMode: appTheme.mode,
           debugShowCheckedModeBanner: false,
-          color: Colors.black,
+          color: Colors.white,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

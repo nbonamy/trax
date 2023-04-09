@@ -15,9 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   easy_isolate: ^1.3.0
   intl: any
-  macos_ui:
-    git:
-      url: https://github.com/nbonamy/macos_ui
+  macos_ui: ^1.12.2
   path: ^1.8.2
   path_provider: ^2.0.14
   provider: ^6.0.2
