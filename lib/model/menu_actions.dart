@@ -10,6 +10,7 @@ typedef MenuActionStream = Stream<MenuAction>;
 
 enum MenuAction {
   fileRefresh,
+  editSelectAll,
 }
 
 class MenuUtils {

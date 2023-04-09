@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ArtistWidget extends StatefulWidget {
+class ArtistWidget extends StatelessWidget {
   final String name;
   final bool selected;
   final Function onSelectArtist;
@@ -13,22 +13,17 @@ class ArtistWidget extends StatefulWidget {
   });
 
   @override
-  State<ArtistWidget> createState() => _ArtistWidgetState();
-}
-
-class _ArtistWidgetState extends State<ArtistWidget> {
-  @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
       decoration: BoxDecoration(
-          color: widget.selected
+          color: selected
               ? const Color.fromRGBO(213, 208, 206, 1.0)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(6)),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () => widget.onSelectArtist(widget.name),
+        onTap: () => onSelectArtist(name),
         child: Container(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -52,7 +47,7 @@ class _ArtistWidgetState extends State<ArtistWidget> {
                 ),
               ),
               const SizedBox(width: 16),
-              Text(widget.name),
+              Text(name),
             ],
           ),
         ),

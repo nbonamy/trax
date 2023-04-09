@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -11,10 +12,12 @@ import '../model/track.dart';
 class AlbumWidget extends StatefulWidget {
   final String title;
   final List<Track> tracks;
+  final Function onSelect;
   const AlbumWidget({
     super.key,
     required this.title,
     required this.tracks,
+    required this.onSelect,
   });
 
   @override
@@ -81,6 +84,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                       } else {
                         return TrackWidget(
                           track: widget.tracks[index - 1],
+                          onSelect: widget.onSelect,
                         );
                       }
                     },
@@ -98,11 +102,8 @@ class _AlbumWidgetState extends State<AlbumWidget> {
   }
 
   double _artworkSize(BoxConstraints constraints) {
-    return constraints.maxWidth > 800
-        ? 350.0
-        : constraints.maxWidth > 400
-            ? 150.0
-            : 0.0;
+    double size = constraints.maxWidth / 2 - 50.0;
+    return size < 150.0 ? 0.0 : min(size, 400.0);
   }
 
   void _getArtwork() {

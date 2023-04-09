@@ -4,32 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class PlatformKeyboard {
-  static bool isPrevious(RawKeyEvent event) {
-    return (event.isKeyPressed(LogicalKeyboardKey.arrowLeft) ||
-            event.isKeyPressed(LogicalKeyboardKey.arrowUp) ||
-            event.isKeyPressed(LogicalKeyboardKey.bracketLeft)) &&
-        !commandModifierPressed(event);
+  static LogicalKeyboardKey get selectionExtendModifier {
+    return LogicalKeyboardKey.shiftLeft;
   }
 
-  static bool isNext(RawKeyEvent event) {
-    return (event.isKeyPressed(LogicalKeyboardKey.arrowRight) ||
-            event.isKeyPressed(LogicalKeyboardKey.arrowDown) ||
-            event.isKeyPressed(LogicalKeyboardKey.space) ||
-            event.isKeyPressed(LogicalKeyboardKey.bracketRight)) &&
-        !commandModifierPressed(event);
+  static LogicalKeyboardKey get selectionToggleModifier {
+    return Platform.isMacOS
+        ? LogicalKeyboardKey.metaLeft
+        : LogicalKeyboardKey.controlLeft;
   }
 
-  static bool isEscape(RawKeyEvent event) {
-    return event.physicalKey == PhysicalKeyboardKey.escape;
+  static bool get selectionExtendActive {
+    return RawKeyboard.instance.keysPressed
+        .contains(PlatformKeyboard.selectionExtendModifier);
   }
 
-  static bool isEnter(RawKeyEvent event) {
-    return event.physicalKey == PhysicalKeyboardKey.enter ||
-        event.physicalKey == PhysicalKeyboardKey.numpadEnter;
-  }
-
-  static bool selectionExtensionModifierPressed(RawKeyEvent event) {
-    return Platform.isMacOS ? event.isMetaPressed : event.isControlPressed;
+  static bool get selectionToggleActive {
+    return RawKeyboard.instance.keysPressed
+        .contains(PlatformKeyboard.selectionToggleModifier);
   }
 
   static bool commandModifierPressed(RawKeyEvent event) {

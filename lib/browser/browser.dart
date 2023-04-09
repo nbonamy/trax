@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import '../model/menu_actions.dart';
+import '../model/selection.dart';
 import 'content.dart';
 import 'sidebar.dart';
 
 class BrowserWidget extends StatefulWidget {
-  const BrowserWidget({super.key});
+  final Stream<MenuAction> menuActionStream;
+  const BrowserWidget({super.key, required this.menuActionStream});
 
   @override
   State<BrowserWidget> createState() => BrowserWidgetState();
@@ -30,8 +33,13 @@ class BrowserWidgetState extends State<BrowserWidget> {
           );
         },
       ),
-      child: BrowserContent(
-        artist: _artist,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => SelectionModel.of(context).clear(),
+        child: BrowserContent(
+          artist: _artist,
+          menuActionStream: widget.menuActionStream,
+        ),
       ),
     );
 
@@ -40,6 +48,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
 
   void onSelectArtist(String artist) {
     setState(() {
+      SelectionModel.of(context).clear(notify: false);
       _artist = artist;
     });
   }

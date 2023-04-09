@@ -9,6 +9,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'components/theme.dart';
 import 'model/preferences.dart';
+import 'model/selection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +66,9 @@ class TraxApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => database,
         ),
+        ChangeNotifierProvider(
+          create: (_) => SelectionModel(),
+        )
       ],
       builder: (context, _) {
         final appTheme = context.watch<AppTheme>();
