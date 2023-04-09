@@ -32,7 +32,7 @@ class Track {
     return safeTags.trackIndex;
   }
 
-  factory Track.parse(String filename, TagLib tagLib) {
+  factory Track.parse(String filename, TagLib? tagLib) {
     File f = File(filename);
     FileStat fs = f.statSync();
     return Track(
@@ -41,7 +41,7 @@ class Track {
       lastModified: max(fs.changed.millisecondsSinceEpoch,
           fs.modified.millisecondsSinceEpoch),
       format: getFormat(filename),
-      tags: tagLib.getAudioTags(filename),
+      tags: tagLib?.getAudioTags(filename),
     );
   }
 

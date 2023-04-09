@@ -49,35 +49,16 @@ class TraxDatabase extends ChangeNotifier {
       if (albums.containsKey(album) == false) {
         albums[album] = [];
       }
-      albums[album]!.add(
-        Track(
-          filename: row['filename'],
-          filesize: row['filesize'],
-          lastModified: row['last_modification'],
-          format: row['format'].toString().toFormat(),
-          tags: Tags(
-            title: row['title'],
-            album: row['album'],
-            artist: row['artist'],
-            performer: row['performer'],
-            composer: row['composer'],
-            genre: row['genre'],
-            copyright: row['copyright'],
-            comment: row['comment'],
-            year: int.parse(row['year']),
-            compilation: row['compilation'] == 1,
-            volumeIndex: row['volume_index'],
-            trackIndex: row['track_index'],
-            duration: row['duration'],
-            numChannels: row['num_channels'],
-            sampleRate: row['sample_rate'],
-            bitsPerSample: row['bits_per_sample'],
-            bitrate: row['bitrate'],
-          ),
-        ),
-      );
+      albums[album]!.add(_dehydrateTrack(row));
     }
     return albums;
+  }
+
+  Track? getTrack(String filename) {
+    final ResultSet resultSet = _database!
+        .select('SELECT * FROM tracks WHERE filename=(?)', [filename]);
+    if (resultSet.length != 1) return null;
+    return _dehydrateTrack(resultSet.first);
   }
 
   void insert(Track track) {
@@ -182,5 +163,33 @@ class TraxDatabase extends ChangeNotifier {
 
   void _updateVersion(int version) {
     _database!.execute('UPDATE info SET version=(?)', [version]);
+  }
+
+  Track _dehydrateTrack(Row row) {
+    return Track(
+      filename: row['filename'],
+      filesize: row['filesize'],
+      lastModified: row['last_modification'],
+      format: row['format'].toString().toFormat(),
+      tags: Tags(
+        title: row['title'],
+        album: row['album'],
+        artist: row['artist'],
+        performer: row['performer'],
+        composer: row['composer'],
+        genre: row['genre'],
+        copyright: row['copyright'],
+        comment: row['comment'],
+        year: int.parse(row['year']),
+        compilation: row['compilation'] == 1,
+        volumeIndex: row['volume_index'],
+        trackIndex: row['track_index'],
+        duration: row['duration'],
+        numChannels: row['num_channels'],
+        sampleRate: row['sample_rate'],
+        bitsPerSample: row['bits_per_sample'],
+        bitrate: row['bitrate'],
+      ),
+    );
   }
 }
