@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import '../model/menu_actions.dart';
@@ -19,6 +19,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
   @override
   Widget build(BuildContext context) {
     Widget window = MacosWindow(
+      backgroundColor: Colors.white,
       sidebar: Sidebar(
         minWidth: 250,
         padding: const EdgeInsets.all(16),

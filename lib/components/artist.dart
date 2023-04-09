@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:macos_ui/macos_ui.dart';
 
 class ArtistWidget extends StatelessWidget {
   final String name;
@@ -40,7 +41,7 @@ class ArtistWidget extends StatelessWidget {
                     0.2,
                   ),
                 ),
-                child: Icon(
+                child: MacosIcon(
                   CupertinoIcons.music_mic,
                   size: 24,
                   color: Colors.black.withOpacity(0.7),
