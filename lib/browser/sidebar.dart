@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:trax/components/artist.dart';
 import 'package:trax/data/database.dart';
+
+import '../utils/events.dart';
 
 class BrowserSidebar extends StatefulWidget {
   final ScrollController scrollController;
   final Function onSelectArtist;
   final String? artist;
-  const BrowserSidebar(
-      {super.key,
-      required this.scrollController,
-      required this.onSelectArtist,
-      required this.artist});
+  const BrowserSidebar({
+    super.key,
+    required this.scrollController,
+    required this.onSelectArtist,
+    required this.artist,
+  });
 
   @override
   State<BrowserSidebar> createState() => _BrowserSidebarState();
@@ -18,12 +22,13 @@ class BrowserSidebar extends StatefulWidget {
 
 class _BrowserSidebarState extends State<BrowserSidebar> {
   List<String> artists = [];
-
+  String? _statusMessage;
   @override
   void initState() {
     super.initState();
     _loadArtists();
     TraxDatabase.of(context).addListener(_loadArtists);
+    eventBus.on().listen(onEvent);
   }
 
   @override
@@ -40,31 +45,41 @@ class _BrowserSidebarState extends State<BrowserSidebar> {
           child: ScrollConfiguration(
             behavior:
                 ScrollConfiguration.of(context).copyWith(scrollbars: false),
-            child: SingleChildScrollView(
+            child: ListView.builder(
               controller: widget.scrollController,
-              child: Column(
-                children: artists
-                    .map<Widget>(
-                      (artist) => ArtistWidget(
-                        name: artist,
-                        selected:
-                            widget.artist != null && artist == widget.artist,
-                        onSelectArtist: widget.onSelectArtist,
-                      ),
-                    )
-                    .toList(),
-              ),
+              itemCount: artists.length,
+              itemBuilder: (context, index) {
+                String artist = artists[index];
+                return ArtistWidget(
+                  name: artist,
+                  selected: widget.artist != null && artist == widget.artist,
+                  onSelectArtist: widget.onSelectArtist,
+                );
+              },
             ),
           ),
         ),
-        if (true)
+        if (_statusMessage != null)
           Column(
-            children: const [
-              Divider(),
-              SizedBox(height: 4),
-              Text(
-                'Scanning audio files...',
-                style: TextStyle(fontSize: 12),
+            children: [
+              const Divider(),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _statusMessage!,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: LoadingAnimationWidget.staggeredDotsWave(
+                      color: Colors.black.withOpacity(0.8),
+                      size: 12,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -76,5 +91,16 @@ class _BrowserSidebarState extends State<BrowserSidebar> {
     setState(() {
       artists = TraxDatabase.of(context).artists();
     });
+  }
+
+  void onEvent(event) {
+    if (event is BackgroundActionStartEvent &&
+        event.action == BackgroundAction.scan) {
+      setState(() => _statusMessage = 'Scanning audio files');
+    }
+    if (event is BackgroundActionEndEvent &&
+        event.action == BackgroundAction.scan) {
+      setState(() => _statusMessage = null);
+    }
   }
 }

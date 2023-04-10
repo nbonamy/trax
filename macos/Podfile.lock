@@ -46,7 +46,7 @@ SPEC CHECKSUMS:
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
   shared_preferences_foundation: 986fc17f3d3251412d18b0265f9c64113a8c2472
-  taglib_ffi: 038c207a740bb898846d81a191f06f9554da9980
+  taglib_ffi: ea0311bceb5b97621e56432a971834feca44fda2
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
 
 PODFILE CHECKSUM: 137ddf7b4dbe5a83427ebf04ae8dea674cfd87fa

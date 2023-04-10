@@ -8,6 +8,7 @@ import 'package:window_manager/window_manager.dart';
 import '../browser/browser.dart';
 import '../model/menu_actions.dart';
 import '../model/preferences.dart';
+import '../utils/events.dart';
 
 class TraxHomePage extends StatefulWidget {
   const TraxHomePage({super.key});
@@ -153,7 +154,18 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
 
   void _onMenu(MenuAction action) async {
     if (action == MenuAction.fileRefresh) {
-      runScan(Preferences.of(context).musicFolder, TraxDatabase.of(context));
+      eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));
+      runScan(
+        Preferences.of(context).musicFolder,
+        TraxDatabase.of(context),
+        () {
+          TraxDatabase.of(context).notify();
+        },
+        () {
+          TraxDatabase.of(context).notify();
+          eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
+        },
+      );
     } else if (action == MenuAction.editSelectAll) {
       _menuActionStream.sink.add(action);
     }

@@ -48,7 +48,13 @@ class ArtistWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              Text(name),
+              Expanded(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),

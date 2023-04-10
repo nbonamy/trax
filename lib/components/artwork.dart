@@ -9,12 +9,13 @@ class ArtworkWidget extends StatelessWidget {
   final Uint8List bytes;
   final int trackCount;
   final int playtime;
-  const ArtworkWidget(
-      {super.key,
-      required this.size,
-      required this.bytes,
-      required this.trackCount,
-      required this.playtime});
+  const ArtworkWidget({
+    super.key,
+    required this.size,
+    required this.bytes,
+    required this.trackCount,
+    required this.playtime,
+  });
 
   @override
   Widget build(BuildContext context) {

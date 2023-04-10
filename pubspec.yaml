@@ -24,6 +24,8 @@ dependencies:
   taglib_ffi:
     path: ../taglib_ffi
   window_manager: ^0.3.2
+  loading_animation_widget: ^1.2.0+4
+  event_bus: ^2.0.0
 
 dev_dependencies:
   flutter_test:

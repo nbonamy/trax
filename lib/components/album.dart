@@ -90,7 +90,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
 
   double _artworkSize(BoxConstraints constraints) {
     double size = constraints.maxWidth / 2 - 50.0;
-    return size < 150.0 ? 0.0 : min(size, 400.0);
+    return size < 150.0 ? 0.0 : min(size, 300.0);
   }
 
   void _getArtwork() {

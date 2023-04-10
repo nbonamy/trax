@@ -23,8 +23,17 @@ class TraxDatabase extends ChangeNotifier {
 
   Future<void> init() async {
     String dbFile = databaseFile ?? await SystemPath.dbFile();
+    print('Database file: $dbFile');
     _database = sqlite3.open(dbFile);
     _checkSchemaVersion();
+    //clear();
+  }
+
+  bool artistExists(String artist) {
+    final ResultSet resultSet = _database!.select(
+        'SELECT COUNT(*) FROM tracks WHERE artist=(?) AND compilation=0',
+        [artist]);
+    return resultSet.first[0] != 0;
   }
 
   List<String> files() {
@@ -34,9 +43,21 @@ class TraxDatabase extends ChangeNotifier {
   }
 
   List<String> artists() {
-    final ResultSet resultSet =
-        _database!.select('SELECT DISTINCT artist FROM tracks ORDER BY artist');
-    return resultSet.rows.map((r) => r[0].toString()).toList();
+    final ResultSet resultSet = _database!.select(
+        'SELECT DISTINCT artist, compilation FROM tracks ORDER BY artist');
+    List<String> artists = [];
+    for (Row row in resultSet) {
+      if (row[1] == 1) {
+        if (artists.isNotEmpty && artists[0] != 'Compilations') {
+          artists.insert(0, 'Compilations');
+        }
+      } else if (row[0].length == 0) {
+        artists.add('Unknown artist');
+      } else {
+        artists.add(row[0]);
+      }
+    }
+    return artists;
   }
 
   LinkedHashMap<String, List<Track>> albums(String artist) {
@@ -61,13 +82,10 @@ class TraxDatabase extends ChangeNotifier {
     return _dehydrateTrack(resultSet.first);
   }
 
-  void insert(Track track) {
-    // first delete
-    delete(track.filename, notify: false);
-
+  void insert(Track track, {bool notify = true}) {
     // now insert
     _database!.execute('''
-    INSERT INTO tracks(filename, filesize, last_modification, format,
+    INSERT OR REPLACE INTO tracks(filename, filesize, last_modification, format,
       title, album, artist, performer, composer,
       genre, copyright, comment, year, compilation,
       volume_index, track_index, duration,
@@ -98,12 +116,18 @@ class TraxDatabase extends ChangeNotifier {
     ]);
 
     // update
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   void delete(String filename, {bool notify = true}) {
     _database!.execute('DELETE FROM tracks WHERE filename=(?)', [filename]);
     if (notify) notifyListeners();
+  }
+
+  void clear() {
+    _database!.execute('DELETE FROM tracks');
   }
 
   void notify() {
@@ -140,6 +164,14 @@ class TraxDatabase extends ChangeNotifier {
       volume_index INTEGER, track_index INTEGER, duration INTEGER,
       num_channels INTEGER, sample_rate INTEGER, bits_per_sample INTEGER, bitrate INTEGER
     );
+    ''');
+
+    // indexes
+    _database!.execute('''
+      CREATE UNIQUE INDEX tracks_idx1 ON tracks(filename);
+    ''');
+    _database!.execute('''
+      CREATE INDEX tracks_idx2 ON tracks(artist, compilation);
     ''');
 
     // tracks table

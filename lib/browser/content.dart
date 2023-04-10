@@ -13,16 +13,19 @@ import '../model/track.dart';
 class BrowserContent extends StatefulWidget {
   final String? artist;
   final MenuActionStream menuActionStream;
-  const BrowserContent(
-      {super.key, this.artist, required this.menuActionStream});
+  const BrowserContent({
+    super.key,
+    this.artist,
+    required this.menuActionStream,
+  });
 
   @override
   State<BrowserContent> createState() => _BrowserContentState();
 }
 
 class _BrowserContentState extends State<BrowserContent> with MenuHandler {
-  static const double _kVerticalPadding = 32.0;
-  static const double _kHorizontalPadding = 96.0;
+  static const double _kVerticalPadding = 16.0;
+  static const double _kHorizontalPadding = 64.0;
   final ScrollController _controller = ScrollController();
   LinkedHashMap<String, List<Track>> _albums = LinkedHashMap();
   @override
