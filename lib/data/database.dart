@@ -51,8 +51,6 @@ class TraxDatabase extends ChangeNotifier {
         if (artists.isNotEmpty && artists[0] != 'Compilations') {
           artists.insert(0, 'Compilations');
         }
-      } else if (row[0].length == 0) {
-        artists.add('Unknown artist');
       } else {
         artists.add(row[0]);
       }

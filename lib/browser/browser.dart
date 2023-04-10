@@ -5,6 +5,7 @@ import '../components/search_box.dart';
 import '../components/status_bar.dart';
 import '../model/menu_actions.dart';
 import '../model/selection.dart';
+import '../utils/consts.dart';
 import '../utils/events.dart';
 import 'content.dart';
 import 'sidebar.dart';
@@ -34,9 +35,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
       sidebar: Sidebar(
         minWidth: 250,
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Color.fromRGBO(237, 231, 230, 1.0),
-        ),
+        decoration: BoxDecoration(color: Consts.sideBarBgColor),
         top: const SearchBoxWidget(),
         builder: (context, controller) {
           return Column(
@@ -48,7 +47,8 @@ class BrowserWidgetState extends State<BrowserWidget> {
                   artist: _artist,
                 ),
               ),
-              if (_statusMessage != null) StatusBarWidget(message: _statusMessage!)
+              if (_statusMessage != null)
+                StatusBarWidget(message: _statusMessage!)
             ],
           );
         },

@@ -33,7 +33,7 @@ class TrackWidget extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  track.trackIndex.toString(),
+                  track.trackIndex == 0 ? '' : track.trackIndex.toString(),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: fgColor2,
@@ -43,7 +43,7 @@ class TrackWidget extends StatelessWidget {
                 const SizedBox(width: 32),
                 Expanded(
                   child: Text(
-                    track.title,
+                    track.displayTitle,
                     maxLines: 1,
                     style: TextStyle(
                       fontSize: 13,

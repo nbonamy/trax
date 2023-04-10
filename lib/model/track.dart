@@ -20,8 +20,20 @@ class Track {
     return tags ?? Tags();
   }
 
-  String get title {
-    return safeTags.title;
+  String get displayTitle {
+    return getDisplayTitle(safeTags.title);
+  }
+
+  String get displayAlbum {
+    return getDisplayAlbum(safeTags.title);
+  }
+
+  String get displayArtist {
+    return getDisplayArtist(safeTags.title);
+  }
+
+  String get displayGenre {
+    return getDisplayTitle(safeTags.title);
   }
 
   int get volumeIndex {
@@ -71,5 +83,27 @@ class Track {
       default:
         return Format.notAudio;
     }
+  }
+
+  static String getDisplayTitle(String title) {
+    return _defaultValue(title, 'Unknown title');
+  }
+
+  static String getDisplayAlbum(String album) {
+    return _defaultValue(album, 'Unknown album');
+  }
+
+  static String getDisplayArtist(String artist) {
+    return _defaultValue(artist, 'Unknown artist');
+  }
+
+  static String getDisplayGenre(String genre) {
+    return _defaultValue(genre, 'Unknown genre');
+  }
+
+  static String _defaultValue(dynamic value, String defaultValue) {
+    if (value == null) return defaultValue;
+    if (value is String && value.isEmpty) return defaultValue;
+    return value;
   }
 }

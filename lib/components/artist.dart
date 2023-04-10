@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import '../model/track.dart';
+import '../utils/consts.dart';
+
 class ArtistWidget extends StatelessWidget {
   final String name;
   final bool selected;
@@ -18,9 +21,7 @@ class ArtistWidget extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
       decoration: BoxDecoration(
-          color: selected
-              ? const Color.fromRGBO(213, 208, 206, 1.0)
-              : Colors.transparent,
+          color: selected ? Consts.sideBarSelectColor : Colors.transparent,
           borderRadius: BorderRadius.circular(6)),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -50,7 +51,7 @@ class ArtistWidget extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  name,
+                  Track.getDisplayArtist(name),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

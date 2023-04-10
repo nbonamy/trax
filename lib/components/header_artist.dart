@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../model/track.dart';
 import '../utils/consts.dart';
 
 class HeaderArtistWidget extends StatelessWidget {
@@ -22,7 +23,7 @@ class HeaderArtistWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            artist,
+            Track.getDisplayArtist(artist),
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 22,

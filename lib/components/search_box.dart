@@ -15,8 +15,8 @@ class SearchBoxWidget extends StatelessWidget {
       ),
       child: MacosSearchField(
         decoration: BoxDecoration(
-          color: const Color.fromRGBO(228, 222, 218, 1.0),
-          border: Border.all(color: const Color.fromRGBO(223, 217, 213, 1.0)),
+          color: const Color.fromRGBO(229, 222, 217, 1.0),
+          border: Border.all(color: const Color.fromRGBO(224, 217, 212, 1.0)),
           borderRadius: const BorderRadius.all(Radius.circular(7.0)),
         ),
         padding: const EdgeInsets.symmetric(

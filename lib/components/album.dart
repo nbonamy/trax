@@ -26,7 +26,7 @@ class AlbumWidget extends StatefulWidget {
 
 class _AlbumWidgetState extends State<AlbumWidget> {
   final TagLib _tagLib = TagLib();
-  late Uint8List _artworkBytes;
+  late Uint8List? _artworkBytes;
 
   @override
   void initState() {
@@ -56,12 +56,18 @@ class _AlbumWidgetState extends State<AlbumWidget> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ArtworkWidget(
-              size: _artworkSize(constraints),
-              bytes: _artworkBytes,
-              trackCount: trackCount,
-              playtime: playtimeMinutes,
-            ),
+            if (_artworkBytes != null)
+              ArtworkWidget(
+                size: _artworkSize(constraints),
+                bytes: _artworkBytes!,
+                trackCount: trackCount,
+                playtime: playtimeMinutes,
+              )
+            else
+              SizedBox(
+                width: _artworkSize(constraints),
+                height: _artworkSize(constraints),
+              ),
             SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
             Expanded(
               child: Column(
@@ -95,7 +101,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
 
   void _getArtwork() {
     setState(() {
-      _artworkBytes = _tagLib.getArtworkBytes(widget.tracks.first.filename)!;
+      _artworkBytes = _tagLib.getArtworkBytes(widget.tracks.first.filename);
     });
   }
 }
