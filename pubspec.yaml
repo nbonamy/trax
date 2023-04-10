@@ -26,6 +26,8 @@ dependencies:
   window_manager: ^0.3.2
   loading_animation_widget: ^1.2.0+4
   event_bus: ^2.0.0
+  cached_network_image: ^3.2.3
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:

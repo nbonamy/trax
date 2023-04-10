@@ -10,15 +10,20 @@ typedef MenuActionStream = Stream<MenuAction>;
 
 enum MenuAction {
   fileRefresh,
+  fileRebuild,
   editSelectAll,
 }
 
 class MenuUtils {
-  static SingleActivator cmdShortcut(LogicalKeyboardKey key) {
+  static SingleActivator cmdShortcut(
+    LogicalKeyboardKey key, {
+    bool shift = false,
+  }) {
     return SingleActivator(
       key,
       control: PlatformKeyboard.ctrlIsCommandModifier(),
       meta: PlatformKeyboard.metaIsCommandModifier(),
+      shift: shift,
     );
   }
 }

@@ -6,7 +6,8 @@
   
   "menuFile": "Fichier",
   "menuFileRefresh": "Rafraîchir",
-  
+  "menuFileRebuild": "Reconstruire",
+
   "menuEdit": "Edition",
   "menuEditSelectAll": "Tout sélectionner",
   "menuEditDelete": "Déplacer dans la Corbeille",

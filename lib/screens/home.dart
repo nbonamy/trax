@@ -60,6 +60,16 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
             shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR),
             onSelected: () => _onMenu(MenuAction.fileRefresh),
           ),
+          PlatformMenuItem(
+            label: t.menuFileRebuild,
+            shortcut: MenuUtils.cmdShortcut(
+              LogicalKeyboardKey.keyR,
+              shift: true,
+            ),
+            onSelected: () => _onMenu(
+              MenuAction.fileRebuild,
+            ),
+          ),
         ],
       ),
       PlatformMenu(
@@ -154,21 +164,29 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
 
   void _onMenu(MenuAction action) async {
     if (action == MenuAction.fileRefresh) {
-      eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));
-      runScan(
-        Preferences.of(context).musicFolder,
-        TraxDatabase.of(context),
-        () {
-          TraxDatabase.of(context).notify();
-        },
-        () {
-          TraxDatabase.of(context).notify();
-          eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
-        },
-      );
+      _runScan();
+    } else if (action == MenuAction.fileRebuild) {
+      TraxDatabase.of(context).clear();
+      TraxDatabase.of(context).notify();
+      _runScan();
     } else if (action == MenuAction.editSelectAll) {
       _menuActionStream.sink.add(action);
     }
+  }
+
+  void _runScan() {
+    eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));
+    runScan(
+      Preferences.of(context).musicFolder,
+      TraxDatabase.of(context),
+      () {
+        TraxDatabase.of(context).notify();
+      },
+      () {
+        TraxDatabase.of(context).notify();
+        eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
+      },
+    );
   }
 
   @override
