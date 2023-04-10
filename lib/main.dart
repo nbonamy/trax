@@ -5,6 +5,7 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:trax/data/database.dart';
 import 'package:trax/screens/home.dart';
+import 'package:trax/utils/track_utils.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'components/theme.dart';
@@ -74,7 +75,11 @@ class TraxApp extends StatelessWidget {
       builder: (context, _) {
         final appTheme = context.watch<AppTheme>();
         return MacosApp(
-          title: 'Trax',
+          onGenerateTitle: (context) {
+            AppLocalizations? t = AppLocalizations.of(context);
+            TrackUtils.initLocalization(t);
+            return t?.appName ?? 'Trax';
+          },
           theme: MacosThemeData.light(),
           darkTheme: MacosThemeData.dark(),
           themeMode: appTheme.mode,

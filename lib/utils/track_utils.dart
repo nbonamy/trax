@@ -1,7 +1,13 @@
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../model/track.dart';
 
 extension TrackUtils on Track {
   static final List<String> _prefixes = ['The', 'Le', 'La', 'Les'];
+
+  static AppLocalizations? _t;
+  static initLocalization(AppLocalizations? t) {
+    _t = t;
+  }
 
   String get displayTitle {
     return getDisplayTitle(safeTags.title);
@@ -16,7 +22,7 @@ extension TrackUtils on Track {
   }
 
   String get displayGenre {
-    return getDisplayTitle(safeTags.title);
+    return getDisplayGenre(safeTags.title);
   }
 
   String get displayTrackIndex {
@@ -28,19 +34,23 @@ extension TrackUtils on Track {
   }
 
   static String getDisplayTitle(String title) {
-    return _defaultValue(title, 'Unknown title');
+    return _defaultValue(title, _t?.unknownTitle);
   }
 
   static String getDisplayAlbum(String album) {
-    return _defaultValue(album, 'Unknown album');
+    return _defaultValue(album, _t?.unknownAlbum);
   }
 
   static String getDisplayArtist(String artist) {
     if (artist == Track.kArtistCompilations) {
-      return 'Compilations';
+      return _t?.compilations ?? artist;
     } else {
-      return _defaultValue(artist, 'Unknown artist');
+      return _defaultValue(artist, _t?.unknownArtist);
     }
+  }
+
+  static String getDisplayGenre(String genre) {
+    return _defaultValue(genre, _t?.unknownGenre);
   }
 
   static String getDisplayTrackIndex(int index) {
@@ -57,11 +67,8 @@ extension TrackUtils on Track {
     return artist;
   }
 
-  static String getDisplayGenre(String genre) {
-    return _defaultValue(genre, 'Unknown genre');
-  }
-
-  static String _defaultValue(dynamic value, String defaultValue) {
+  static String _defaultValue(dynamic value, String? defaultValue) {
+    if (defaultValue == null) return value;
     if (value == null) return defaultValue;
     if (value is String && value.isEmpty) return defaultValue;
     return value;
