@@ -5,6 +5,7 @@ import 'package:trax/utils/time_utils.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../utils/consts.dart';
+import '../utils/track_utils.dart';
 
 class TrackWidget extends StatelessWidget {
   final Track track;
@@ -33,7 +34,7 @@ class TrackWidget extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  track.trackIndex == 0 ? '' : track.trackIndex.toString(),
+                  track.displayTrackIndex,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: fgColor2,

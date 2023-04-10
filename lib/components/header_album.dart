@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../model/track.dart';
 import '../utils/consts.dart';
+import '../utils/track_utils.dart';
 
 class HeaderAlbumWidget extends StatelessWidget {
   final String title;
@@ -20,7 +20,7 @@ class HeaderAlbumWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          Track.getDisplayAlbum(title),
+          TrackUtils.getDisplayAlbum(title),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -28,7 +28,7 @@ class HeaderAlbumWidget extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          '${Track.getDisplayGenre(genre).toUpperCase()} ${year != 0 ? '· $year' : ''}',
+          '${TrackUtils.getDisplayGenre(genre).toUpperCase()} ${year != 0 ? '· $year' : ''}',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black.withOpacity(Consts.fadedOpacity),

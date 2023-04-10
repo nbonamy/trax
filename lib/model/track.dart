@@ -10,6 +10,8 @@ extension FormatEx on String {
 }
 
 class Track {
+  static const String kArtistCompilations = '_compilations_';
+
   final String filename;
   Format format = Format.notAudio;
   int lastModified = 0;
@@ -18,30 +20,6 @@ class Track {
 
   Tags get safeTags {
     return tags ?? Tags();
-  }
-
-  String get displayTitle {
-    return getDisplayTitle(safeTags.title);
-  }
-
-  String get displayAlbum {
-    return getDisplayAlbum(safeTags.title);
-  }
-
-  String get displayArtist {
-    return getDisplayArtist(safeTags.title);
-  }
-
-  String get displayGenre {
-    return getDisplayTitle(safeTags.title);
-  }
-
-  int get volumeIndex {
-    return safeTags.volumeIndex;
-  }
-
-  int get trackIndex {
-    return safeTags.trackIndex;
   }
 
   factory Track.parse(String filename, TagLib? tagLib) {
@@ -85,25 +63,5 @@ class Track {
     }
   }
 
-  static String getDisplayTitle(String title) {
-    return _defaultValue(title, 'Unknown title');
-  }
 
-  static String getDisplayAlbum(String album) {
-    return _defaultValue(album, 'Unknown album');
-  }
-
-  static String getDisplayArtist(String artist) {
-    return _defaultValue(artist, 'Unknown artist');
-  }
-
-  static String getDisplayGenre(String genre) {
-    return _defaultValue(genre, 'Unknown genre');
-  }
-
-  static String _defaultValue(dynamic value, String defaultValue) {
-    if (value == null) return defaultValue;
-    if (value is String && value.isEmpty) return defaultValue;
-    return value;
-  }
 }

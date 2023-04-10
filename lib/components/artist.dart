@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
-import '../model/track.dart';
+import '../utils/track_utils.dart';
 import '../utils/consts.dart';
 
 class ArtistWidget extends StatelessWidget {
@@ -51,7 +51,7 @@ class ArtistWidget extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  Track.getDisplayArtist(name),
+                  TrackUtils.getDisplayArtist(name),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

@@ -7,6 +7,7 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
 import '../utils/path_utils.dart';
+import '../utils/track_utils.dart';
 
 class TraxDatabase extends ChangeNotifier {
   static const int _latestSchemaVersion = 1;
@@ -48,29 +49,36 @@ class TraxDatabase extends ChangeNotifier {
     List<String> artists = [];
     for (Row row in resultSet) {
       if (row[1] == 1) {
-        if (artists.isNotEmpty && artists[0] != 'Compilations') {
-          artists.insert(0, 'Compilations');
+        if (artists.contains(Track.kArtistCompilations) == false) {
+          artists.add(Track.kArtistCompilations);
         }
       } else {
         artists.add(row[0]);
       }
     }
+    artists.sort((a, b) {
+      if (a == Track.kArtistCompilations) return -1;
+      if (b == Track.kArtistCompilations) return 1;
+      if (a.isEmpty) return -1;
+      if (b.isEmpty) return 1;
+      return TrackUtils.getSortableArtist(a)
+          .compareTo(TrackUtils.getSortableArtist(b));
+    });
     return artists;
   }
 
   LinkedHashMap<String, List<Track>> albums(String artist) {
-    LinkedHashMap<String, List<Track>> albums = LinkedHashMap();
+    if (artist == Track.kArtistCompilations) return compilations();
     final ResultSet resultSet = _database!.select(
-        'SELECT * FROM tracks WHERE artist=(?) ORDER BY year, volume_index, track_index',
+        'SELECT * FROM tracks WHERE artist=(?) ORDER BY album, volume_index, track_index, title',
         [artist]);
-    for (final Row row in resultSet) {
-      String album = row['album'].toString();
-      if (albums.containsKey(album) == false) {
-        albums[album] = [];
-      }
-      albums[album]!.add(_dehydrateTrack(row));
-    }
-    return albums;
+    return _dehydrateAlbums(resultSet);
+  }
+
+  LinkedHashMap<String, List<Track>> compilations() {
+    final ResultSet resultSet = _database!.select(
+        'SELECT * FROM tracks WHERE compilation=1 ORDER BY album, volume_index, track_index, title');
+    return _dehydrateAlbums(resultSet);
   }
 
   Track? getTrack(String filename) {
@@ -193,6 +201,32 @@ class TraxDatabase extends ChangeNotifier {
 
   void _updateVersion(int version) {
     _database!.execute('UPDATE info SET version=(?)', [version]);
+  }
+
+  LinkedHashMap<String, List<Track>> _dehydrateAlbums(ResultSet resultSet) {
+    LinkedHashMap<String, List<Track>> albums = LinkedHashMap();
+    for (final Row row in resultSet) {
+      String album = row['album'].toString();
+      if (albums.containsKey(album) == false) {
+        albums[album] = [];
+      }
+      albums[album]!.add(_dehydrateTrack(row));
+    }
+
+    // now sort by year of 1st track
+    List<String> titles = albums.keys.toList();
+    titles.sort((a, b) {
+      int y1 = albums[a]!.first.tags?.year ?? 0;
+      int y2 = albums[b]!.first.tags?.year ?? 0;
+      return (y1 != y2) ? y1.compareTo(y2) : a.compareTo(b);
+    });
+
+    // now rebuild the list
+    return LinkedHashMap.fromIterable(
+      titles,
+      key: (t) => t,
+      value: (t) => albums[t]!,
+    );
   }
 
   Track _dehydrateTrack(Row row) {
