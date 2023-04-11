@@ -520,7 +520,7 @@ packages:
       path: "../taglib_ffi"
       relative: true
     source: path
-    version: "0.0.4"
+    version: "0.0.5"
   term_glyph:
     dependency: transitive
     description:

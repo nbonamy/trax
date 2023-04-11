@@ -94,10 +94,10 @@ class TraxDatabase extends ChangeNotifier {
     INSERT OR REPLACE INTO tracks(filename, filesize, last_modification, format,
       title, album, artist, performer, composer,
       genre, copyright, comment, year, compilation,
-      volume_index, track_index, duration,
+      volume_index, volume_count, track_index, track_count, duration,
       num_channels, sample_rate, bits_per_sample, bitrate)
     VALUES((?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?),
-      (?), (?), (?), (?), (?), (?), (?), (?))''', [
+      (?), (?), (?), (?), (?), (?), (?), (?), (?), (?))''', [
       track.filename,
       track.filesize,
       track.lastModified,
@@ -113,7 +113,9 @@ class TraxDatabase extends ChangeNotifier {
       track.safeTags.year,
       track.safeTags.compilation,
       track.safeTags.volumeIndex,
+      track.safeTags.volumeCount,
       track.safeTags.trackIndex,
+      track.safeTags.trackCount,
       track.safeTags.duration,
       track.safeTags.numChannels,
       track.safeTags.sampleRate,
@@ -167,8 +169,9 @@ class TraxDatabase extends ChangeNotifier {
       filename TEXT, filesize INTEGER, last_modification INTEGER, format TEXT,
       title TEXT, album TEXT, artist TEXT, performer TEXT, composer TEXT,
       genre TEXT, copyright TEXT, comment TEXT, year TEXT, compilation INTEGER,
-      volume_index INTEGER, track_index INTEGER, duration INTEGER,
-      num_channels INTEGER, sample_rate INTEGER, bits_per_sample INTEGER, bitrate INTEGER
+      volume_index INTEGER, volume_count INTEGER, track_index INTEGER, track_count INTEGER,
+      duration INTEGER, num_channels INTEGER, sample_rate INTEGER,
+      bits_per_sample INTEGER, bitrate INTEGER
     );
     ''');
 
@@ -247,7 +250,9 @@ class TraxDatabase extends ChangeNotifier {
         year: int.parse(row['year']),
         compilation: row['compilation'] == 1,
         volumeIndex: row['volume_index'],
+        volumeCount: row['volume_count'],
         trackIndex: row['track_index'],
+        trackCount: row['track_count'],
         duration: row['duration'],
         numChannels: row['num_channels'],
         sampleRate: row['sample_rate'],

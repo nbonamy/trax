@@ -20,9 +20,6 @@ import 'file.dart';
 import 'lyrics.dart';
 
 class TagEditorWidget extends StatefulWidget {
-  static const String kMixedValueStr = '__mixed__';
-  static const int kMixedValueInt = -1;
-
   final MenuActionStream menuActionStream;
   final UnmodifiableListView<Track> selection;
   final List<Track> allTracks;
@@ -126,37 +123,43 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
       // now compare each field
       if (track.safeTags.title != tags.title) {
-        tags.title = TagEditorWidget.kMixedValueStr;
+        tags.title = TagSaver.kMixedValueStr;
       }
       if (track.safeTags.album != tags.album) {
-        tags.album = TagEditorWidget.kMixedValueStr;
+        tags.album = TagSaver.kMixedValueStr;
       }
       if (track.safeTags.artist != tags.artist) {
-        tags.artist = TagEditorWidget.kMixedValueStr;
+        tags.artist = TagSaver.kMixedValueStr;
       }
       if (track.safeTags.performer != tags.performer) {
-        tags.performer = TagEditorWidget.kMixedValueStr;
+        tags.performer = TagSaver.kMixedValueStr;
       }
       if (track.safeTags.composer != tags.composer) {
-        tags.composer = TagEditorWidget.kMixedValueStr;
+        tags.composer = TagSaver.kMixedValueStr;
       }
       if (track.safeTags.genre != tags.genre) {
-        tags.genre = TagEditorWidget.kMixedValueStr;
+        tags.genre = TagSaver.kMixedValueStr;
       }
       if (track.safeTags.year != tags.year) {
-        tags.year = TagEditorWidget.kMixedValueInt;
+        tags.year = TagSaver.kMixedValueInt;
       }
       if (track.safeTags.volumeIndex != tags.volumeIndex) {
-        tags.volumeIndex = TagEditorWidget.kMixedValueInt;
+        tags.volumeIndex = TagSaver.kMixedValueInt;
+      }
+      if (track.safeTags.volumeCount != tags.volumeCount) {
+        tags.volumeIndex = TagSaver.kMixedValueInt;
       }
       if (track.safeTags.trackIndex != tags.trackIndex) {
-        tags.trackIndex = TagEditorWidget.kMixedValueInt;
+        tags.trackIndex = TagSaver.kMixedValueInt;
+      }
+      if (track.safeTags.trackCount != tags.trackCount) {
+        tags.trackIndex = TagSaver.kMixedValueInt;
       }
       if (track.safeTags.copyright != tags.copyright) {
-        tags.copyright = TagEditorWidget.kMixedValueStr;
+        tags.copyright = TagSaver.kMixedValueStr;
       }
       if (track.safeTags.comment != tags.comment) {
-        tags.comment = TagEditorWidget.kMixedValueStr;
+        tags.comment = TagSaver.kMixedValueStr;
       }
     }
   }
@@ -317,6 +320,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   Future<bool> _saveSingle() async {
     if (currentTrack == null) return false;
     Tags? updatedTags = _detailsKey.currentState?.tags;
+    if (updatedTags == null) return false;
     TagSaver tagSaver = TagSaver(
       _tagLib,
       TraxDatabase.of(context),
@@ -326,7 +330,20 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   }
 
   Future<bool> _saveMultiple() async {
-    return false;
+    Tags? updatedTags = _detailsKey.currentState?.tags;
+    if (updatedTags == null) return false;
+    TagSaver tagSaver = TagSaver(
+      _tagLib,
+      TraxDatabase.of(context),
+      Preferences.of(context).musicFolder,
+    );
+    for (Track track in widget.selection) {
+      if (track.tags == null) continue;
+      Tags initialTags = Tags.copy(track.tags!);
+      tagSaver.mergeTags(initialTags, updatedTags);
+      await tagSaver.update(track, initialTags, null);
+    }
+    return true;
   }
 
   @override

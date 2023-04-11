@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../processors/saver.dart';
 import '../utils/consts.dart';
 import '../utils/track_utils.dart';
-import 'editor.dart';
 
 extension Int on TextEditingController {
   int get intValue => num.tryParse(text)?.toInt() ?? 0;
@@ -38,21 +39,67 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   late TextEditingController _commentController;
   late TextEditingController _yearController;
   late TextEditingController _volumeIndexController;
+  late TextEditingController _volumeCountController;
   late TextEditingController _trackIndexController;
+  late TextEditingController _trackCountController;
+
+  bool _genreInitialized = false;
+  late List<String> _genres;
   late String _genreValue;
 
+  final List<TextEditingController> _userCleared = [];
+  final List<TextEditingController> _mixedValue = [];
+
+  String get genreStr {
+    if (_genreValue == TagSaver.kMixedValueStr) {
+      return AppLocalizations.of(context)!.tagsMixed;
+    } else if (_genreValue == TagSaver.kClearedValueStr) {
+      return '';
+    } else {
+      return _genreValue;
+    }
+  }
+
   Tags get tags {
-    _tags.title = _titleController.text;
-    _tags.album = _albumController.text;
-    _tags.artist = _artistController.text;
-    _tags.performer = _performerController.text;
-    _tags.composer = _composerController.text;
+    String getText(TextEditingController controller) {
+      if (!widget.singleTrackMode) {
+        if (_userCleared.contains(controller)) {
+          return TagSaver.kClearedValueStr;
+        }
+        if (_mixedValue.contains(controller)) {
+          return TagSaver.kMixedValueStr;
+        }
+      }
+      // default
+      return controller.text;
+    }
+
+    int getInt(TextEditingController controller) {
+      if (!widget.singleTrackMode) {
+        if (_userCleared.contains(controller)) {
+          return TagSaver.kClearedValueInt;
+        }
+        if (_mixedValue.contains(controller)) {
+          return TagSaver.kMixedValueInt;
+        }
+      }
+      // default
+      return controller.intValue;
+    }
+
+    _tags.title = getText(_titleController);
+    _tags.album = getText(_albumController);
+    _tags.artist = getText(_artistController);
+    _tags.performer = getText(_performerController);
+    _tags.composer = getText(_composerController);
     _tags.genre = _genreValue;
-    _tags.copyright = _copyrightController.text;
-    _tags.comment = _commentController.text;
-    _tags.year = _yearController.intValue;
-    _tags.volumeIndex = _volumeIndexController.intValue;
-    _tags.trackIndex = _trackIndexController.intValue;
+    _tags.copyright = getText(_copyrightController);
+    _tags.comment = getText(_commentController);
+    _tags.year = getInt(_yearController);
+    _tags.volumeIndex = getInt(_volumeIndexController);
+    _tags.volumeCount = getInt(_volumeCountController);
+    _tags.trackIndex = getInt(_trackIndexController);
+    _tags.trackCount = getInt(_trackCountController);
     return _tags;
   }
 
@@ -69,6 +116,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   }
 
   void loadData() {
+    _userCleared.clear();
     _tags = Tags.copy(widget.tags);
     _titleController = TextEditingController(text: _tags.title);
     _albumController = TextEditingController(text: _tags.album);
@@ -79,17 +127,28 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _copyrightController = TextEditingController(text: _tags.copyright);
     _commentController = TextEditingController(text: _tags.comment);
     _yearController = TextEditingController(
-        text: _tags.year == TagEditorWidget.kMixedValueInt
-            ? TagEditorWidget.kMixedValueStr
+        text: _tags.year == TagSaver.kMixedValueInt
+            ? TagSaver.kMixedValueStr
             : TrackUtils.getDisplayInteger(_tags.year));
     _volumeIndexController = TextEditingController(
-        text: _tags.volumeIndex == TagEditorWidget.kMixedValueInt
-            ? TagEditorWidget.kMixedValueStr
+        text: _tags.volumeIndex == TagSaver.kMixedValueInt
+            ? TagSaver.kMixedValueStr
             : TrackUtils.getDisplayInteger(_tags.volumeIndex));
+    _volumeCountController = TextEditingController(
+        text: _tags.volumeCount == TagSaver.kMixedValueInt
+            ? TagSaver.kMixedValueStr
+            : TrackUtils.getDisplayInteger(_tags.volumeCount));
     _trackIndexController = TextEditingController(
-        text: _tags.trackIndex == TagEditorWidget.kMixedValueInt
-            ? TagEditorWidget.kMixedValueStr
+        text: _tags.trackIndex == TagSaver.kMixedValueInt
+            ? TagSaver.kMixedValueStr
             : TrackUtils.getDisplayInteger(_tags.trackIndex));
+    _trackCountController = TextEditingController(
+        text: _tags.trackCount == TagSaver.kMixedValueInt
+            ? TagSaver.kMixedValueStr
+            : TrackUtils.getDisplayInteger(_tags.trackCount));
+
+    // update genres
+    _genreInitialized = false;
   }
 
   @override
@@ -100,10 +159,13 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     String mixedNumPlaceholder = widget.singleTrackMode ? '' : '-';
     String indexSeparator = t.indexOfCount;
 
-    // genre
-    List<String> genres = List.from(Consts.genres);
-    if (genres.contains(_genreValue) == false) {
-      genres.add(_genreValue);
+    // update genres
+    if (!_genreInitialized) {
+      _genres = List.from(Consts.genres);
+      if (_genres.contains(genreStr) == false) {
+        _genres.add(genreStr);
+      }
+      _genreInitialized = true;
     }
 
     // return
@@ -136,9 +198,18 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
         ),
         _dropDowndRow(
           t.tagGenre,
-          value: _genreValue,
-          values: genres,
-          onChanged: (value) => setState(() => _genreValue = value),
+          value: genreStr,
+          values: _genres,
+          onChanged: (value) {
+            if (!widget.singleTrackMode) {
+              if (value.isEmpty) {
+                value = TagSaver.kClearedValueStr;
+              } else if (value == t.tagsMixed) {
+                value = TagSaver.kMixedValueStr;
+              }
+            }
+            setState(() => _genreValue = value);
+          },
         ),
         _textFieldRow(
           t.tagYear,
@@ -153,7 +224,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           indexSeparator,
           40,
           _volumeIndexController,
-          _volumeIndexController,
+          _volumeCountController,
           placeholder: mixedNumPlaceholder,
           keyboardType: TextInputType.number,
         ),
@@ -162,7 +233,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           indexSeparator,
           40,
           _trackIndexController,
-          _trackIndexController,
+          _trackCountController,
           placeholder: mixedNumPlaceholder,
           keyboardType: TextInputType.number,
         ),
@@ -289,7 +360,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     );
   }
 
-  MacosTextField _textField(
+  Widget _textField(
     TextInputType? keyboardType,
     int? maxLength,
     TextEditingController controller,
@@ -297,36 +368,51 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     int? minLines,
   ) {
     // check controller value
-    bool isMixed = false;
-    if (controller.text == TagEditorWidget.kMixedValueStr) {
-      isMixed = true;
+    bool isMixed = _mixedValue.contains(controller);
+    if (!isMixed && controller.text == TagSaver.kMixedValueStr) {
+      _mixedValue.add(controller);
       controller.text = '';
+      isMixed = true;
     }
-    return MacosTextField(
-      padding: const EdgeInsets.symmetric(
-        vertical: 2.0,
-        horizontal: 4.0,
-      ),
-      textAlignVertical: TextAlignVertical.center,
-      keyboardType: keyboardType,
-      maxLength: maxLength,
-      controller: controller,
-      placeholder: isMixed ? placeholder : null,
-      minLines: minLines ?? 1,
-      maxLines: minLines ?? 1,
-      onEditingComplete: () {
-        widget.onComplete();
+    FocusNode focusNode = FocusNode();
+    return KeyboardListener(
+      focusNode: focusNode,
+      onKeyEvent: (key) {
+        if (key.logicalKey == LogicalKeyboardKey.backspace &&
+            controller.text.isEmpty) {
+          _userCleared.add(controller);
+        }
       },
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color.fromRGBO(192, 192, 192, 1.0),
-          width: 0.8,
+      child: MacosTextField(
+        padding: const EdgeInsets.symmetric(
+          vertical: 2.0,
+          horizontal: 4.0,
         ),
-      ),
-      focusedDecoration: BoxDecoration(
-        border: Border.all(
-          color: const Color.fromRGBO(197, 216, 249, 1.0),
-          width: 0.8,
+        textAlignVertical: TextAlignVertical.center,
+        keyboardType: keyboardType,
+        maxLength: maxLength,
+        controller: controller,
+        placeholder: isMixed ? placeholder : null,
+        minLines: minLines ?? 1,
+        maxLines: minLines ?? 1,
+        inputFormatters: [
+          if (keyboardType == TextInputType.number)
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+        ],
+        onEditingComplete: () {
+          widget.onComplete();
+        },
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: const Color.fromRGBO(192, 192, 192, 1.0),
+            width: 0.8,
+          ),
+        ),
+        focusedDecoration: BoxDecoration(
+          border: Border.all(
+            color: const Color.fromRGBO(197, 216, 249, 1.0),
+            width: 0.8,
+          ),
         ),
       ),
     );

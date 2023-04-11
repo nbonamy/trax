@@ -8,16 +8,19 @@ import '../data/database.dart';
 import '../model/track.dart';
 
 class TagSaver {
+  static const String kMixedValueStr = '__mixed__';
+  static const String kClearedValueStr = '__cleared__';
+  static const int kMixedValueInt = -999;
+  static const int kClearedValueInt = -888;
+
   final TagLib tagLib;
   final TraxDatabase database;
   final String rootFolder;
 
   TagSaver(this.tagLib, this.database, this.rootFolder);
 
-  Future<bool> update(
-      Track track, Tags? updatedTags, Uint8List? artwork) async {
+  Future<bool> update(Track track, Tags updatedTags, Uint8List? artwork) async {
     // basic checks
-    if (updatedTags == null) return false;
     if (updatedTags.equals(track.tags)) return true;
 
     // now update
@@ -26,15 +29,52 @@ class TagSaver {
     database.insert(track, notify: false);
 
     // move?
-    String fullpath = filename(track);
-    await moveTrack(track, fullpath);
+    String fullpath = _filename(track);
+    await _moveTrack(track, fullpath);
 
     // done
     database.notify();
     return true;
   }
 
-  Future<void> moveTrack(Track track, String fullpath, {notify = false}) async {
+  void mergeTags(Tags initialTags, Tags updatedTags) {
+    initialTags.title = _mergeTagStr(initialTags.title, updatedTags.title);
+    initialTags.album = _mergeTagStr(initialTags.album, updatedTags.album);
+    initialTags.artist = _mergeTagStr(initialTags.artist, updatedTags.artist);
+    initialTags.performer =
+        _mergeTagStr(initialTags.performer, updatedTags.performer);
+    initialTags.composer =
+        _mergeTagStr(initialTags.composer, updatedTags.composer);
+    initialTags.genre = _mergeTagStr(initialTags.genre, updatedTags.genre);
+    initialTags.copyright =
+        _mergeTagStr(initialTags.copyright, updatedTags.copyright);
+    initialTags.comment =
+        _mergeTagStr(initialTags.comment, updatedTags.comment);
+    initialTags.year = _mergeTagInt(initialTags.year, updatedTags.year);
+    initialTags.volumeIndex =
+        _mergeTagInt(initialTags.volumeIndex, updatedTags.volumeIndex);
+    initialTags.volumeCount =
+        _mergeTagInt(initialTags.volumeCount, updatedTags.volumeCount);
+    initialTags.trackIndex =
+        _mergeTagInt(initialTags.trackIndex, updatedTags.trackIndex);
+    initialTags.trackCount =
+        _mergeTagInt(initialTags.trackCount, updatedTags.trackCount);
+  }
+
+  String _mergeTagStr(String initialValue, String updatedValue) {
+    if (updatedValue == TagSaver.kClearedValueStr) return '';
+    if (updatedValue == TagSaver.kMixedValueStr) return initialValue;
+    return updatedValue;
+  }
+
+  int _mergeTagInt(int initialValue, int updatedValue) {
+    if (updatedValue == TagSaver.kClearedValueInt) return 0;
+    if (updatedValue == TagSaver.kMixedValueInt) return initialValue;
+    return updatedValue;
+  }
+
+  Future<void> _moveTrack(Track track, String fullpath,
+      {notify = false}) async {
     if (fullpath != track.filename) {
       String currpath = track.filename;
       database.delete(currpath, notify: false);
@@ -45,7 +85,7 @@ class TagSaver {
     }
   }
 
-  String filename(Track track) {
+  String _filename(Track track) {
     String filepath = rootFolder;
     filepath = p.join(filepath, track.displayArtist);
     filepath = p.join(filepath, track.displayAlbum);
