@@ -1,5 +1,5 @@
-
 import 'dart:io';
+import 'dart:math';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -40,26 +40,9 @@ class SystemPath {
     return p.join(appDataDir.path, 'trax.db');
   }
 
-  static String getFolderNamedAsset(String? dirpath, {bool isDrive = false}) {
-    if (isDrive) {
-      return 'assets/img/folders/drive.png';
-    } else if (dirpath != null) {
-      var basename = p.basename(dirpath).toLowerCase();
-      if ([
-        'applications',
-        'desktop',
-        'documents',
-        'downloads',
-        'dropbox',
-        'movies',
-        'music',
-        'pictures',
-      ].contains(basename)) {
-        return 'assets/img/folders/$basename.png';
-      }
-    }
-
-    // default
-    return 'assets/img/folders/default.png';
+  static String temporaryFile({String extension = '.tmp'}) {
+    Directory tempPath = Directory.systemTemp;
+    int randomId = 100000000 + Random().nextInt(9999999);
+    return p.join(tempPath.path, '$randomId$extension');
   }
 }

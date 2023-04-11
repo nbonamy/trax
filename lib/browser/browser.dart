@@ -74,12 +74,15 @@ class BrowserWidgetState extends State<BrowserWidget> {
   }
 
   void onEvent(event) {
-    if (event is BackgroundActionStartEvent &&
-        event.action == BackgroundAction.scan) {
-      setState(() => _statusMessage = 'Scanning audio files');
+    if (event is BackgroundActionStartEvent) {
+      if (event.action == BackgroundAction.scan) {
+        setState(() => _statusMessage = 'Scanning audio files');
+      }
+      if (event.action == BackgroundAction.import) {
+        setState(() => _statusMessage = 'Parsing imported files');
+      }
     }
-    if (event is BackgroundActionEndEvent &&
-        event.action == BackgroundAction.scan) {
+    if (event is BackgroundActionEndEvent) {
       setState(() => _statusMessage = null);
     }
   }

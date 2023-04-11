@@ -177,11 +177,6 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           placeholder: mixedTextPlaceholder,
         ),
         _textFieldRow(
-          t.tagPerformer,
-          _performerController,
-          placeholder: mixedTextPlaceholder,
-        ),
-        _textFieldRow(
           t.tagAlbum,
           _albumController,
           placeholder: mixedTextPlaceholder,
@@ -189,6 +184,11 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
         _textFieldRow(
           t.tagArtist,
           _artistController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagPerformer,
+          _performerController,
           placeholder: mixedTextPlaceholder,
         ),
         _textFieldRow(

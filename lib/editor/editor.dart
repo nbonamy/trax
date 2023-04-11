@@ -25,12 +25,14 @@ import 'lyrics.dart';
 class TagEditorWidget extends StatefulWidget {
   final MenuActionStream menuActionStream;
   final UnmodifiableListView<Track> selection;
+  final EditorMode editorMode;
   final List<Track> allTracks;
   const TagEditorWidget({
     super.key,
     required this.menuActionStream,
     required this.selection,
     required this.allTracks,
+    required this.editorMode,
   });
 
   @override
@@ -54,7 +56,8 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   int _activeIndex = -1;
   late Tags tags;
 
-  bool get singleTrackMode => widget.selection.length == 1;
+  bool get singleTrackMode =>
+      widget.editorMode == EditorMode.edit && widget.selection.length == 1;
 
   Track? get currentTrack =>
       singleTrackMode ? widget.allTracks.elementAt(_activeIndex) : null;
@@ -332,10 +335,12 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       Preferences.of(context).musicFolder,
     );
     return await tagSaver.update(
+      widget.editorMode,
       currentTrack!,
       updatedTags,
       artworkAction,
       _artworkKey.currentState?.bytes,
+      moveOnImport: Preferences.of(context).moveOnImport,
     );
   }
 
@@ -358,12 +363,17 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       Tags initialTags = Tags.copy(track.tags!);
       tagSaver.mergeTags(initialTags, updatedTags);
       await tagSaver.update(
+        widget.editorMode,
         track,
         initialTags,
         artworkAction,
         _artworkKey.currentState?.bytes,
+        moveOnImport: Preferences.of(context).moveOnImport,
+        notify: widget.selection.last == track,
       );
     }
+
+    // done
     return true;
   }
 

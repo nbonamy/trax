@@ -2,16 +2,15 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:taglib_ffi/taglib_ffi.dart';
+import 'package:trax/utils/path_utils.dart';
 
 import '../data/database.dart';
 import '../model/track.dart';
 import '../utils/track_utils.dart';
 
-enum ArtworkAction {
-  untouched,
-  updated,
-  deleted,
-}
+enum EditorMode { edit, import }
+
+enum ArtworkAction { untouched, updated, deleted }
 
 class TagSaver {
   static const String kMixedValueStr = '__mixed__';
@@ -26,24 +25,41 @@ class TagSaver {
   TagSaver(this.tagLib, this.database, this.rootFolder);
 
   Future<bool> update(
+    EditorMode editorMode,
     Track track,
     Tags updatedTags,
     ArtworkAction artworkAction,
-    Uint8List? artworkBytes,
-  ) async {
+    Uint8List? artworkBytes, {
+    bool moveOnImport = true,
+    bool notify = true,
+  }) async {
     // track
     bool updated = false;
 
+    // copy before?
+    if (editorMode == EditorMode.import && moveOnImport == false) {
+      String tempFilePath =
+          SystemPath.temporaryFile(extension: p.extension(track.filename));
+      await File(track.filename).copy(tempFilePath);
+      track.filename = tempFilePath;
+    }
+
     // tag update?
-    if (updatedTags.equals(track.tags) == false) {
+    bool tagsUpdated = updatedTags.equals(track.tags) == false;
+    if (editorMode == EditorMode.import || tagsUpdated) {
       // now update
-      tagLib.setAudioTags(track.filename, updatedTags);
-      track.tags = updatedTags;
-      database.insert(track, notify: false);
+      if (tagsUpdated) {
+        tagLib.setAudioTags(track.filename, updatedTags);
+        track.tags = updatedTags;
+      }
 
       // move?
       String fullpath = _filename(track);
-      await _moveTrack(track, fullpath);
+      bool moved = await _moveTrack(track, fullpath);
+      if (moved == false) {
+        // save because move has not
+        database.insert(track, notify: false);
+      }
 
       // track
       updated = true;
@@ -59,7 +75,7 @@ class TagSaver {
     }
 
     // done
-    if (updated) {
+    if (notify && updated) {
       database.notify();
     }
     return true;
@@ -101,16 +117,19 @@ class TagSaver {
     return updatedValue;
   }
 
-  Future<void> _moveTrack(Track track, String fullpath,
-      {notify = false}) async {
-    if (fullpath != track.filename) {
-      String currpath = track.filename;
-      database.delete(currpath, notify: false);
-      await Directory(p.dirname(fullpath)).create(recursive: true);
-      await File(currpath).rename(fullpath);
-      track.filename = fullpath;
-      database.insert(track, notify: notify);
-    }
+  Future<bool> _moveTrack(
+    Track track,
+    String fullpath, {
+    notify = false,
+  }) async {
+    if (fullpath == track.filename) return false;
+    String currpath = track.filename;
+    database.delete(currpath, notify: false);
+    await Directory(p.dirname(fullpath)).create(recursive: true);
+    await File(currpath).rename(fullpath);
+    track.filename = fullpath;
+    database.insert(track, notify: notify);
+    return true;
   }
 
   String _filename(Track track) {

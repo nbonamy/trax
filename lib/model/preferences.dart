@@ -27,6 +27,14 @@ class Preferences extends ChangeNotifier {
 
   set musicFolder(String folder) {}
 
+  bool get moveOnImport {
+    return _prefs.getBool('import.move') ?? false;
+  }
+
+  set moveOnImport(bool moveOnImport) {
+    _prefs.setBool('import.move', moveOnImport);
+  }
+
   Rect get windowBounds {
     try {
       var bounds = _prefs.getString('bounds');

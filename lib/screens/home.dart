@@ -147,10 +147,6 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
 
   void _onMenu(MenuAction action) async {
     switch (action) {
-      case MenuAction.fileImport:
-        _runImport();
-        break;
-
       case MenuAction.fileRefresh:
         _runScan();
         break;
@@ -166,8 +162,6 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         break;
     }
   }
-
-  void _runImport() {}
 
   void _runScan() {
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));
