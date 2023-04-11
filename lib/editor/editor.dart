@@ -156,7 +156,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         tags.trackIndex = TagSaver.kMixedValueInt;
       }
       if (track.safeTags.trackCount != tags.trackCount) {
-        tags.trackIndex = TagSaver.kMixedValueInt;
+        tags.trackCount = TagSaver.kMixedValueInt;
       }
       if (track.safeTags.copyright != tags.copyright) {
         tags.copyright = TagSaver.kMixedValueStr;
@@ -182,6 +182,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     return DialogWidget(
       width: 500,
       height: 565,
+      preferenceKey: 'editor.alignment',
       header: Row(
         children: [
           ArtworkWidget(

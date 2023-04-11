@@ -45,4 +45,21 @@ class Preferences extends ChangeNotifier {
     _prefs.setString('bounds',
         '${rc.left.toStringAsFixed(1)},${rc.top.toStringAsFixed(1)},${rc.right.toStringAsFixed(1)},${rc.bottom.toStringAsFixed(1)}');
   }
+
+  Alignment getDialogAlignment(String preferenceKey) {
+    try {
+      var alignment = _prefs.getString(preferenceKey);
+      var parts = alignment?.split(',');
+      var x = double.parse(parts![0]);
+      var y = double.parse(parts[1]);
+      return Alignment(x, y);
+    } catch (_) {
+      return Alignment.center;
+    }
+  }
+
+  void saveEditorAlignment(String preferenceKey, Alignment alignment) {
+    _prefs.setString(preferenceKey,
+        '${alignment.x.toStringAsFixed(1)},${alignment.y.toStringAsFixed(1)}');
+  }
 }

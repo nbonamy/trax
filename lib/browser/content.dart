@@ -165,23 +165,30 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
         selectionModel.set(allTracks);
         break;
       case MenuAction.trackInfo:
-        showDialog(
-            context: context,
-            barrierColor: Colors.transparent,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                content: TagEditorWidget(
-                  menuActionStream: widget.menuActionStream,
-                  selection: selectionModel.get,
-                  allTracks: allTracks,
-                ),
-              );
-            });
+        _showEditor(selectionModel.get, allTracks);
         break;
       default:
         break;
     }
+  }
+
+  void _showEditor(
+    UnmodifiableListView<Track> selection,
+    List<Track> allTracks,
+  ) {
+    showDialog(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            child: TagEditorWidget(
+              menuActionStream: widget.menuActionStream,
+              selection: selection,
+              allTracks: allTracks,
+            ),
+          );
+        });
   }
 }

@@ -62,7 +62,7 @@ class TagSaver {
     if (updated) {
       database.notify();
     }
-    return updated;
+    return true;
   }
 
   void mergeTags(Tags initialTags, Tags updatedTags) {
