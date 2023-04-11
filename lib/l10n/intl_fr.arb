@@ -12,6 +12,9 @@
   "menuEditSelectAll": "Tout sélectionner",
   "menuEditDelete": "Déplacer dans la Corbeille",
 
+  "menuTrack": "Piste",
+  "menuTrackInfo": "Info...",
+
   "menuView": "Affichage",
 
   "menuWindow": "Fenêtres",

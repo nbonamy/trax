@@ -115,40 +115,20 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
           //     ),
         ],
       ),
-      // PlatformMenu(
-      //   label: t.menuImage,
-      //   menus: [
-      //     const PlatformMenuItemGroup(
-      //       members: [
-      //         // PlatformMenuItem(
-      //         //   label: t.menuImageView,
-      //         //   shortcut: const SingleActivator(LogicalKeyboardKey.enter),
-      //         //   onSelected: () => _onMenu(MenuAction.imageView),
-      //         // ),
-      //       ],
-      //     ),
-      //     PlatformMenu(
-      //       label: t.menuImageTransform,
-      //       menus: [
-      //         // PlatformMenuItem(
-      //         //   label: t.menuImageRotate90CW,
-      //         //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.arrowRight),
-      //         //   onSelected: () => _onMenu(MenuAction.imageRotate90cw),
-      //         // ),
-      //         // PlatformMenuItem(
-      //         //   label: t.menuImageRotate90CCW,
-      //         //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.arrowLeft),
-      //         //   onSelected: () => _onMenu(MenuAction.imageRotate90ccw),
-      //         // ),
-      //         // PlatformMenuItem(
-      //         //   label: t.menuImageRotate180,
-      //         //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.arrowDown),
-      //         //   onSelected: () => _onMenu(MenuAction.imageRotate180),
-      //         // ),
-      //       ],
-      //     ),
-      //   ],
-      // ),
+      PlatformMenu(
+        label: t.menuTrack,
+        menus: [
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuTrackInfo,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyI),
+                onSelected: () => _onMenu(MenuAction.trackInfo),
+              ),
+            ],
+          ),
+        ],
+      ),
       // PlatformMenu(
       //   label: t.menuView,
       //   menus: [
@@ -163,14 +143,20 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
   }
 
   void _onMenu(MenuAction action) async {
-    if (action == MenuAction.fileRefresh) {
-      _runScan();
-    } else if (action == MenuAction.fileRebuild) {
-      TraxDatabase.of(context).clear();
-      TraxDatabase.of(context).notify();
-      _runScan();
-    } else if (action == MenuAction.editSelectAll) {
-      _menuActionStream.sink.add(action);
+    switch (action) {
+      case MenuAction.fileRefresh:
+        _runScan();
+        break;
+
+      case MenuAction.fileRebuild:
+        TraxDatabase.of(context).clear();
+        TraxDatabase.of(context).notify();
+        _runScan();
+        break;
+
+      default:
+        _menuActionStream.sink.add(action);
+        break;
     }
   }
 

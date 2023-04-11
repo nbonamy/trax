@@ -14,19 +14,27 @@ extension TrackUtils on Track {
   }
 
   String get displayAlbum {
-    return getDisplayAlbum(safeTags.title);
+    return getDisplayAlbum(safeTags.album);
   }
 
   String get displayArtist {
-    return getDisplayArtist(safeTags.title);
+    return getDisplayArtist(safeTags.artist);
   }
 
   String get displayGenre {
-    return getDisplayGenre(safeTags.title);
+    return getDisplayGenre(safeTags.genre);
+  }
+
+  String get displayYear {
+    return getDisplayInteger(safeTags.year);
+  }
+
+  String get displayVolumeIndex {
+    return getDisplayInteger(safeTags.volumeIndex);
   }
 
   String get displayTrackIndex {
-    return getDisplayTrackIndex(safeTags.trackIndex);
+    return getDisplayInteger(safeTags.trackIndex);
   }
 
   int get volumeIndex {
@@ -53,8 +61,8 @@ extension TrackUtils on Track {
     return _defaultValue(genre, _t?.unknownGenre);
   }
 
-  static String getDisplayTrackIndex(int index) {
-    return index == 0 ? '' : index.toString();
+  static String getDisplayInteger(int value) {
+    return value == 0 ? '' : value.toString();
   }
 
   static String getSortableArtist(String artist) {

@@ -12,6 +12,7 @@ enum MenuAction {
   fileRefresh,
   fileRebuild,
   editSelectAll,
+  trackInfo,
 }
 
 class MenuUtils {

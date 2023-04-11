@@ -12,6 +12,9 @@
   "menuEditSelectAll": "Select All",
   "menuEditDelete": "Move to Trash",
 
+  "menuTrack": "Track",
+  "menuTrackInfo": "Info...",
+
   "menuView": "View",
   
   "menuWindow": "Window",

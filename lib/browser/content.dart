@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:trax/components/header_artist.dart';
 import 'package:trax/data/database.dart';
 import 'package:trax/model/selection.dart';
+import 'package:trax/screens/editor.dart';
 import 'package:trax/utils/platform_keyboard.dart';
 
 import '../components/album.dart';
@@ -28,6 +29,10 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   static const double _kHorizontalPadding = 64.0;
   final ScrollController _controller = ScrollController();
   LinkedHashMap<String, List<Track>> _albums = LinkedHashMap();
+
+  List<Track> get allTracks =>
+      _albums.values.fold([], (all, tracks) => [...all, ...tracks]);
+
   @override
   void initState() {
     super.initState();
@@ -154,11 +159,25 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
 
   @override
   void onMenuAction(MenuAction action) {
+    SelectionModel selectionModel = SelectionModel.of(context);
     switch (action) {
       case MenuAction.editSelectAll:
-        SelectionModel.of(context).set(
-          _albums.values.fold([], (all, tracks) => [...all, ...tracks]),
-        );
+        selectionModel.set(allTracks);
+        break;
+      case MenuAction.trackInfo:
+        showDialog(
+            context: context,
+            barrierColor: Colors.transparent,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                content: TagEditorWidget(
+                  selection: selectionModel.get,
+                  allTracks: allTracks,
+                ),
+              );
+            });
         break;
       default:
         break;

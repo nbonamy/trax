@@ -10,6 +10,10 @@ typedef Selection = UnmodifiableListView<String>;
 class SelectionModel extends ChangeNotifier {
   final List<Track> _selection = [];
 
+  bool get isEmpty {
+    return _selection.isEmpty;
+  }
+
   UnmodifiableListView<Track> get get => UnmodifiableListView(_selection);
 
   static SelectionModel of(BuildContext context) {

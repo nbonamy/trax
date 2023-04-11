@@ -35,7 +35,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
       sidebar: Sidebar(
         minWidth: 250,
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Consts.sideBarBgColor),
+        decoration: const BoxDecoration(color: Consts.sideBarBgColor),
         top: const SearchBoxWidget(),
         builder: (context, controller) {
           return Column(
