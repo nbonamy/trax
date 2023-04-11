@@ -6,11 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
+import 'package:trax/data/database.dart';
 
 import '../model/menu_actions.dart';
 import '../model/track.dart';
 import '../utils/track_utils.dart';
+import 'artwork.dart';
 import 'details.dart';
+import 'file.dart';
+import 'lyrics.dart';
 
 class TagEditorWidget extends StatefulWidget {
   static const String kMixedValueStr = '__mixed__';
@@ -36,6 +40,10 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
   final TagLib _tagLib = TagLib();
 
+  final GlobalKey<EditorDetailsWidgetState> _detailsKey = GlobalKey();
+  final GlobalKey<EditorArtworkWidgetState> _artworkKey = GlobalKey();
+  final GlobalKey<EditorLyricsWidgetState> _lyricsKey = GlobalKey();
+
   late String _activeTitle;
   late String _activeAlbum;
   late String _activeArtist;
@@ -45,6 +53,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   late Tags tags;
 
   bool get singleTrackMode => widget.selection.length == 1;
+
+  Track? get currentTrack =>
+      singleTrackMode ? widget.allTracks.elementAt(_activeIndex) : null;
 
   final _tabsController = MacosTabController(
     initialIndex: 0,
@@ -73,7 +84,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
   void loadData() {
     if (singleTrackMode) {
-      loadTrackData(widget.allTracks.elementAt(_activeIndex));
+      loadTrackData(currentTrack!);
     } else {
       loadTracksData(widget.selection);
     }
@@ -241,12 +252,22 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                     ],
                     children: [
                       EditorDetailsWidget(
+                        key: _detailsKey,
                         tags: tags,
                         singleTrackMode: singleTrackMode,
                       ),
-                      const Center(child: Text('Tab 2')),
-                      const Center(child: Text('Tab 3')),
-                      const Center(child: Text('Tab 4')),
+                      EditorArtworkWidget(
+                        key: _artworkKey,
+                        bytes: null,
+                        singleTrackMode: singleTrackMode,
+                      ),
+                      EditorLyricsWidget(
+                        key: _lyricsKey,
+                        singleTrackMode: singleTrackMode,
+                      ),
+                      EditorFileWidget(
+                        singleTrackMode: singleTrackMode,
+                      ),
                     ]
                         .map(
                           (w) => Expanded(
@@ -278,7 +299,11 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                     const SizedBox(width: 8),
                     _actionButton(
                       t.ok,
-                      () => Navigator.of(context).pop(),
+                      () {
+                        if (_save()) {
+                          Navigator.of(context).pop();
+                        }
+                      },
                       defaultButton: true,
                     ),
                   ]),
@@ -301,6 +326,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
   void _prevTrack() {
     if (_canPrev()) {
+      _save();
       _activeIndex--;
       loadData();
     }
@@ -308,9 +334,32 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
   void _nextTrack() {
     if (_canNext()) {
+      _save();
       _activeIndex++;
       loadData();
     }
+  }
+
+  bool _save() {
+    if (singleTrackMode) {
+      return _saveSingle();
+    } else {
+      return _saveMultiple();
+    }
+  }
+
+  bool _saveSingle() {
+    Tags? updatedTags = _detailsKey.currentState?.tags;
+    if (updatedTags == null) return false;
+    if (updatedTags.equals(currentTrack!.tags)) return true;
+    _tagLib.setAudioTags(currentTrack!.filename, updatedTags);
+    currentTrack!.tags = updatedTags;
+    TraxDatabase.of(context).insert(currentTrack!);
+    return true;
+  }
+
+  bool _saveMultiple() {
+    return false;
   }
 
   @override

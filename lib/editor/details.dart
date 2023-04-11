@@ -8,6 +8,10 @@ import '../utils/consts.dart';
 import '../utils/track_utils.dart';
 import 'editor.dart';
 
+extension Int on TextEditingController {
+  int get intValue => num.tryParse(text)?.toInt() ?? 0;
+}
+
 class EditorDetailsWidget extends StatefulWidget {
   final Tags tags;
   final bool singleTrackMode;
@@ -18,20 +22,37 @@ class EditorDetailsWidget extends StatefulWidget {
   });
 
   @override
-  State<EditorDetailsWidget> createState() => _EditorDetailsWidgetState();
+  State<EditorDetailsWidget> createState() => EditorDetailsWidgetState();
 }
 
-class _EditorDetailsWidgetState extends State<EditorDetailsWidget> {
+class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
+  late Tags _tags;
   late TextEditingController _titleController;
   late TextEditingController _albumController;
   late TextEditingController _artistController;
   late TextEditingController _performerController;
   late TextEditingController _composerController;
+  late TextEditingController _copyrightController;
+  late TextEditingController _commentController;
   late TextEditingController _yearController;
   late TextEditingController _volumeIndexController;
   late TextEditingController _trackIndexController;
-  late TextEditingController _copyrightController;
-  late TextEditingController _commentController;
+  late String _genreValue;
+
+  Tags get tags {
+    _tags.title = _titleController.text;
+    _tags.album = _albumController.text;
+    _tags.artist = _artistController.text;
+    _tags.performer = _performerController.text;
+    _tags.composer = _composerController.text;
+    _tags.genre = _genreValue;
+    _tags.copyright = _copyrightController.text;
+    _tags.comment = _commentController.text;
+    _tags.year = _yearController.intValue;
+    _tags.volumeIndex = _volumeIndexController.intValue;
+    _tags.trackIndex = _trackIndexController.intValue;
+    return _tags;
+  }
 
   @override
   void initState() {
@@ -46,25 +67,27 @@ class _EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   }
 
   void loadData() {
-    _titleController = TextEditingController(text: widget.tags.title);
-    _albumController = TextEditingController(text: widget.tags.album);
-    _artistController = TextEditingController(text: widget.tags.artist);
-    _performerController = TextEditingController(text: widget.tags.performer);
-    _composerController = TextEditingController(text: widget.tags.composer);
+    _tags = Tags.copy(widget.tags);
+    _titleController = TextEditingController(text: _tags.title);
+    _albumController = TextEditingController(text: _tags.album);
+    _artistController = TextEditingController(text: _tags.artist);
+    _performerController = TextEditingController(text: _tags.performer);
+    _composerController = TextEditingController(text: _tags.composer);
+    _genreValue = _tags.genre;
+    _copyrightController = TextEditingController(text: _tags.copyright);
+    _commentController = TextEditingController(text: _tags.comment);
     _yearController = TextEditingController(
-        text: widget.tags.year == TagEditorWidget.kMixedValueInt
+        text: _tags.year == TagEditorWidget.kMixedValueInt
             ? TagEditorWidget.kMixedValueStr
-            : TrackUtils.getDisplayInteger(widget.tags.year));
+            : TrackUtils.getDisplayInteger(_tags.year));
     _volumeIndexController = TextEditingController(
-        text: widget.tags.volumeIndex == TagEditorWidget.kMixedValueInt
+        text: _tags.volumeIndex == TagEditorWidget.kMixedValueInt
             ? TagEditorWidget.kMixedValueStr
-            : TrackUtils.getDisplayInteger(widget.tags.volumeIndex));
+            : TrackUtils.getDisplayInteger(_tags.volumeIndex));
     _trackIndexController = TextEditingController(
-        text: widget.tags.trackIndex == TagEditorWidget.kMixedValueInt
+        text: _tags.trackIndex == TagEditorWidget.kMixedValueInt
             ? TagEditorWidget.kMixedValueStr
-            : TrackUtils.getDisplayInteger(widget.tags.trackIndex));
-    _copyrightController = TextEditingController(text: widget.tags.copyright);
-    _commentController = TextEditingController(text: widget.tags.comment);
+            : TrackUtils.getDisplayInteger(_tags.trackIndex));
   }
 
   @override
@@ -76,8 +99,8 @@ class _EditorDetailsWidgetState extends State<EditorDetailsWidget> {
 
     // genre
     List<String> genres = List.from(Consts.genres);
-    if (genres.contains(widget.tags.genre) == false) {
-      genres.add(widget.tags.genre);
+    if (genres.contains(_genreValue) == false) {
+      genres.add(_genreValue);
     }
 
     // return
@@ -115,9 +138,9 @@ class _EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           ),
           _dropDowndRow(
             t.tagGenre,
-            value: widget.tags.genre,
+            value: _genreValue,
             values: genres,
-            onChanged: (_) {},
+            onChanged: (value) => setState(() => _genreValue = value),
           ),
           _textFieldRow(
             t.tagYear,
