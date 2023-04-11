@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:trax/components/artist.dart';
-import 'package:trax/data/database.dart';
+
+import '../components/artist.dart';
+import '../data/database.dart';
 
 class BrowserSidebar extends StatefulWidget {
   final ScrollController scrollController;

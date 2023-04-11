@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trax/utils/time_utils.dart';
 
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../utils/consts.dart';
+import '../utils/time_utils.dart';
 import '../utils/track_utils.dart';
 
 class TrackWidget extends StatelessWidget {

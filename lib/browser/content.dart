@@ -1,15 +1,15 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:trax/components/header_artist.dart';
-import 'package:trax/data/database.dart';
-import 'package:trax/model/selection.dart';
-import 'package:trax/screens/editor.dart';
-import 'package:trax/utils/platform_keyboard.dart';
 
 import '../components/album.dart';
+import '../components/header_artist.dart';
+import '../data/database.dart';
+import '../editor/editor.dart';
 import '../model/menu_actions.dart';
+import '../model/selection.dart';
 import '../model/track.dart';
+import '../utils/platform_keyboard.dart';
 
 class BrowserContent extends StatefulWidget {
   final String? artist;

@@ -2,8 +2,8 @@ import 'dart:io';
 import 'dart:isolate';
 import 'package:easy_isolate/easy_isolate.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
-import 'package:trax/data/database.dart';
 
+import '../data/database.dart';
 import '../model/track.dart';
 
 const String kBootStrapMessage = 'bootstrap';
@@ -176,7 +176,7 @@ void mediaParser(
 
   // message is a queue
   String filename = message;
-  print('start parsing $filename');
+  //print('start parsing $filename');
   TagLib tagLib = TagLib();
   Track track = Track.parse(filename, tagLib);
   mainSendPort.send({'command': 'insert', 'track': track});

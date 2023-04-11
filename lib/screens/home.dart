@@ -1,13 +1,13 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:trax/data/database.dart';
-import 'package:trax/scanner/scanner.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../browser/browser.dart';
+import '../data/database.dart';
 import '../model/menu_actions.dart';
 import '../model/preferences.dart';
+import '../scanner/scanner.dart';
 import '../utils/events.dart';
 
 class TraxHomePage extends StatefulWidget {

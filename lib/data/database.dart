@@ -24,7 +24,7 @@ class TraxDatabase extends ChangeNotifier {
 
   Future<void> init() async {
     String dbFile = databaseFile ?? await SystemPath.dbFile();
-    print('Database file: $dbFile');
+    //print('Database file: $dbFile');
     _database = sqlite3.open(dbFile);
     _checkSchemaVersion();
     //clear();

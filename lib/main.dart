@@ -3,14 +3,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:trax/data/database.dart';
-import 'package:trax/screens/home.dart';
-import 'package:trax/utils/track_utils.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'components/theme.dart';
+import 'data/database.dart';
 import 'model/preferences.dart';
 import 'model/selection.dart';
+import 'screens/home.dart';
+import 'utils/track_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

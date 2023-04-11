@@ -3,11 +3,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
-import 'package:trax/components/artwork.dart';
-import 'package:trax/components/header_album.dart';
-import 'package:trax/components/track_list.dart';
 
 import '../model/track.dart';
+import 'artwork.dart';
+import 'header_album.dart';
+import 'track_list.dart';
 
 class AlbumWidget extends StatefulWidget {
   final String title;
