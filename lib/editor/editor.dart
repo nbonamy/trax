@@ -2,13 +2,14 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/data/database.dart';
 import 'package:trax/processors/saver.dart';
 
+import '../components/dialog.dart';
+import '../components/tab_view.dart';
 import '../model/menu_actions.dart';
 import '../model/preferences.dart';
 import '../model/track.dart';
@@ -37,7 +38,6 @@ class TagEditorWidget extends StatefulWidget {
 }
 
 class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
-  static const kDialogBorderRadius = 8.0;
   static const kArtworkSize = 80.0;
 
   final TagLib _tagLib = TagLib();
@@ -173,153 +173,100 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     );
 
     // return
-    return Container(
+    return DialogWidget(
       width: 500,
       height: 565,
-      decoration: BoxDecoration(
-          border: Border.all(
-            color: const Color.fromRGBO(238, 232, 230, 1.0),
-            width: 0.25,
-          ),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(kDialogBorderRadius),
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color.fromRGBO(170, 170, 170, 1),
-              spreadRadius: 8,
-              blurRadius: 24,
-            )
-          ]),
-      child: Column(
+      header: Row(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(238, 232, 230, 1.0),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(kDialogBorderRadius),
-                topRight: Radius.circular(kDialogBorderRadius),
-              ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2.0),
+            child: Image.memory(
+              _artworkBytes!,
+              width: kArtworkSize,
+              height: kArtworkSize,
+              fit: BoxFit.contain,
             ),
-            padding: const EdgeInsets.all(16),
-            child: Row(
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(2.0),
-                  child: Image.memory(
-                    _artworkBytes!,
-                    width: kArtworkSize,
-                    height: kArtworkSize,
-                    fit: BoxFit.contain,
+                if (_activeTitle.isNotEmpty)
+                  Text(
+                    _activeTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: activeHeaderStyle,
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_activeTitle.isNotEmpty)
-                        Text(
-                          _activeTitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: activeHeaderStyle,
-                        ),
-                      if (_activeAlbum.isNotEmpty)
-                        Text(_activeAlbum,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: _activeTitle.isEmpty
-                                ? activeHeaderStyle
-                                : null),
-                      if (_activeArtist.isNotEmpty)
-                        Text(_activeArtist,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: _activeTitle.isEmpty && _activeAlbum.isEmpty
-                                ? activeHeaderStyle
-                                : null),
-                    ],
-                  ),
-                ),
+                if (_activeAlbum.isNotEmpty)
+                  Text(_activeAlbum,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _activeTitle.isEmpty ? activeHeaderStyle : null),
+                if (_activeArtist.isNotEmpty)
+                  Text(_activeArtist,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _activeTitle.isEmpty && _activeAlbum.isEmpty
+                          ? activeHeaderStyle
+                          : null),
               ],
             ),
           ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(kDialogBorderRadius),
-                  bottomRight: Radius.circular(kDialogBorderRadius),
-                ),
-              ),
-              child: Column(
-                children: [
-                  MacosTabView(
-                    padding: const EdgeInsets.only(top: 36),
-                    controller: _tabsController,
-                    tabs: [
-                      MacosTab(label: t.editorDetails),
-                      MacosTab(label: t.editorArtwork),
-                      if (singleTrackMode) MacosTab(label: t.editorLyrics),
-                      if (singleTrackMode) MacosTab(label: t.editorFile),
-                    ],
-                    children: [
-                      EditorDetailsWidget(
-                        key: _detailsKey,
-                        tags: tags,
-                        singleTrackMode: singleTrackMode,
-                        onComplete: _onSave,
-                      ),
-                      EditorArtworkWidget(
-                        key: _artworkKey,
-                        bytes: null,
-                        singleTrackMode: singleTrackMode,
-                      ),
-                      if (singleTrackMode)
-                        EditorLyricsWidget(
-                          key: _lyricsKey,
-                          singleTrackMode: singleTrackMode,
-                        ),
-                      if (singleTrackMode)
-                        EditorFileWidget(
-                          singleTrackMode: singleTrackMode,
-                        ),
-                    ]
-                        .map(
-                          (w) => Container(
-                            color: CupertinoColors.white,
-                            child: w,
-                          ),
-                        )
-                        .toList(),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    if (singleTrackMode) ...[
-                      _actionButton(
-                        '〈',
-                        _canPrev() ? _prevTrack : null,
-                        noBorder: true,
-                      ),
-                      const SizedBox(width: 4),
-                      _actionButton(
-                        '〉',
-                        _canNext() ? _nextTrack : null,
-                        noBorder: true,
-                      ),
-                      const Spacer(),
-                    ],
-                    _actionButton(t.cancel, _onClose),
-                    const SizedBox(width: 8),
-                    _actionButton(t.ok, _onSave, defaultButton: true),
-                  ]),
-                ],
-              ),
-            ),
+        ],
+      ),
+      body: TabView(
+        controller: _tabsController,
+        labels: [
+          t.editorDetails,
+          t.editorArtwork,
+          if (singleTrackMode) t.editorLyrics,
+          if (singleTrackMode) t.editorFile,
+        ],
+        children: [
+          EditorDetailsWidget(
+            key: _detailsKey,
+            tags: tags,
+            singleTrackMode: singleTrackMode,
+            onComplete: _onSave,
           ),
+          EditorArtworkWidget(
+            key: _artworkKey,
+            bytes: null,
+            singleTrackMode: singleTrackMode,
+          ),
+          if (singleTrackMode)
+            EditorLyricsWidget(
+              key: _lyricsKey,
+              singleTrackMode: singleTrackMode,
+            ),
+          if (singleTrackMode)
+            EditorFileWidget(
+              singleTrackMode: singleTrackMode,
+            ),
+        ],
+      ),
+      footer: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (singleTrackMode) ...[
+            _actionButton(
+              '〈',
+              _canPrev() ? _prevTrack : null,
+              noBorder: true,
+            ),
+            const SizedBox(width: 4),
+            _actionButton(
+              '〉',
+              _canNext() ? _nextTrack : null,
+              noBorder: true,
+            ),
+            const Spacer(),
+          ],
+          _actionButton(t.cancel, _onClose),
+          const SizedBox(width: 8),
+          _actionButton(t.ok, _onSave, defaultButton: true),
         ],
       ),
     );
