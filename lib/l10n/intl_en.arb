@@ -38,6 +38,11 @@
 
   "compilations": "Compilations",
 
+  "editorDetails": "Details",
+  "editorArtwork": "Artwork",
+  "editorLyrics": "Lyrics",
+  "editorFile": "File",
+
   "tagTitle": "Title",
   "tagAlbum": "Album",
   "tagArtist": "Album artist",
@@ -51,6 +56,8 @@
   "tagComment": "Comment",
 
   "tagsMixed": "Mixed",
+  
+  "indexOfCount": "of",
 
   "appName": "trax"
 

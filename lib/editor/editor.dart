@@ -59,10 +59,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   Track? get currentTrack =>
       singleTrackMode ? widget.allTracks.elementAt(_activeIndex) : null;
 
-  final _tabsController = MacosTabController(
-    initialIndex: 0,
-    length: 4,
-  );
+  late MacosTabController _tabsController;
 
   @override
   void initState() {
@@ -73,6 +70,12 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     if (singleTrackMode) {
       _activeIndex = widget.allTracks.indexOf(widget.selection.first);
     }
+
+    // other
+    _tabsController = MacosTabController(
+      initialIndex: 0,
+      length: singleTrackMode ? 4 : 2,
+    );
 
     // now load data
     loadData();
@@ -257,11 +260,11 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                   MacosTabView(
                     padding: const EdgeInsets.only(top: 36),
                     controller: _tabsController,
-                    tabs: const [
-                      MacosTab(label: 'Details'),
-                      MacosTab(label: 'Artwork'),
-                      MacosTab(label: 'Lyrics'),
-                      MacosTab(label: 'File'),
+                    tabs: [
+                      MacosTab(label: t.editorDetails),
+                      MacosTab(label: t.editorArtwork),
+                      if (singleTrackMode) MacosTab(label: t.editorLyrics),
+                      if (singleTrackMode) MacosTab(label: t.editorFile),
                     ],
                     children: [
                       EditorDetailsWidget(
@@ -275,13 +278,15 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                         bytes: null,
                         singleTrackMode: singleTrackMode,
                       ),
-                      EditorLyricsWidget(
-                        key: _lyricsKey,
-                        singleTrackMode: singleTrackMode,
-                      ),
-                      EditorFileWidget(
-                        singleTrackMode: singleTrackMode,
-                      ),
+                      if (singleTrackMode)
+                        EditorLyricsWidget(
+                          key: _lyricsKey,
+                          singleTrackMode: singleTrackMode,
+                        ),
+                      if (singleTrackMode)
+                        EditorFileWidget(
+                          singleTrackMode: singleTrackMode,
+                        ),
                     ]
                         .map(
                           (w) => Container(

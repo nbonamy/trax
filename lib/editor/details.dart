@@ -98,6 +98,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     AppLocalizations t = AppLocalizations.of(context)!;
     String mixedTextPlaceholder = widget.singleTrackMode ? '' : t.tagsMixed;
     String mixedNumPlaceholder = widget.singleTrackMode ? '' : '-';
+    String indexSeparator = t.indexOfCount;
 
     // genre
     List<String> genres = List.from(Consts.genres);
@@ -106,164 +107,241 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     }
 
     // return
-    return Column(children: [
-      Table(
-        columnWidths: const {
-          0: FixedColumnWidth(100.0),
-          1: FlexColumnWidth(),
-        },
-        children: [
-          _textFieldRow(
-            t.tagTitle,
-            _titleController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _textFieldRow(
-            t.tagPerformer,
-            _performerController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _textFieldRow(
-            t.tagAlbum,
-            _albumController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _textFieldRow(
-            t.tagArtist,
-            _artistController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _textFieldRow(
-            t.tagComposer,
-            _composerController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _dropDowndRow(
-            t.tagGenre,
-            value: _genreValue,
-            values: genres,
-            onChanged: (value) => setState(() => _genreValue = value),
-          ),
-          _textFieldRow(
-            t.tagYear,
-            _yearController,
-            placeholder: mixedNumPlaceholder,
-            keyboardType: TextInputType.number,
-            maxLength: 4,
-          ),
-          _textFieldRow(
-            t.tagVolumeIndex,
-            _volumeIndexController,
-            placeholder: mixedNumPlaceholder,
-            keyboardType: TextInputType.number,
-          ),
-          _textFieldRow(
-            t.tagTrackIndex,
-            _trackIndexController,
-            placeholder: mixedNumPlaceholder,
-            keyboardType: TextInputType.number,
-          ),
-          _textFieldRow(
-            t.tagCopyright,
-            _copyrightController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _textFieldRow(
-            t.tagComment,
-            _commentController,
-            placeholder: mixedTextPlaceholder,
-            minLines: 3,
-          ),
-        ],
-      ),
-    ]);
+    return Column(
+      children: [
+        _textFieldRow(
+          t.tagTitle,
+          _titleController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagPerformer,
+          _performerController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagAlbum,
+          _albumController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagArtist,
+          _artistController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagComposer,
+          _composerController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _dropDowndRow(
+          t.tagGenre,
+          value: _genreValue,
+          values: genres,
+          onChanged: (value) => setState(() => _genreValue = value),
+        ),
+        _textFieldRow(
+          t.tagYear,
+          _yearController,
+          placeholder: mixedNumPlaceholder,
+          keyboardType: TextInputType.number,
+          maxLength: 4,
+          width: 60,
+        ),
+        _textFieldsRow(
+          t.tagVolumeIndex,
+          indexSeparator,
+          40,
+          _volumeIndexController,
+          _volumeIndexController,
+          placeholder: mixedNumPlaceholder,
+          keyboardType: TextInputType.number,
+        ),
+        _textFieldsRow(
+          t.tagTrackIndex,
+          indexSeparator,
+          40,
+          _trackIndexController,
+          _trackIndexController,
+          placeholder: mixedNumPlaceholder,
+          keyboardType: TextInputType.number,
+        ),
+        _textFieldRow(
+          t.tagCopyright,
+          _copyrightController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagComment,
+          _commentController,
+          placeholder: mixedTextPlaceholder,
+          minLines: 3,
+        ),
+      ],
+    );
   }
 
-  TableRow _textFieldRow(
+  Widget _textFieldRow(
     String label,
     TextEditingController controller, {
     String? placeholder,
     TextInputType? keyboardType,
     int? maxLength,
     int? minLines,
+    double? width,
   }) {
+    Widget textField = _textField(
+      keyboardType,
+      maxLength,
+      controller,
+      placeholder,
+      minLines,
+    );
+    return _row(label, 6, [
+      width == null
+          ? Expanded(child: textField)
+          : SizedBox(width: width, child: textField)
+    ]);
+  }
+
+  Widget _textFieldsRow(
+    String label,
+    String separator,
+    double width,
+    TextEditingController controller1,
+    TextEditingController controller2, {
+    String? placeholder,
+    TextInputType? keyboardType,
+    int? maxLength,
+    int? minLines,
+  }) {
+    return _row(
+      label,
+      6,
+      [
+        SizedBox(
+          width: width,
+          child: _textField(
+            keyboardType,
+            maxLength,
+            controller1,
+            placeholder,
+            minLines,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 6, left: 4, right: 4),
+          child: Text(
+            separator,
+            style: const TextStyle(fontSize: 13),
+          ),
+        ),
+        SizedBox(
+          width: width,
+          child: _textField(
+            keyboardType,
+            maxLength,
+            controller2,
+            placeholder,
+            minLines,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _dropDowndRow(
+    String label, {
+    required String value,
+    required List<String> values,
+    required ValueChanged? onChanged,
+    bool expanded = false,
+  }) {
+    Widget dropdown = _dropdown(value, values, onChanged);
+    return _row(label, 3, [expanded ? Expanded(child: dropdown) : dropdown]);
+  }
+
+  Widget _row(String label, double paddingTop, List<Widget> widgets) {
+    return Flex(
+      direction: Axis.horizontal,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _label(label, 6),
+        ...widgets,
+      ],
+    );
+  }
+
+  Widget _label(String label, double paddingTop) {
+    return SizedBox(
+      width: 100,
+      child: Padding(
+        padding: EdgeInsets.only(top: paddingTop, right: 4),
+        child: Text(
+          label.toLowerCase(),
+          textAlign: TextAlign.right,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Color.fromRGBO(125, 125, 125, 1.0),
+          ),
+        ),
+      ),
+    );
+  }
+
+  MacosTextField _textField(
+    TextInputType? keyboardType,
+    int? maxLength,
+    TextEditingController controller,
+    String? placeholder,
+    int? minLines,
+  ) {
     // check controller value
     bool isMixed = false;
     if (controller.text == TagEditorWidget.kMixedValueStr) {
       isMixed = true;
       controller.text = '';
     }
-    return TableRow(
-      children: [
-        _formLabel(label, 6),
-        MacosTextField(
-          padding: const EdgeInsets.symmetric(
-            vertical: 2.0,
-            horizontal: 4.0,
-          ),
-          keyboardType: keyboardType,
-          maxLength: maxLength,
-          controller: controller,
-          placeholder: isMixed ? placeholder : null,
-          minLines: minLines ?? 1,
-          maxLines: minLines ?? 1,
-          onEditingComplete: () {
-            widget.onComplete();
-          },
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color.fromRGBO(192, 192, 192, 1.0),
-              width: 0.8,
-            ),
-          ),
-          focusedDecoration: BoxDecoration(
-            border: Border.all(
-              color: const Color.fromRGBO(197, 216, 249, 1.0),
-              width: 0.8,
-            ),
-          ),
+    return MacosTextField(
+      padding: const EdgeInsets.symmetric(
+        vertical: 2.0,
+        horizontal: 4.0,
+      ),
+      textAlignVertical: TextAlignVertical.center,
+      keyboardType: keyboardType,
+      maxLength: maxLength,
+      controller: controller,
+      placeholder: isMixed ? placeholder : null,
+      minLines: minLines ?? 1,
+      maxLines: minLines ?? 1,
+      onEditingComplete: () {
+        widget.onComplete();
+      },
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: const Color.fromRGBO(192, 192, 192, 1.0),
+          width: 0.8,
         ),
-      ],
+      ),
+      focusedDecoration: BoxDecoration(
+        border: Border.all(
+          color: const Color.fromRGBO(197, 216, 249, 1.0),
+          width: 0.8,
+        ),
+      ),
     );
   }
 
-  TableRow _dropDowndRow(
-    String label, {
-    required String value,
-    required List<String> values,
-    required ValueChanged? onChanged,
-  }) {
-    return TableRow(
-      children: [
-        _formLabel(label, 3),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            children: [
-              MacosPopupButton(
-                value: value,
-                items: values
-                    .map((i) => MacosPopupMenuItem(value: i, child: Text(i)))
-                    .toList(),
-                onChanged: onChanged,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _formLabel(String label, double paddingTop) {
+  Widget _dropdown(
+      String value, List<String> values, ValueChanged<dynamic>? onChanged) {
     return Padding(
-      padding: EdgeInsets.only(top: paddingTop, right: 4),
-      child: Text(
-        label.toLowerCase(),
-        textAlign: TextAlign.right,
-        style: const TextStyle(
-          fontSize: 13,
-          color: Color.fromRGBO(125, 125, 125, 1.0),
-        ),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: MacosPopupButton(
+        value: value,
+        items: values
+            .map((i) => MacosPopupMenuItem(value: i, child: Text(i)))
+            .toList(),
+        onChanged: onChanged,
       ),
     );
   }
