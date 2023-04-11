@@ -10,6 +10,7 @@ import 'data/database.dart';
 import 'model/preferences.dart';
 import 'model/selection.dart';
 import 'screens/home.dart';
+import 'utils/consts.dart';
 import 'utils/track_utils.dart';
 
 void main() async {
@@ -78,7 +79,7 @@ class TraxApp extends StatelessWidget {
           onGenerateTitle: (context) {
             AppLocalizations? t = AppLocalizations.of(context);
             TrackUtils.initLocalization(t);
-            return t?.appName ?? 'Trax';
+            return t?.appName ?? Consts.appName;
           },
           theme: MacosThemeData.light(),
           darkTheme: MacosThemeData.dark(),

@@ -2,79 +2,103 @@ import Cocoa
 import FlutterMacOS
 
 class BlurryContainerViewController: NSViewController {
-  let flutterViewController = FlutterViewController()
-
-  init() {
-    super.init(nibName: nil, bundle: nil)
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError()
-  }
-
-  override func loadView() {
-    let blurView = NSVisualEffectView()
-    blurView.autoresizingMask = [.width, .height]
-    blurView.blendingMode = .behindWindow
-    blurView.state = .active
-    if #available(macOS 10.14, *) {
-        blurView.material = .sidebar
+    let flutterViewController = FlutterViewController()
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
     }
-    self.view = blurView
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    self.addChild(flutterViewController)
-
-    flutterViewController.view.frame = self.view.bounds
-    flutterViewController.backgroundColor = .clear // **Required post-Flutter 3.7.0**
-    flutterViewController.view.autoresizingMask = [.width, .height]
-    self.view.addSubview(flutterViewController.view)
-  }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+    override func loadView() {
+        let blurView = NSVisualEffectView()
+        blurView.autoresizingMask = [.width, .height]
+        blurView.blendingMode = .behindWindow
+        blurView.state = .active
+        if #available(macOS 10.14, *) {
+            blurView.material = .sidebar
+        }
+        self.view = blurView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.addChild(flutterViewController)
+        
+        flutterViewController.view.frame = self.view.bounds
+        flutterViewController.backgroundColor = .clear // **Required post-Flutter 3.7.0**
+        flutterViewController.view.autoresizingMask = [.width, .height]
+        self.view.addSubview(flutterViewController.view)
+    }
 }
 
 class MainFlutterWindow: NSWindow, NSWindowDelegate {
-  override func awakeFromNib() {
-    delegate = self
-    let blurryContainerViewController = BlurryContainerViewController()
-    let windowFrame = self.frame
-    self.contentViewController = blurryContainerViewController
-    self.setFrame(windowFrame, display: true)
-
-    if #available(macOS 10.13, *) {
-      let customToolbar = NSToolbar()
-      customToolbar.showsBaselineSeparator = false
-      self.toolbar = customToolbar
+    
+    override func awakeFromNib() {
+        delegate = self
+        let blurryContainerViewController = BlurryContainerViewController()
+        let windowFrame = self.frame
+        self.contentViewController = blurryContainerViewController
+        self.setFrame(windowFrame, display: true)
+        
+        if #available(macOS 10.13, *) {
+            let customToolbar = NSToolbar()
+            customToolbar.showsBaselineSeparator = false
+            self.toolbar = customToolbar
+        }
+        self.titleVisibility = .hidden
+        self.titlebarAppearsTransparent = true
+        if #available(macOS 11.0, *) {
+            // Use .expanded if the app will have a title bar, else use .unified
+            self.toolbarStyle = .unified
+        }
+        
+        self.isMovableByWindowBackground = true
+        self.styleMask.insert(NSWindow.StyleMask.fullSizeContentView)
+        
+        self.isOpaque = false
+        self.backgroundColor = .clear
+        
+        let platformUtilsChannel = FlutterMethodChannel(
+            name: "platform_utils/messages",
+            binaryMessenger: blurryContainerViewController.flutterViewController.engine.binaryMessenger)
+        platformUtilsChannel.setMethodCallHandler { (call, result) in
+            if ("moveToTrash" == call.method) {
+                let filepath = call.arguments as! String;
+                try? self.moveToTrash(atPath: filepath);
+                result(true);
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        }
+        
+        RegisterGeneratedPlugins(registry: blurryContainerViewController.flutterViewController)
+        
+        super.awakeFromNib()
     }
-    self.titleVisibility = .hidden
-    self.titlebarAppearsTransparent = true
-    if #available(macOS 11.0, *) {
-      // Use .expanded if the app will have a title bar, else use .unified
-      self.toolbarStyle = .unified
+    
+    func window(_ window: NSWindow, willUseFullScreenPresentationOptions proposedOptions: NSApplication.PresentationOptions = []) -> NSApplication.PresentationOptions {
+        return [.autoHideToolbar, .autoHideMenuBar, .fullScreen]
     }
-
-    self.isMovableByWindowBackground = true
-    self.styleMask.insert(NSWindow.StyleMask.fullSizeContentView)
-
-    self.isOpaque = false
-    self.backgroundColor = .clear
-
-    RegisterGeneratedPlugins(registry: blurryContainerViewController.flutterViewController)
-
-    super.awakeFromNib()
-  }
-
-  func window(_ window: NSWindow, willUseFullScreenPresentationOptions proposedOptions: NSApplication.PresentationOptions = []) -> NSApplication.PresentationOptions {
-    return [.autoHideToolbar, .autoHideMenuBar, .fullScreen]
-  }
-
-  func windowWillEnterFullScreen(_ notification: Notification) {
-      self.toolbar?.isVisible = false
-  }
-  
-  func windowDidExitFullScreen(_ notification: Notification) {
-      self.toolbar?.isVisible = true
-  }
+    
+    func windowWillEnterFullScreen(_ notification: Notification) {
+        self.toolbar?.isVisible = false
+    }
+    
+    func windowDidExitFullScreen(_ notification: Notification) {
+        self.toolbar?.isVisible = true
+    }
+    
+    func moveToTrash(atPath path: String) throws {
+        let fileURL = URL(fileURLWithPath: path)
+        let trashURL = try FileManager.default.url(for: .trashDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        let destinationURL = trashURL.appendingPathComponent(fileURL.lastPathComponent)
+        try FileManager.default.moveItem(at: fileURL, to: destinationURL)
+    }
+    
 }
+
+

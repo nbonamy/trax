@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 class Consts {
+  static const String appName = 'trax';
+
   static const double fadedOpacity = 0.4;
 
   static const Color sideBarBgColor = Color.fromRGBO(241, 235, 230, 1.0);

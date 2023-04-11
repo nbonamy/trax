@@ -1,82 +1,112 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:macos_ui/macos_ui.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'draggable_card.dart';
+import '../utils/consts.dart';
 
-class DialogWidget extends StatelessWidget {
-  static const kDialogBorderRadius = 8.0;
-  final double width;
-  final double height;
-  final Widget header;
-  final Widget body;
-  final Widget footer;
-  final String? preferenceKey;
-  const DialogWidget({
-    super.key,
-    required this.width,
-    required this.height,
-    required this.header,
-    required this.body,
-    required this.footer,
-    this.preferenceKey,
-  });
+typedef DialogCallback = void Function(BuildContext);
+typedef PromptCallback = void Function(BuildContext, String);
 
-  @override
-  Widget build(BuildContext context) {
-    return DraggableCard(
-      preferenceKey: preferenceKey,
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color.fromRGBO(238, 232, 230, 1.0),
-              width: 0.25,
-            ),
-            borderRadius: const BorderRadius.all(
-              Radius.circular(kDialogBorderRadius),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color.fromRGBO(170, 170, 170, 1),
-                spreadRadius: 8,
-                blurRadius: 24,
-              )
-            ]),
-        child: Flex(
-          direction: Axis.vertical,
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(238, 232, 230, 1.0),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(kDialogBorderRadius),
-                  topRight: Radius.circular(kDialogBorderRadius),
+class TraxDialog {
+  static Future confirm({
+    required BuildContext context,
+    String? title,
+    required String text,
+    String? cancelLabel,
+    String? confirmLabel,
+    required DialogCallback onConfirmed,
+    DialogCallback? onCancel,
+    bool isDestructive = false,
+    Color? barrierColor,
+  }) {
+    AppLocalizations t = AppLocalizations.of(context)!;
+    return showMacosAlertDialog(
+      context: context,
+      barrierColor: barrierColor,
+      builder: (context) => MacosAlertDialog(
+        appIcon: const Icon(CupertinoIcons.music_note, size: 56),
+        title: Text(
+          title ?? AppLocalizations.of(context)?.appName ?? Consts.appName,
+          style: MacosTheme.of(context)
+              .typography
+              .title3
+              .copyWith(fontWeight: FontWeight.bold),
+        ),
+        message: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: MacosTheme.of(context).typography.callout,
+        ),
+        primaryButton: PushButton(
+          isSecondary: isDestructive,
+          buttonSize: ButtonSize.large,
+          onPressed: () => onConfirmed(context),
+          child: Text(confirmLabel ?? t.yes),
+        ),
+        secondaryButton: PushButton(
+          isSecondary: !isDestructive,
+          buttonSize: ButtonSize.large,
+          onPressed: () => onCancel != null
+              ? onCancel(context)
+              : Navigator.of(context).pop(),
+          child: Text(cancelLabel ?? t.cancel),
+        ),
+      ),
+    );
+  }
+
+  static Future<dynamic> prompt({
+    required BuildContext context,
+    required String text,
+    required String value,
+    required PromptCallback onConfirmed,
+    DialogCallback? onCancel,
+    bool isDanger = false,
+  }) {
+    TextEditingController controller = TextEditingController(text: value);
+    AppLocalizations t = AppLocalizations.of(context)!;
+    return showMacosSheet(
+      context: context,
+      builder: (context) => MacosSheet(
+        child: Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 256,
+            height: 256,
+            child: Column(
+              children: [
+                Text(text),
+                MacosTextField(
+                  controller: controller,
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-              child: header,
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(kDialogBorderRadius),
-                    bottomRight: Radius.circular(kDialogBorderRadius),
-                  ),
-                ),
-                child: Flex(
-                  direction: Axis.vertical,
+                Row(
                   children: [
-                    Expanded(child: body),
-                    const SizedBox(height: 24),
-                    footer,
+                    Expanded(
+                      child: PushButton(
+                        buttonSize: ButtonSize.small,
+                        isSecondary: true,
+                        onPressed: () => onCancel != null
+                            ? onCancel(context)
+                            : Navigator.of(context).pop(),
+                        child: Text(t.cancel),
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Expanded(
+                      child: PushButton(
+                        color: Colors.green,
+                        buttonSize: ButtonSize.small,
+                        onPressed: () =>
+                            onConfirmed(context, controller.value.text),
+                        child: Text(t.ok),
+                      ),
+                    ),
                   ],
-                ),
-              ),
+                )
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

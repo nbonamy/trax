@@ -9,7 +9,7 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../components/artwork.dart';
 import '../components/button.dart';
-import '../components/dialog.dart';
+import '../components/dialog_window.dart';
 import '../components/tab_view.dart';
 import '../data/database.dart';
 import '../model/menu_actions.dart';

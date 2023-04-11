@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
+import 'package:trax/utils/file_utils.dart';
 
 import '../components/album.dart';
 import '../components/header_artist.dart';
@@ -171,11 +172,27 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       case MenuAction.editSelectAll:
         selectionModel.set(allTracks);
         break;
+      case MenuAction.editDelete:
+        _deleteFiles(
+          TraxDatabase.of(context),
+          selectionModel.get.map((t) => t.filename).toList(),
+        );
+        break;
       case MenuAction.trackInfo:
         _showEditor(EditorMode.edit, selectionModel.get, allTracks);
         break;
       default:
         break;
+    }
+  }
+
+  _deleteFiles(TraxDatabase database, List<String> files) async {
+    bool? rc = await FileUtils.confirmDelete(context, files);
+    if (rc != null && rc) {
+      for (String filename in files) {
+        database.delete(filename, notify: false);
+      }
+      database.notify();
     }
   }
 
@@ -209,19 +226,20 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     List<Track> allTracks,
   ) {
     showDialog(
-        context: context,
-        barrierColor: Colors.transparent,
-        builder: (BuildContext context) {
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            child: TagEditorWidget(
-              editorMode: editorMode,
-              menuActionStream: widget.menuActionStream,
-              selection: selection,
-              allTracks: allTracks,
-            ),
-          );
-        });
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          child: TagEditorWidget(
+            editorMode: editorMode,
+            menuActionStream: widget.menuActionStream,
+            selection: selection,
+            allTracks: allTracks,
+          ),
+        );
+      },
+    );
   }
 }
