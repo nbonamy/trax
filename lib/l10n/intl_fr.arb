@@ -5,6 +5,7 @@
   "no": "Non",
   
   "menuFile": "Fichier",
+  "menuFileImport": "Importer...",
   "menuFileRefresh": "Rafraîchir",
   "menuFileRebuild": "Reconstruire",
 

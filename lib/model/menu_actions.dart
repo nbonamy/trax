@@ -9,9 +9,11 @@ typedef MenuActionController = StreamController<MenuAction>;
 typedef MenuActionStream = Stream<MenuAction>;
 
 enum MenuAction {
+  fileImport,
   fileRefresh,
   fileRebuild,
   editSelectAll,
+  editDelete,
   trackInfo,
   trackPrevious,
   trackNext,

@@ -55,20 +55,32 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
       PlatformMenu(
         label: t.menuFile,
         menus: [
-          PlatformMenuItem(
-            label: t.menuFileRefresh,
-            shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR),
-            onSelected: () => _onMenu(MenuAction.fileRefresh),
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuFileImport,
+                onSelected: () => _onMenu(MenuAction.fileImport),
+              ),
+            ],
           ),
-          PlatformMenuItem(
-            label: t.menuFileRebuild,
-            shortcut: MenuUtils.cmdShortcut(
-              LogicalKeyboardKey.keyR,
-              shift: true,
-            ),
-            onSelected: () => _onMenu(
-              MenuAction.fileRebuild,
-            ),
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuFileRefresh,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR),
+                onSelected: () => _onMenu(MenuAction.fileRefresh),
+              ),
+              PlatformMenuItem(
+                label: t.menuFileRebuild,
+                shortcut: MenuUtils.cmdShortcut(
+                  LogicalKeyboardKey.keyR,
+                  shift: true,
+                ),
+                onSelected: () => _onMenu(
+                  MenuAction.fileRebuild,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -82,37 +94,13 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyA),
                 onSelected: () => _onMenu(MenuAction.editSelectAll),
               ),
+              PlatformMenuItem(
+                label: t.menuEditDelete,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.backspace),
+                onSelected: () => _onMenu(MenuAction.editDelete),
+              ),
             ],
           ),
-          //     const PlatformMenuItemGroup(
-          //       members: [
-          //         // PlatformMenuItem(
-          //         //   label: t.menuEditCopy,
-          //         //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyC),
-          //         //   onSelected: () => _onMenu(MenuAction.editCopy),
-          //         // ),
-          //         // PlatformMenuItem(
-          //         //   label: t.menuEditPaste,
-          //         //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyV),
-          //         //   onSelected: () => _onMenu(MenuAction.editPaste),
-          //         // ),
-          //         // PlatformMenuItem(
-          //         //   label: t.menuEditPasteMove,
-          //         //   shortcut: SingleActivator(
-          //         //     LogicalKeyboardKey.keyV,
-          //         //     alt: true,
-          //         //     control: PlatformKeyboard.ctrlIsCommandModifier(),
-          //         //     meta: PlatformKeyboard.metaIsCommandModifier(),
-          //         //   ),
-          //         //   onSelected: () => _onMenu(MenuAction.editPasteMove),
-          //         // ),
-          //         // PlatformMenuItem(
-          //         //   label: t.menuEditDelete,
-          //         //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.backspace),
-          //         //   onSelected: () => _onMenu(MenuAction.editDelete),
-          //         // ),
-          //       ],
-          //     ),
         ],
       ),
       PlatformMenu(
@@ -154,6 +142,10 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
 
   void _onMenu(MenuAction action) async {
     switch (action) {
+      case MenuAction.fileImport:
+        _runImport();
+        break;
+
       case MenuAction.fileRefresh:
         _runScan();
         break;
@@ -169,6 +161,8 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         break;
     }
   }
+
+  void _runImport() {}
 
   void _runScan() {
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));

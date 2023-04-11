@@ -5,6 +5,7 @@
   "no": "No",
   
   "menuFile": "File",
+  "menuFileImport": "Import...",
   "menuFileRefresh": "Refresh",
   "menuFileRebuild": "Rebuild",
   
