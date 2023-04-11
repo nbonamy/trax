@@ -7,8 +7,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/data/database.dart';
+import 'package:trax/processors/saver.dart';
 
 import '../model/menu_actions.dart';
+import '../model/preferences.dart';
 import '../model/track.dart';
 import '../utils/track_utils.dart';
 import 'artwork.dart';
@@ -161,6 +163,13 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     // needed
     AppLocalizations t = AppLocalizations.of(context)!;
 
+    // one of header text will be bold
+    TextStyle activeHeaderStyle = const TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 24,
+    );
+
+    // return
     return Container(
       width: 500,
       height: 565,
@@ -206,23 +215,27 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _activeTitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
+                      if (_activeTitle.isNotEmpty)
+                        Text(
+                          _activeTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: activeHeaderStyle,
                         ),
-                      ),
-                      Text(
-                        _activeArtist,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        _activeAlbum,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      if (_activeAlbum.isNotEmpty)
+                        Text(_activeAlbum,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: _activeTitle.isEmpty
+                                ? activeHeaderStyle
+                                : null),
+                      if (_activeArtist.isNotEmpty)
+                        Text(_activeArtist,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: _activeTitle.isEmpty && _activeAlbum.isEmpty
+                                ? activeHeaderStyle
+                                : null),
                     ],
                   ),
                 ),
@@ -255,6 +268,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                         key: _detailsKey,
                         tags: tags,
                         singleTrackMode: singleTrackMode,
+                        onComplete: _onSave,
                       ),
                       EditorArtworkWidget(
                         key: _artworkKey,
@@ -270,11 +284,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                       ),
                     ]
                         .map(
-                          (w) => Expanded(
-                            child: Container(
-                              color: CupertinoColors.white,
-                              child: w,
-                            ),
+                          (w) => Container(
+                            color: CupertinoColors.white,
+                            child: w,
                           ),
                         )
                         .toList(),
@@ -295,17 +307,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                       ),
                       const Spacer(),
                     ],
-                    _actionButton(t.cancel, () => Navigator.of(context).pop()),
+                    _actionButton(t.cancel, _onClose),
                     const SizedBox(width: 8),
-                    _actionButton(
-                      t.ok,
-                      () {
-                        if (_save()) {
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      defaultButton: true,
-                    ),
+                    _actionButton(t.ok, _onSave, defaultButton: true),
                   ]),
                 ],
               ),
@@ -314,6 +318,16 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         ],
       ),
     );
+  }
+
+  void _onSave() async {
+    if (await _save()) {
+      _onClose();
+    }
+  }
+
+  void _onClose() {
+    Navigator.of(context).pop();
   }
 
   bool _canPrev() {
@@ -340,7 +354,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     }
   }
 
-  bool _save() {
+  Future<bool> _save() {
     if (singleTrackMode) {
       return _saveSingle();
     } else {
@@ -348,17 +362,18 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     }
   }
 
-  bool _saveSingle() {
+  Future<bool> _saveSingle() async {
+    if (currentTrack == null) return false;
     Tags? updatedTags = _detailsKey.currentState?.tags;
-    if (updatedTags == null) return false;
-    if (updatedTags.equals(currentTrack!.tags)) return true;
-    _tagLib.setAudioTags(currentTrack!.filename, updatedTags);
-    currentTrack!.tags = updatedTags;
-    TraxDatabase.of(context).insert(currentTrack!);
-    return true;
+    TagSaver tagSaver = TagSaver(
+      _tagLib,
+      TraxDatabase.of(context),
+      Preferences.of(context).musicFolder,
+    );
+    return await tagSaver.update(currentTrack!, updatedTags, null);
   }
 
-  bool _saveMultiple() {
+  Future<bool> _saveMultiple() async {
     return false;
   }
 

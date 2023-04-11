@@ -15,10 +15,12 @@ extension Int on TextEditingController {
 class EditorDetailsWidget extends StatefulWidget {
   final Tags tags;
   final bool singleTrackMode;
+  final VoidCallback onComplete;
   const EditorDetailsWidget({
     super.key,
     required this.tags,
     required this.singleTrackMode,
+    required this.onComplete,
   });
 
   @override
@@ -203,8 +205,11 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           maxLength: maxLength,
           controller: controller,
           placeholder: isMixed ? placeholder : null,
-          minLines: minLines,
-          maxLines: minLines,
+          minLines: minLines ?? 1,
+          maxLines: minLines ?? 1,
+          onEditingComplete: () {
+            widget.onComplete();
+          },
           decoration: BoxDecoration(
             border: Border.all(
               color: const Color.fromRGBO(192, 192, 192, 1.0),

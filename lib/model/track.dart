@@ -12,7 +12,7 @@ extension FormatEx on String {
 class Track {
   static const String kArtistCompilations = '_compilations_';
 
-  final String filename;
+  String filename;
   Format format = Format.notAudio;
   int lastModified = 0;
   int filesize = 0;
@@ -62,6 +62,4 @@ class Track {
         return Format.notAudio;
     }
   }
-
-
 }

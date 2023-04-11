@@ -7,7 +7,7 @@ import '../browser/browser.dart';
 import '../data/database.dart';
 import '../model/menu_actions.dart';
 import '../model/preferences.dart';
-import '../scanner/scanner.dart';
+import '../processors/scanner.dart';
 import '../utils/events.dart';
 
 class TraxHomePage extends StatefulWidget {
