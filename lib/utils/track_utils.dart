@@ -1,4 +1,5 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../model/track.dart';
 
 extension TrackUtils on Track {

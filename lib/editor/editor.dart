@@ -5,14 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
-import 'package:trax/data/database.dart';
-import 'package:trax/processors/saver.dart';
 
 import '../components/dialog.dart';
 import '../components/tab_view.dart';
+import '../data/database.dart';
 import '../model/menu_actions.dart';
 import '../model/preferences.dart';
 import '../model/track.dart';
+import '../processors/saver.dart';
 import '../utils/track_utils.dart';
 import 'artwork.dart';
 import 'details.dart';
@@ -236,7 +236,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           ),
           EditorArtworkWidget(
             key: _artworkKey,
-            bytes: null,
+            bytes: _artworkBytes,
             singleTrackMode: singleTrackMode,
           ),
           if (singleTrackMode)

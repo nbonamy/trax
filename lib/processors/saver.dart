@@ -2,10 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:taglib_ffi/taglib_ffi.dart';
-import 'package:trax/utils/track_utils.dart';
 
 import '../data/database.dart';
 import '../model/track.dart';
+import '../utils/track_utils.dart';
 
 class TagSaver {
   static const String kMixedValueStr = '__mixed__';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../utils/consts.dart';
 import '../utils/track_utils.dart';
 import 'artist_profile_pic.dart';
