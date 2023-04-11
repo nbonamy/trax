@@ -11,6 +11,7 @@
   
   "menuEdit": "Edit",
   "menuEditSelectAll": "Select All",
+  "menuEditPaste": "Paste",
   "menuEditDelete": "Move to Trash",
 
   "menuTrack": "Track",
@@ -58,6 +59,10 @@
   "tagsMixed": "Mixed",
   
   "indexOfCount": "of",
+
+  "artworkDelete": "Delete",
+  "artworkAdd": "Add...",
+  "artworkReplace": "Replace...",
 
   "appName": "trax"
 

@@ -11,6 +11,7 @@
 
   "menuEdit": "Edition",
   "menuEditSelectAll": "Tout sélectionner",
+  "menuEditPaste": "Coller",
   "menuEditDelete": "Déplacer dans la Corbeille",
 
   "menuTrack": "Piste",
@@ -58,6 +59,10 @@
   "tagsMixed": "Multiple",
 
   "indexOfCount": "sur",
+
+  "artworkDelete": "Supprimer",
+  "artworkAdd": "Ajouter...",
+  "artworkReplace": "Remplacer...",
 
   "appName": "trax"
 

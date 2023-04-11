@@ -36,7 +36,8 @@ class DialogWidget extends StatelessWidget {
               blurRadius: 24,
             )
           ]),
-      child: Column(
+      child: Flex(
+        direction: Axis.vertical,
         children: [
           Container(
             decoration: const BoxDecoration(
@@ -59,9 +60,10 @@ class DialogWidget extends StatelessWidget {
                   bottomRight: Radius.circular(kDialogBorderRadius),
                 ),
               ),
-              child: Column(
+              child: Flex(
+                direction: Axis.vertical,
                 children: [
-                  body,
+                  Expanded(child: body),
                   const SizedBox(height: 24),
                   footer,
                 ],

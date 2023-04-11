@@ -1,52 +1,40 @@
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
-
-import '../utils/consts.dart';
+import 'package:flutter/cupertino.dart';
 
 class ArtworkWidget extends StatelessWidget {
+  final Uint8List? bytes;
   final double size;
-  final Uint8List bytes;
-  final int trackCount;
-  final int playtime;
+  final double radius;
+  final Color placeholderBorderColor;
   const ArtworkWidget({
     super.key,
-    required this.size,
     required this.bytes,
-    required this.trackCount,
-    required this.playtime,
+    required this.size,
+    this.radius = 8.0,
+    this.placeholderBorderColor = CupertinoColors.lightBackgroundGray,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: size == 0
-            ? []
-            : [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.memory(
-                    bytes,
-                    width: size,
-                    height: size,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '$trackCount SONGS, $playtime MINUTES',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(Consts.fadedOpacity),
-                  ),
-                ),
-              ],
-      ),
-    );
+    return bytes == null
+        ? Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: placeholderBorderColor,
+              ),
+            ),
+          )
+        : ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: Image.memory(
+              bytes!,
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+            ),
+          );
   }
 }

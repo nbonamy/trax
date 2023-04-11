@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
-import 'artwork.dart';
+import 'album_artwork.dart';
 import 'header_album.dart';
 import 'track_list.dart';
 
@@ -56,18 +56,12 @@ class _AlbumWidgetState extends State<AlbumWidget> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (_artworkBytes != null)
-              ArtworkWidget(
-                size: _artworkSize(constraints),
-                bytes: _artworkBytes!,
-                trackCount: trackCount,
-                playtime: playtimeMinutes,
-              )
-            else
-              SizedBox(
-                width: _artworkSize(constraints),
-                height: _artworkSize(constraints),
-              ),
+            AlbumArtworkWidget(
+              size: _artworkSize(constraints),
+              bytes: _artworkBytes,
+              trackCount: trackCount,
+              playtime: playtimeMinutes,
+            ),
             SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
             Expanded(
               child: Column(

@@ -13,6 +13,7 @@ enum MenuAction {
   fileRefresh,
   fileRebuild,
   editSelectAll,
+  editPaste,
   editDelete,
   trackInfo,
   trackPrevious,

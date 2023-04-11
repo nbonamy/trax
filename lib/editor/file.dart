@@ -28,6 +28,6 @@ class EditorFileWidgetState extends State<EditorFileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 322, color: Colors.green);
+    return Container(color: Colors.green);
   }
 }

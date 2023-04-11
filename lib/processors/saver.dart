@@ -7,6 +7,12 @@ import '../data/database.dart';
 import '../model/track.dart';
 import '../utils/track_utils.dart';
 
+enum ArtworkAction {
+  untouched,
+  updated,
+  deleted,
+}
+
 class TagSaver {
   static const String kMixedValueStr = '__mixed__';
   static const String kClearedValueStr = '__cleared__';
@@ -19,22 +25,44 @@ class TagSaver {
 
   TagSaver(this.tagLib, this.database, this.rootFolder);
 
-  Future<bool> update(Track track, Tags updatedTags, Uint8List? artwork) async {
-    // basic checks
-    if (updatedTags.equals(track.tags)) return true;
+  Future<bool> update(
+    Track track,
+    Tags updatedTags,
+    ArtworkAction artworkAction,
+    Uint8List? artworkBytes,
+  ) async {
+    // track
+    bool updated = false;
 
-    // now update
-    tagLib.setAudioTags(track.filename, updatedTags);
-    track.tags = updatedTags;
-    database.insert(track, notify: false);
+    // tag update?
+    if (updatedTags.equals(track.tags) == false) {
+      // now update
+      tagLib.setAudioTags(track.filename, updatedTags);
+      track.tags = updatedTags;
+      database.insert(track, notify: false);
 
-    // move?
-    String fullpath = _filename(track);
-    await _moveTrack(track, fullpath);
+      // move?
+      String fullpath = _filename(track);
+      await _moveTrack(track, fullpath);
+
+      // track
+      updated = true;
+    }
+
+    // update artwork
+    if (artworkAction == ArtworkAction.deleted) {
+      tagLib.setArtwork(track.filename, Uint8List(0));
+      updated = true;
+    } else if (artworkAction == ArtworkAction.updated) {
+      tagLib.setArtwork(track.filename, artworkBytes!);
+      updated = true;
+    }
 
     // done
-    database.notify();
-    return true;
+    if (updated) {
+      database.notify();
+    }
+    return updated;
   }
 
   void mergeTags(Tags initialTags, Tags updatedTags) {

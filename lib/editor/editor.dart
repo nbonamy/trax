@@ -4,8 +4,11 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../components/artwork.dart';
+import '../components/button.dart';
 import '../components/dialog.dart';
 import '../components/tab_view.dart';
 import '../data/database.dart';
@@ -181,14 +184,11 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       height: 565,
       header: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(2.0),
-            child: Image.memory(
-              _artworkBytes!,
-              width: kArtworkSize,
-              height: kArtworkSize,
-              fit: BoxFit.contain,
-            ),
+          ArtworkWidget(
+            bytes: _artworkBytes,
+            size: kArtworkSize,
+            radius: 4.0,
+            placeholderBorderColor: CupertinoColors.systemGrey3,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -254,22 +254,22 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           if (singleTrackMode) ...[
-            _actionButton(
+            Button(
               '〈',
               _canPrev() ? _prevTrack : null,
               noBorder: true,
             ),
             const SizedBox(width: 4),
-            _actionButton(
+            Button(
               '〉',
               _canNext() ? _nextTrack : null,
               noBorder: true,
             ),
             const Spacer(),
           ],
-          _actionButton(t.cancel, _onClose),
+          Button(t.cancel, _onClose),
           const SizedBox(width: 8),
-          _actionButton(t.ok, _onSave, defaultButton: true),
+          Button(t.ok, _onSave, defaultButton: true),
         ],
       ),
     );
@@ -318,69 +318,67 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   }
 
   Future<bool> _saveSingle() async {
+    // get and check data
     if (currentTrack == null) return false;
     Tags? updatedTags = _detailsKey.currentState?.tags;
-    if (updatedTags == null) return false;
+    ArtworkAction? artworkAction = _artworkKey.currentState?.action;
+    if (updatedTags == null || artworkAction == null) return false;
+
+    // now save
     TagSaver tagSaver = TagSaver(
       _tagLib,
       TraxDatabase.of(context),
       Preferences.of(context).musicFolder,
     );
-    return await tagSaver.update(currentTrack!, updatedTags, null);
+    return await tagSaver.update(
+      currentTrack!,
+      updatedTags,
+      artworkAction,
+      _artworkKey.currentState?.bytes,
+    );
   }
 
   Future<bool> _saveMultiple() async {
+    // get and check data
     Tags? updatedTags = _detailsKey.currentState?.tags;
-    if (updatedTags == null) return false;
+    ArtworkAction? artworkAction = _artworkKey.currentState?.action;
+    if (updatedTags == null || artworkAction == null) return false;
+
+    // saver
     TagSaver tagSaver = TagSaver(
       _tagLib,
       TraxDatabase.of(context),
       Preferences.of(context).musicFolder,
     );
+
+    // iterate
     for (Track track in widget.selection) {
       if (track.tags == null) continue;
       Tags initialTags = Tags.copy(track.tags!);
       tagSaver.mergeTags(initialTags, updatedTags);
-      await tagSaver.update(track, initialTags, null);
+      await tagSaver.update(
+        track,
+        initialTags,
+        artworkAction,
+        _artworkKey.currentState?.bytes,
+      );
     }
     return true;
   }
 
   @override
-  void onMenuAction(MenuAction action) {
-    if (action == MenuAction.trackPrevious) {
+  void onMenuAction(MenuAction action) async {
+    if (action == MenuAction.editPaste) {
+      if (_tabsController.index == 1) {
+        final imageBytes = await Pasteboard.image;
+        if (imageBytes != null) {
+          _artworkKey.currentState?.bytes = imageBytes;
+        }
+      }
+    } else if (action == MenuAction.trackPrevious) {
       _prevTrack();
     } else if (action == MenuAction.trackNext) {
       _nextTrack();
-    }
-  }
-
-  Widget _actionButton(
-    String label,
-    VoidCallback? onPressed, {
-    bool defaultButton = false,
-    bool noBorder = false,
-  }) {
-    PushButton button = PushButton(
-      buttonSize: ButtonSize.large,
-      padding: EdgeInsets.symmetric(
-        vertical: 2,
-        horizontal: noBorder ? 0 : 24,
-      ),
-      color: defaultButton ? null : CupertinoColors.white,
-      disabledColor: CupertinoColors.white,
-      onPressed: onPressed,
-      child: Text(label),
-    );
-    if (defaultButton || noBorder) {
-      return button;
-    } else {
-      return Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: CupertinoColors.lightBackgroundGray),
-        ),
-        child: button,
-      );
     }
   }
 }

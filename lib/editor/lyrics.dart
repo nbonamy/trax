@@ -28,6 +28,6 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 322, color: Colors.red);
+    return Container(color: Colors.red);
   }
 }
