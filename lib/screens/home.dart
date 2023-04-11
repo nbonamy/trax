@@ -125,6 +125,16 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyI),
                 onSelected: () => _onMenu(MenuAction.trackInfo),
               ),
+              PlatformMenuItem(
+                label: t.menuTrackPrev,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyP),
+                onSelected: () => _onMenu(MenuAction.trackPrevious),
+              ),
+              PlatformMenuItem(
+                label: t.menuTrackNext,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyN),
+                onSelected: () => _onMenu(MenuAction.trackNext),
+              ),
             ],
           ),
         ],

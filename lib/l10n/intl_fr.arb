@@ -14,6 +14,8 @@
 
   "menuTrack": "Piste",
   "menuTrackInfo": "Info...",
+  "menuTrackPrev": "Piste précédente",
+  "menuTrackNext": "Piste suivante",
 
   "menuView": "Affichage",
 
@@ -34,6 +36,20 @@
   "unknownGenre": "Genre inconnu",
 
   "compilations": "Compilations",
+
+  "tagTitle": "Titre",
+  "tagAlbum": "Album",
+  "tagArtist": "Artiste",
+  "tagPerformer": "Interprète",
+  "tagComposer": "Compositeur",
+  "tagGenre": "Genre",
+  "tagYear": "Année",
+  "tagVolumeIndex": "Disque",
+  "tagTrackIndex": "Piste",
+  "tagCopyright": "Copyright",
+  "tagComment": "Commentaire",
+
+  "tagsMixed": "Multiple",
 
   "appName": "trax"
 

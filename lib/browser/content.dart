@@ -173,6 +173,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 content: TagEditorWidget(
+                  menuActionStream: widget.menuActionStream,
                   selection: selectionModel.get,
                   allTracks: allTracks,
                 ),
