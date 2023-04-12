@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/path_utils.dart';
 
+enum ImportFileOp { copy, move }
+
 class Preferences extends ChangeNotifier {
   static Preferences of(BuildContext context) {
     return Provider.of<Preferences>(context, listen: false);
@@ -22,17 +24,27 @@ class Preferences extends ChangeNotifier {
   }
 
   String get musicFolder {
-    return SystemPath.music() ?? '/Music';
+    return _prefs.getString('musicfolder') ?? SystemPath.music() ?? '/Music';
   }
 
-  set musicFolder(String folder) {}
-
-  bool get moveOnImport {
-    return _prefs.getBool('import.move') ?? false;
+  set musicFolder(String folder) {
+    _prefs.setString('musicfolder', folder);
   }
 
-  set moveOnImport(bool moveOnImport) {
-    _prefs.setBool('import.move', moveOnImport);
+  ImportFileOp get importFileOp {
+    return ImportFileOp.values.elementAt(_prefs.getInt('importfileop') ?? 0);
+  }
+
+  set importFileOp(ImportFileOp importFileOp) {
+    _prefs.setInt('importfileop', importFileOp.index);
+  }
+
+  bool get keepMediaOrganized {
+    return _prefs.getBool('keeporganized') ?? true;
+  }
+
+  set keepMediaOrganized(bool keepOrganized) {
+    _prefs.setBool('keeporganized', keepOrganized);
   }
 
   Rect get windowBounds {

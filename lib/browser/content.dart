@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:trax/utils/file_utils.dart';
 
 import '../components/album.dart';
 import '../components/header_artist.dart';
@@ -13,6 +12,7 @@ import '../model/menu_actions.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
+import '../utils/file_utils.dart';
 import '../utils/platform_keyboard.dart';
 
 class BrowserContent extends StatefulWidget {

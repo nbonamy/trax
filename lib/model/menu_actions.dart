@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:trax/utils/events.dart';
 
+import '../utils/events.dart';
 import '../utils/platform_keyboard.dart';
 
 enum MenuAction {
+  appSettings,
   fileImport,
   fileRefresh,
   fileRebuild,

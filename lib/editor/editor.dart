@@ -308,15 +308,15 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     );
   }
 
+  void _onClose() {
+    Navigator.of(context).pop();
+  }
+
   void _onSave() async {
     if (await _save()) {
       widget.onComplete?.call();
       _onClose();
     }
-  }
-
-  void _onClose() {
-    Navigator.of(context).pop();
   }
 
   bool _canPrev() {
@@ -369,8 +369,8 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       currentTrack!,
       updatedTags,
       artworkAction,
+      Preferences.of(context),
       _artworkKey.currentState?.bytes,
-      moveOnImport: Preferences.of(context).moveOnImport,
       notify: widget.notify,
     );
   }
@@ -398,8 +398,8 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         track,
         initialTags,
         artworkAction,
+        Preferences.of(context),
         _artworkKey.currentState?.bytes,
-        moveOnImport: Preferences.of(context).moveOnImport,
         notify: widget.notify && widget.selection.last == track,
       );
     }

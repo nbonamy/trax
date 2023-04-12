@@ -9,6 +9,8 @@ class Consts {
   //static const Color sideBarFgColor = const Color.fromRGBO(177, 171, 166, 1.0);
   static const Color sideBarSelectColor = Color.fromRGBO(216, 210, 205, 1.0);
 
+  static const String compilationsFolder = 'Compilations';
+
   static const List<String> genres = [
     '',
     'A Cappella',

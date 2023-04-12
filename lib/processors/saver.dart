@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:path/path.dart' as p;
 import 'package:taglib_ffi/taglib_ffi.dart';
-import 'package:trax/utils/path_utils.dart';
 
 import '../data/database.dart';
+import '../model/preferences.dart';
 import '../model/track.dart';
+import '../utils/consts.dart';
+import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
 
 enum EditorMode { edit, import }
@@ -29,15 +32,16 @@ class TagSaver {
     Track track,
     Tags updatedTags,
     ArtworkAction artworkAction,
+    Preferences preferences,
     Uint8List? artworkBytes, {
-    bool moveOnImport = true,
     bool notify = true,
   }) async {
     // track
     bool updated = false;
 
     // copy before?
-    if (editorMode == EditorMode.import && moveOnImport == false) {
+    if (editorMode == EditorMode.import &&
+        preferences.importFileOp == ImportFileOp.copy) {
       String tempFilePath =
           SystemPath.temporaryFile(extension: p.extension(track.filename));
       await File(track.filename).copy(tempFilePath);
@@ -54,7 +58,7 @@ class TagSaver {
       }
 
       // move?
-      String fullpath = _filename(track);
+      String fullpath = _targetFilename(track, preferences.keepMediaOrganized);
       bool moved = await _moveTrack(track, fullpath);
       if (moved == false) {
         // save because move has not
@@ -132,10 +136,17 @@ class TagSaver {
     return true;
   }
 
-  String _filename(Track track) {
+  String _targetFilename(Track track, bool keepMediaOrganized) {
     String filepath = rootFolder;
-    filepath = p.join(filepath, track.displayArtist);
-    filepath = p.join(filepath, track.displayAlbum);
+    if (keepMediaOrganized) {
+      if (track.safeTags.compilation) {
+        filepath = p.join(filepath, Consts.compilationsFolder);
+        filepath = p.join(filepath, track.displayAlbum);
+      } else {
+        filepath = p.join(filepath, track.displayArtist);
+        filepath = p.join(filepath, track.displayAlbum);
+      }
+    }
     String filename = track.displayTrackIndex;
     if (filename.isNotEmpty) filename = '$filename. ';
     filename = '$filename${track.displayTitle}${p.extension(track.filename)}';

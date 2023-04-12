@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -14,6 +14,7 @@ import '../model/track.dart';
 import '../processors/saver.dart';
 import '../processors/scanner.dart';
 import '../utils/events.dart';
+import 'settings.dart';
 
 class TraxHomePage extends StatefulWidget {
   const TraxHomePage({super.key});
@@ -49,11 +50,28 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
       PlatformMenu(
         label: t.appName,
         menus: [
-          const PlatformProvidedMenuItem(
-            type: PlatformProvidedMenuItemType.about,
+          const PlatformMenuItemGroup(
+            members: [
+              PlatformProvidedMenuItem(
+                type: PlatformProvidedMenuItemType.about,
+              ),
+            ],
           ),
-          const PlatformProvidedMenuItem(
-            type: PlatformProvidedMenuItemType.quit,
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuAppSettings,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.comma),
+                onSelected: () => _onMenu(MenuAction.appSettings),
+              ),
+            ],
+          ),
+          const PlatformMenuItemGroup(
+            members: [
+              PlatformProvidedMenuItem(
+                type: PlatformProvidedMenuItemType.quit,
+              ),
+            ],
           ),
         ],
       ),
@@ -152,6 +170,10 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
 
   void _onMenu(MenuAction action) async {
     switch (action) {
+      case MenuAction.appSettings:
+        SettingsWidget.show(context);
+        break;
+
       case MenuAction.fileImport:
         _import();
         break;

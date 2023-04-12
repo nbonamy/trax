@@ -5,11 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
-import 'package:trax/utils/events.dart';
 
 import '../components/artwork.dart';
 import '../data/database.dart';
 import '../model/track.dart';
+import '../utils/events.dart';
 import '../utils/track_utils.dart';
 
 class StartWidget extends StatelessWidget {
@@ -38,7 +38,8 @@ class StartWidget extends StatelessWidget {
               TagLib tagLib = TagLib();
               LinkedHashMap<String, List<Track>> recents = database.recents();
               return Wrap(
-                children: recents.keys.map((a) {
+                clipBehavior: Clip.hardEdge,
+                children: recents.keys.toList().take(12).map((a) {
                   Track track = recents[a]!.first;
                   Uint8List? artworkBytes =
                       tagLib.getArtworkBytes(track.filename);

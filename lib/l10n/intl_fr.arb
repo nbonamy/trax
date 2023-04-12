@@ -1,8 +1,11 @@
 {
   "ok": "OK",
-  "cancel": "Annuler",
   "yes": "Oui",
   "no": "Non",
+  "cancel": "Annuler",
+  "save": "Sauvegarder",
+  
+  "menuAppSettings": "Configuration...",
   
   "menuFile": "Fichier",
   "menuFileImport": "Importer...",
@@ -67,6 +70,15 @@
   "artworkAdd": "Ajouter...",
   "artworkReplace": "Remplacer...",
 
+  "importFileOpCopy": "Copier",
+  "importFileOpMove": "Déplacer",
+
+  "settingsMusicFolder": "Dossier Musique",
+  "settingsImportOptions": "Options d'import",
+  "settingsImportFileOpDesc": "les fichiers lors de l'ajout dans la Collection",
+  "settingsKeepOrganizedDesc": "Garder le dossier Musique organisé",
+
   "appName": "trax"
+
 
 }

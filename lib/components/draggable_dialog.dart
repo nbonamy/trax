@@ -11,6 +11,8 @@ class DraggableDialog extends StatefulWidget {
   final Widget body;
   final Widget footer;
   final String? preferenceKey;
+  final Color headerBgColor;
+  final Color contentsBgColor;
   const DraggableDialog({
     super.key,
     required this.width,
@@ -19,6 +21,8 @@ class DraggableDialog extends StatefulWidget {
     required this.body,
     required this.footer,
     this.preferenceKey,
+    this.headerBgColor = const Color.fromRGBO(238, 232, 230, 1.0),
+    this.contentsBgColor = Colors.white,
   });
 
   @override
@@ -31,8 +35,10 @@ class _DraggableDialogState extends State<DraggableDialog> {
   @override
   void initState() {
     super.initState();
-    _alignment =
-        Preferences.of(context).getDialogAlignment(widget.preferenceKey!);
+    if (widget.preferenceKey != null) {
+      _alignment =
+          Preferences.of(context).getDialogAlignment(widget.preferenceKey!);
+    }
   }
 
   @override
@@ -42,38 +48,43 @@ class _DraggableDialogState extends State<DraggableDialog> {
       child: DraggableWidget(
         alignSelf: false,
         initialAlign: _alignment,
-        onAlign: (a) {
+        onAlign: (alignment) {
           setState(() {
-            _alignment = a;
-            Preferences.of(context)
-                .saveEditorAlignment(widget.preferenceKey!, _alignment);
+            _alignment = alignment;
+            if (widget.preferenceKey != null) {
+              Preferences.of(context).saveEditorAlignment(
+                widget.preferenceKey!,
+                _alignment,
+              );
+            }
           });
         },
         child: Container(
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
-              border: Border.all(
-                color: const Color.fromRGBO(238, 232, 230, 1.0),
-                width: 0.25,
-              ),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(DraggableDialog.kDialogBorderRadius),
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color.fromRGBO(170, 170, 170, 1),
-                  spreadRadius: 8,
-                  blurRadius: 24,
-                )
-              ]),
+            border: Border.all(
+              color: widget.headerBgColor,
+              width: 0.25,
+            ),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(DraggableDialog.kDialogBorderRadius),
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(170, 170, 170, 1),
+                spreadRadius: 8,
+                blurRadius: 24,
+              )
+            ],
+          ),
           child: Flex(
             direction: Axis.vertical,
             children: [
               Container(
-                decoration: const BoxDecoration(
-                  color: Color.fromRGBO(238, 232, 230, 1.0),
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: widget.headerBgColor,
+                  borderRadius: const BorderRadius.only(
                     topLeft:
                         Radius.circular(DraggableDialog.kDialogBorderRadius),
                     topRight:
@@ -87,9 +98,9 @@ class _DraggableDialogState extends State<DraggableDialog> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: widget.contentsBgColor,
+                    borderRadius: const BorderRadius.only(
                       bottomLeft:
                           Radius.circular(DraggableDialog.kDialogBorderRadius),
                       bottomRight:
