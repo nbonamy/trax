@@ -48,8 +48,10 @@ class StartWidget extends StatelessWidget {
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
-                        onTap: () => eventBus
-                            .fire(SelectArtistEvent(track.safeTags.artist)),
+                        onTap: () => eventBus.fire(SelectArtistAlbumEvent(
+                          track.safeTags.artist,
+                          track.safeTags.album,
+                        )),
                         child: SizedBox(
                           width: 192,
                           child: Column(

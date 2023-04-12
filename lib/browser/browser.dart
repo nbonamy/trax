@@ -24,6 +24,7 @@ class BrowserWidget extends StatefulWidget {
 
 class BrowserWidgetState extends State<BrowserWidget> {
   String? _artist;
+  String? _initialAlbum;
   String? _statusMessage;
 
   @override
@@ -77,6 +78,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
               )
             : BrowserContent(
                 artist: _artist,
+                initialAlbum: _initialAlbum,
                 menuActionStream: widget.menuActionStream,
               ),
       ),
@@ -85,10 +87,11 @@ class BrowserWidgetState extends State<BrowserWidget> {
     return window;
   }
 
-  void onSelectArtist(String? artist) {
+  void onSelectArtist(String? artist, {String? album}) {
     setState(() {
       SelectionModel.of(context).clear(notify: false);
       _artist = artist;
+      _initialAlbum = album;
     });
   }
 
@@ -104,6 +107,8 @@ class BrowserWidgetState extends State<BrowserWidget> {
       setState(() => _statusMessage = null);
     } else if (event is SelectArtistEvent) {
       onSelectArtist(event.artist);
+    } else if (event is SelectArtistAlbumEvent) {
+      onSelectArtist(event.artist, album: event.album);
     }
   }
 }

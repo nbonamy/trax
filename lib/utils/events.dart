@@ -18,3 +18,9 @@ class SelectArtistEvent {
   final String artist;
   SelectArtistEvent(this.artist);
 }
+
+class SelectArtistAlbumEvent {
+  final String artist;
+  final String album;
+  SelectArtistAlbumEvent(this.artist, this.album);
+}

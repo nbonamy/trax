@@ -1,6 +1,8 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:trax/utils/file_utils.dart';
 
 import '../components/album.dart';
@@ -15,10 +17,12 @@ import '../utils/platform_keyboard.dart';
 
 class BrowserContent extends StatefulWidget {
   final String? artist;
+  final String? initialAlbum;
   final MenuActionStream menuActionStream;
   const BrowserContent({
     super.key,
     this.artist,
+    this.initialAlbum,
     required this.menuActionStream,
   });
 
@@ -29,7 +33,7 @@ class BrowserContent extends StatefulWidget {
 class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   static const double _kVerticalPadding = 16.0;
   static const double _kHorizontalPadding = 64.0;
-  final ScrollController _controller = ScrollController();
+  final ItemScrollController _itemScrollController = ItemScrollController();
   LinkedHashMap<String, List<Track>> _albums = LinkedHashMap();
   TraxDatabase? database;
 
@@ -48,9 +52,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   @override
   void didUpdateWidget(BrowserContent oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_controller.hasClients) {
-      _controller.jumpTo(0.0);
-    }
     _loadAlbums();
   }
 
@@ -89,15 +90,19 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              controller: _controller,
+            child: ScrollablePositionedList.builder(
+              itemScrollController: _itemScrollController,
+              initialScrollIndex: widget.initialAlbum == null
+                  ? 0
+                  : max(0, _albums.keys.toList().indexOf(widget.initialAlbum!)),
               itemCount: _albums.length,
               itemBuilder: (context, index) {
                 String title = _albums.keys.elementAt(index);
                 List<Track>? tracks = _albums[title];
                 return Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: _kHorizontalPadding),
+                    horizontal: _kHorizontalPadding,
+                  ),
                   child: AlbumWidget(
                     title: title,
                     tracks: tracks ?? [],
