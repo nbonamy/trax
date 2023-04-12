@@ -30,18 +30,18 @@ class EditorDetailsWidget extends StatefulWidget {
 
 class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   late Tags _tags;
-  late TextEditingController _titleController;
-  late TextEditingController _albumController;
-  late TextEditingController _artistController;
-  late TextEditingController _performerController;
-  late TextEditingController _composerController;
-  late TextEditingController _copyrightController;
-  late TextEditingController _commentController;
-  late TextEditingController _yearController;
-  late TextEditingController _volumeIndexController;
-  late TextEditingController _volumeCountController;
-  late TextEditingController _trackIndexController;
-  late TextEditingController _trackCountController;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _albumController = TextEditingController();
+  final TextEditingController _artistController = TextEditingController();
+  final TextEditingController _performerController = TextEditingController();
+  final TextEditingController _composerController = TextEditingController();
+  final TextEditingController _copyrightController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
+  final TextEditingController _yearController = TextEditingController();
+  final TextEditingController _volumeIndexController = TextEditingController();
+  final TextEditingController _volumeCountController = TextEditingController();
+  final TextEditingController _trackIndexController = TextEditingController();
+  final TextEditingController _trackCountController = TextEditingController();
 
   bool _genreInitialized = false;
   late List<String> _genres;
@@ -49,6 +49,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
 
   final List<TextEditingController> _userCleared = [];
   final List<TextEditingController> _mixedValue = [];
+  TextEditingController? _focusedController;
 
   String get genreStr {
     if (_genreValue == TagSaver.kMixedValueStr) {
@@ -118,37 +119,43 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   void loadData() {
     _userCleared.clear();
     _tags = Tags.copy(widget.tags);
-    _titleController = TextEditingController(text: _tags.title);
-    _albumController = TextEditingController(text: _tags.album);
-    _artistController = TextEditingController(text: _tags.artist);
-    _performerController = TextEditingController(text: _tags.performer);
-    _composerController = TextEditingController(text: _tags.composer);
+    _titleController.text = _tags.title;
+    _albumController.text = _tags.album;
+    _artistController.text = _tags.artist;
+    _performerController.text = _tags.performer;
+    _composerController.text = _tags.composer;
     _genreValue = _tags.genre;
-    _copyrightController = TextEditingController(text: _tags.copyright);
-    _commentController = TextEditingController(text: _tags.comment);
-    _yearController = TextEditingController(
-        text: _tags.year == TagSaver.kMixedValueInt
-            ? TagSaver.kMixedValueStr
-            : TrackUtils.getDisplayInteger(_tags.year));
-    _volumeIndexController = TextEditingController(
-        text: _tags.volumeIndex == TagSaver.kMixedValueInt
-            ? TagSaver.kMixedValueStr
-            : TrackUtils.getDisplayInteger(_tags.volumeIndex));
-    _volumeCountController = TextEditingController(
-        text: _tags.volumeCount == TagSaver.kMixedValueInt
-            ? TagSaver.kMixedValueStr
-            : TrackUtils.getDisplayInteger(_tags.volumeCount));
-    _trackIndexController = TextEditingController(
-        text: _tags.trackIndex == TagSaver.kMixedValueInt
-            ? TagSaver.kMixedValueStr
-            : TrackUtils.getDisplayInteger(_tags.trackIndex));
-    _trackCountController = TextEditingController(
-        text: _tags.trackCount == TagSaver.kMixedValueInt
-            ? TagSaver.kMixedValueStr
-            : TrackUtils.getDisplayInteger(_tags.trackCount));
+    _copyrightController.text = _tags.copyright;
+    _commentController.text = _tags.comment;
+    _yearController.text = _tags.year == TagSaver.kMixedValueInt
+        ? TagSaver.kMixedValueStr
+        : TrackUtils.getDisplayInteger(_tags.year);
+    _volumeIndexController.text = _tags.volumeIndex == TagSaver.kMixedValueInt
+        ? TagSaver.kMixedValueStr
+        : TrackUtils.getDisplayInteger(_tags.volumeIndex);
+    _volumeCountController.text = _tags.volumeCount == TagSaver.kMixedValueInt
+        ? TagSaver.kMixedValueStr
+        : TrackUtils.getDisplayInteger(_tags.volumeCount);
+    _trackIndexController.text = _tags.trackIndex == TagSaver.kMixedValueInt
+        ? TagSaver.kMixedValueStr
+        : TrackUtils.getDisplayInteger(_tags.trackIndex);
+    _trackCountController.text = _tags.trackCount == TagSaver.kMixedValueInt
+        ? TagSaver.kMixedValueStr
+        : TrackUtils.getDisplayInteger(_tags.trackCount);
 
     // update genres
     _genreInitialized = false;
+
+    // focus
+    if (_focusedController != null) {
+      _focusedController!.value = TextEditingValue(
+        text: _focusedController!.text,
+        selection: TextSelection(
+          baseOffset: 0,
+          extentOffset: _focusedController!.text.length,
+        ),
+      );
+    }
   }
 
   @override
@@ -373,9 +380,13 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     FocusNode focusNode = FocusNode();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
+        _focusedController = controller;
         controller.selection =
             TextSelection(baseOffset: 0, extentOffset: controller.text.length);
       } else {
+        if (_focusedController == controller) {
+          _focusedController = null;
+        }
         controller.selection =
             const TextSelection(baseOffset: 0, extentOffset: 0);
       }
@@ -391,6 +402,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     };
     return MacosTextField(
       focusNode: focusNode,
+      autofocus: controller == _focusedController,
       padding: const EdgeInsets.symmetric(
         vertical: 2.0,
         horizontal: 4.0,
@@ -420,7 +432,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       ),
       focusedDecoration: BoxDecoration(
         border: Border.all(
-          color: const Color.fromRGBO(197, 216, 249, 1.0),
+          color: const Color.fromRGBO(109, 148, 220, 1.0),
           width: 0.8,
         ),
       ),
