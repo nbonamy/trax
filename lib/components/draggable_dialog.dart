@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../model/preferences.dart';
 import 'draggable_widget.dart';
 
-class DraggableDialog extends StatelessWidget {
+class DraggableDialog extends StatefulWidget {
   static const kDialogBorderRadius = 8.0;
   final double width;
   final double height;
@@ -21,62 +22,92 @@ class DraggableDialog extends StatelessWidget {
   });
 
   @override
+  State<DraggableDialog> createState() => _DraggableDialogState();
+}
+
+class _DraggableDialogState extends State<DraggableDialog> {
+  Alignment _alignment = Alignment.center;
+
+  @override
+  void initState() {
+    super.initState();
+    _alignment =
+        Preferences.of(context).getDialogAlignment(widget.preferenceKey!);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DraggableWidget(
-      preferenceKey: preferenceKey,
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color.fromRGBO(238, 232, 230, 1.0),
-              width: 0.25,
-            ),
-            borderRadius: const BorderRadius.all(
-              Radius.circular(kDialogBorderRadius),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color.fromRGBO(170, 170, 170, 1),
-                spreadRadius: 8,
-                blurRadius: 24,
-              )
-            ]),
-        child: Flex(
-          direction: Axis.vertical,
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(238, 232, 230, 1.0),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(kDialogBorderRadius),
-                  topRight: Radius.circular(kDialogBorderRadius),
-                ),
+    return Align(
+      alignment: _alignment,
+      child: DraggableWidget(
+        alignSelf: false,
+        initialAlign: _alignment,
+        onAlign: (a) {
+          setState(() {
+            _alignment = a;
+            Preferences.of(context)
+                .saveEditorAlignment(widget.preferenceKey!, _alignment);
+          });
+        },
+        child: Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color.fromRGBO(238, 232, 230, 1.0),
+                width: 0.25,
               ),
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-              child: header,
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(DraggableDialog.kDialogBorderRadius),
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color.fromRGBO(170, 170, 170, 1),
+                  spreadRadius: 8,
+                  blurRadius: 24,
+                )
+              ]),
+          child: Flex(
+            direction: Axis.vertical,
+            children: [
+              Container(
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: Color.fromRGBO(238, 232, 230, 1.0),
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(kDialogBorderRadius),
-                    bottomRight: Radius.circular(kDialogBorderRadius),
+                    topLeft:
+                        Radius.circular(DraggableDialog.kDialogBorderRadius),
+                    topRight:
+                        Radius.circular(DraggableDialog.kDialogBorderRadius),
                   ),
                 ),
-                child: Flex(
-                  direction: Axis.vertical,
-                  children: [
-                    Expanded(child: body),
-                    const SizedBox(height: 24),
-                    footer,
-                  ],
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                child: widget.header,
+              ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft:
+                          Radius.circular(DraggableDialog.kDialogBorderRadius),
+                      bottomRight:
+                          Radius.circular(DraggableDialog.kDialogBorderRadius),
+                    ),
+                  ),
+                  child: Flex(
+                    direction: Axis.vertical,
+                    children: [
+                      Expanded(child: widget.body),
+                      const SizedBox(height: 24),
+                      widget.footer,
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
