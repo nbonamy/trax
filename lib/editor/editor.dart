@@ -23,7 +23,6 @@ import 'file.dart';
 import 'lyrics.dart';
 
 class TagEditorWidget extends StatefulWidget {
-  final MenuActionStream menuActionStream;
   final List<Track> selection;
   final EditorMode editorMode;
   final List<Track> allTracks;
@@ -32,7 +31,6 @@ class TagEditorWidget extends StatefulWidget {
   const TagEditorWidget({
     super.key,
     required this.editorMode,
-    required this.menuActionStream,
     required this.selection,
     this.allTracks = const [],
     this.notify = true,
@@ -45,7 +43,6 @@ class TagEditorWidget extends StatefulWidget {
   static void show(
     BuildContext context,
     EditorMode editorMode,
-    MenuActionStream menuActionStream,
     List<Track> selection, {
     List<Track> allTracks = const [],
     Function? onComplete,
@@ -60,7 +57,6 @@ class TagEditorWidget extends StatefulWidget {
           shadowColor: Colors.transparent,
           child: TagEditorWidget(
             editorMode: editorMode,
-            menuActionStream: menuActionStream,
             selection: selection,
             allTracks: allTracks,
             onComplete: onComplete,
@@ -100,7 +96,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   @override
   void initState() {
     super.initState();
-    initMenuSubscription(widget.menuActionStream);
+    initMenuSubscription();
 
     // do some init
     if (singleTrackMode) {

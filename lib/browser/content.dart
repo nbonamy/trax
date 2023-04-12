@@ -18,12 +18,10 @@ import '../utils/platform_keyboard.dart';
 class BrowserContent extends StatefulWidget {
   final String? artist;
   final String? initialAlbum;
-  final MenuActionStream menuActionStream;
   const BrowserContent({
     super.key,
     this.artist,
     this.initialAlbum,
-    required this.menuActionStream,
   });
 
   @override
@@ -43,7 +41,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   @override
   void initState() {
     super.initState();
-    initMenuSubscription(widget.menuActionStream);
+    initMenuSubscription();
     database = TraxDatabase.of(context);
     database.addListener(_loadAlbums);
     _loadAlbums();
@@ -217,7 +215,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
           shadowColor: Colors.transparent,
           child: TagEditorWidget(
             editorMode: editorMode,
-            menuActionStream: widget.menuActionStream,
             selection: selection,
             allTracks: allTracks,
           ),

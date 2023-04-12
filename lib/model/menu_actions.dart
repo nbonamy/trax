@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trax/utils/events.dart';
 
 import '../utils/platform_keyboard.dart';
-
-typedef MenuActionController = StreamController<MenuAction>;
-typedef MenuActionStream = Stream<MenuAction>;
 
 enum MenuAction {
   fileImport,
@@ -35,10 +33,10 @@ class MenuUtils {
 }
 
 mixin MenuHandler {
-  StreamSubscription<MenuAction>? _menuSubscription;
+  StreamSubscription? _menuSubscription;
 
-  void initMenuSubscription(MenuActionStream stream) {
-    _menuSubscription = stream.listen((event) => onMenuAction(event));
+  void initMenuSubscription() {
+    _menuSubscription = eventBus.listenForMenuAction(onMenuAction);
   }
 
   void cancelMenuSubscription() {

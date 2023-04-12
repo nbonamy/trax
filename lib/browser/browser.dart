@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../components/search_box.dart';
 import '../components/status_bar.dart';
 import '../data/database.dart';
-import '../model/menu_actions.dart';
 import '../model/selection.dart';
 import '../screens/start.dart';
 import '../screens/welcome.dart';
@@ -15,8 +14,7 @@ import 'content.dart';
 import 'sidebar.dart';
 
 class BrowserWidget extends StatefulWidget {
-  final Stream<MenuAction> menuActionStream;
-  const BrowserWidget({super.key, required this.menuActionStream});
+  const BrowserWidget({super.key});
 
   @override
   State<BrowserWidget> createState() => BrowserWidgetState();
@@ -79,7 +77,6 @@ class BrowserWidgetState extends State<BrowserWidget> {
             : BrowserContent(
                 artist: _artist,
                 initialAlbum: _initialAlbum,
-                menuActionStream: widget.menuActionStream,
               ),
       ),
     );

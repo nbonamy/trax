@@ -1,4 +1,13 @@
+import 'dart:async';
+
 import 'package:event_bus/event_bus.dart';
+import '../model/menu_actions.dart';
+
+extension MenuBus on EventBus {
+  StreamSubscription listenForMenuAction(Function f) {
+    return on<MenuActionEvent>().listen((event) => f(event.action));
+  }
+}
 
 final EventBus eventBus = EventBus();
 
@@ -12,6 +21,11 @@ class BackgroundActionStartEvent {
 class BackgroundActionEndEvent {
   final BackgroundAction action;
   BackgroundActionEndEvent(this.action);
+}
+
+class MenuActionEvent {
+  final MenuAction action;
+  MenuActionEvent(this.action);
 }
 
 class SelectArtistEvent {

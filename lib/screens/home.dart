@@ -24,8 +24,8 @@ class TraxHomePage extends StatefulWidget {
 
 class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
   final GlobalKey<BrowserWidgetState> _keyBrowser = GlobalKey();
-  final MenuActionController _menuActionStream =
-      MenuActionController.broadcast();
+  // final MenuActionController _menuActionStream =
+  //     MenuActionController.broadcast();
   @override
   void initState() {
     super.initState();
@@ -38,7 +38,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
       menus: _getMainMenu(context),
       child: BrowserWidget(
         key: _keyBrowser,
-        menuActionStream: _menuActionStream.stream,
+        //menuActionStream: _menuActionStream.stream,
       ),
     );
   }
@@ -167,7 +167,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         break;
 
       default:
-        _menuActionStream.sink.add(action);
+        eventBus.fire(MenuActionEvent(action));
         break;
     }
   }
@@ -197,7 +197,6 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     TagEditorWidget.show(
       context,
       EditorMode.import,
-      _menuActionStream.stream,
       tracks,
       notify: false,
       onComplete: () {
