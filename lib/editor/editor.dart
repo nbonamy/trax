@@ -27,12 +27,16 @@ class TagEditorWidget extends StatefulWidget {
   final List<Track> selection;
   final EditorMode editorMode;
   final List<Track> allTracks;
+  final Function? onComplete;
+  final bool notify;
   const TagEditorWidget({
     super.key,
+    required this.editorMode,
     required this.menuActionStream,
     required this.selection,
-    required this.allTracks,
-    required this.editorMode,
+    this.allTracks = const [],
+    this.notify = true,
+    this.onComplete,
   });
 
   @override
@@ -40,11 +44,13 @@ class TagEditorWidget extends StatefulWidget {
 
   static void show(
     BuildContext context,
-    MenuActionStream menuActionStream,
     EditorMode editorMode,
-    List<Track> selection,
-    List<Track> allTracks,
-  ) {
+    MenuActionStream menuActionStream,
+    List<Track> selection, {
+    List<Track> allTracks = const [],
+    Function? onComplete,
+    bool notify = true,
+  }) {
     showDialog(
       context: context,
       barrierColor: Colors.transparent,
@@ -57,6 +63,8 @@ class TagEditorWidget extends StatefulWidget {
             menuActionStream: menuActionStream,
             selection: selection,
             allTracks: allTracks,
+            onComplete: onComplete,
+            notify: notify,
           ),
         );
       },
@@ -306,6 +314,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
   void _onSave() async {
     if (await _save()) {
+      widget.onComplete?.call();
       _onClose();
     }
   }
@@ -366,6 +375,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       artworkAction,
       _artworkKey.currentState?.bytes,
       moveOnImport: Preferences.of(context).moveOnImport,
+      notify: widget.notify,
     );
   }
 
@@ -394,7 +404,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         artworkAction,
         _artworkKey.currentState?.bytes,
         moveOnImport: Preferences.of(context).moveOnImport,
-        notify: widget.selection.last == track,
+        notify: widget.notify && widget.selection.last == track,
       );
     }
 

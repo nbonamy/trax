@@ -196,10 +196,16 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     // ignore: use_build_context_synchronously
     TagEditorWidget.show(
       context,
-      _menuActionStream.stream,
       EditorMode.import,
+      _menuActionStream.stream,
       tracks,
-      [],
+      notify: false,
+      onComplete: () {
+        eventBus.fire(SelectArtistAlbumEvent(
+          tracks.first.safeTags.artist,
+          tracks.first.safeTags.album,
+        ));
+      },
     );
   }
 

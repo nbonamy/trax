@@ -35,7 +35,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   static const double _kHorizontalPadding = 64.0;
   final ItemScrollController _itemScrollController = ItemScrollController();
   LinkedHashMap<String, List<Track>> _albums = LinkedHashMap();
-  TraxDatabase? database;
+  late TraxDatabase database;
 
   List<Track> get allTracks =>
       _albums.values.fold([], (all, tracks) => [...all, ...tracks]);
@@ -43,10 +43,10 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   @override
   void initState() {
     super.initState();
-    _loadAlbums();
     initMenuSubscription(widget.menuActionStream);
     database = TraxDatabase.of(context);
-    database?.addListener(_loadAlbums);
+    database.addListener(_loadAlbums);
+    _loadAlbums();
   }
 
   @override
@@ -57,16 +57,16 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
 
   @override
   void didChangeDependencies() {
-    database?.removeListener(_loadAlbums);
+    database.removeListener(_loadAlbums);
     database = TraxDatabase.of(context);
-    database?.addListener(_loadAlbums);
+    database.addListener(_loadAlbums);
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     cancelMenuSubscription();
-    database?.removeListener(_loadAlbums);
+    database.removeListener(_loadAlbums);
     super.dispose();
   }
 
@@ -92,9 +92,8 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
           Expanded(
             child: ScrollablePositionedList.builder(
               itemScrollController: _itemScrollController,
-              initialScrollIndex: widget.initialAlbum == null
-                  ? 0
-                  : max(0, _albums.keys.toList().indexOf(widget.initialAlbum!)),
+              initialScrollIndex: max(
+                  0, _albums.keys.toList().indexOf(widget.initialAlbum ?? '')),
               itemCount: _albums.length,
               itemBuilder: (context, index) {
                 String title = _albums.keys.elementAt(index);
@@ -169,7 +168,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       setState(() {});
     } else {
       setState(() {
-        _albums = TraxDatabase.of(context).albums(widget.artist!);
+        _albums = database.albums(widget.artist!);
       });
     }
   }
@@ -183,7 +182,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
         break;
       case MenuAction.editDelete:
         _deleteFiles(
-          TraxDatabase.of(context),
           selectionModel.get.map((t) => t.filename).toList(),
         );
         break;
@@ -195,7 +193,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     }
   }
 
-  _deleteFiles(TraxDatabase database, List<String> files) async {
+  _deleteFiles(List<String> files) async {
     bool? rc = await FileUtils.confirmDelete(context, files);
     if (rc != null && rc) {
       for (String filename in files) {
