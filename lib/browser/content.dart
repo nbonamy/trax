@@ -1,8 +1,6 @@
 import 'dart:collection';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/utils/file_utils.dart';
 
 import '../components/album.dart';
@@ -13,7 +11,6 @@ import '../model/menu_actions.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
-import '../utils/events.dart';
 import '../utils/platform_keyboard.dart';
 
 class BrowserContent extends StatefulWidget {
@@ -34,6 +31,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   static const double _kHorizontalPadding = 64.0;
   final ScrollController _controller = ScrollController();
   LinkedHashMap<String, List<Track>> _albums = LinkedHashMap();
+  TraxDatabase? database;
 
   List<Track> get allTracks =>
       _albums.values.fold([], (all, tracks) => [...all, ...tracks]);
@@ -43,7 +41,8 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     super.initState();
     _loadAlbums();
     initMenuSubscription(widget.menuActionStream);
-    TraxDatabase.of(context).addListener(_loadAlbums);
+    database = TraxDatabase.of(context);
+    database?.addListener(_loadAlbums);
   }
 
   @override
@@ -56,9 +55,17 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   }
 
   @override
+  void didChangeDependencies() {
+    database?.removeListener(_loadAlbums);
+    database = TraxDatabase.of(context);
+    database?.addListener(_loadAlbums);
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     cancelMenuSubscription();
-    TraxDatabase.of(context).removeListener(_loadAlbums);
+    database?.removeListener(_loadAlbums);
     super.dispose();
   }
 
@@ -166,9 +173,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   void onMenuAction(MenuAction action) {
     SelectionModel selectionModel = SelectionModel.of(context);
     switch (action) {
-      case MenuAction.fileImport:
-        _import();
-        break;
       case MenuAction.editSelectAll:
         selectionModel.set(allTracks);
         break;
@@ -196,33 +200,9 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     }
   }
 
-  void _import() async {
-    // get some files
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowMultiple: true,
-      allowedExtensions: ['mp3', 'm4a', 'flac'],
-    );
-    if (result == null) return;
-
-    // we need to parse them
-    List<Track> tracks = [];
-    TagLib tagLib = TagLib();
-    eventBus.fire(BackgroundActionStartEvent(BackgroundAction.import));
-    for (String? filepath in result.paths) {
-      if (filepath == null) continue;
-      Track track = Track.parse(filepath, tagLib);
-      tracks.add(track);
-    }
-    eventBus.fire(BackgroundActionEndEvent(BackgroundAction.import));
-
-    // now show import
-    _showEditor(EditorMode.import, UnmodifiableListView(tracks), []);
-  }
-
   void _showEditor(
     EditorMode editorMode,
-    UnmodifiableListView<Track> selection,
+    List<Track> selection,
     List<Track> allTracks,
   ) {
     showDialog(

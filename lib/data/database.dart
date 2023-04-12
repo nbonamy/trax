@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer';
 
 import 'package:flutter/widgets.dart' hide Row;
 import 'package:provider/provider.dart';
@@ -8,6 +9,12 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 import '../model/track.dart';
 import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
+
+enum AlbumOrdering {
+  none,
+  alpha,
+  chrono,
+}
 
 class TraxDatabase extends ChangeNotifier {
   static const int _latestSchemaVersion = 1;
@@ -24,10 +31,16 @@ class TraxDatabase extends ChangeNotifier {
 
   Future<void> init() async {
     String dbFile = databaseFile ?? await SystemPath.dbFile();
-    //print('Database file: $dbFile');
+    log('Database file: $dbFile');
     _database = sqlite3.open(dbFile);
     _checkSchemaVersion();
     //clear();
+  }
+
+  bool get isEmpty {
+    final ResultSet resultSet =
+        _database!.select('SELECT COUNT(*) FROM tracks');
+    return resultSet.first[0] == 0;
   }
 
   bool artistExists(String artist) {
@@ -72,13 +85,19 @@ class TraxDatabase extends ChangeNotifier {
     final ResultSet resultSet = _database!.select(
         'SELECT * FROM tracks WHERE artist=(?) ORDER BY album, volume_index, track_index, title',
         [artist]);
-    return _dehydrateAlbums(resultSet);
+    return _dehydrateAlbums(resultSet, AlbumOrdering.chrono);
   }
 
   LinkedHashMap<String, List<Track>> compilations() {
     final ResultSet resultSet = _database!.select(
         'SELECT * FROM tracks WHERE compilation=1 ORDER BY album, volume_index, track_index, title');
-    return _dehydrateAlbums(resultSet);
+    return _dehydrateAlbums(resultSet, AlbumOrdering.alpha);
+  }
+
+  LinkedHashMap<String, List<Track>> recents() {
+    final ResultSet resultSet = _database!.select(
+        'SELECT * FROM tracks WHERE imported_at>(UNIXEPOCH()-30*24*60*60)*1000 ORDER BY imported_at DESC');
+    return _dehydrateAlbums(resultSet, AlbumOrdering.none);
   }
 
   Track? getTrack(String filename) {
@@ -95,9 +114,9 @@ class TraxDatabase extends ChangeNotifier {
       title, album, artist, performer, composer,
       genre, copyright, comment, year, compilation,
       volume_index, volume_count, track_index, track_count, duration,
-      num_channels, sample_rate, bits_per_sample, bitrate)
+      num_channels, sample_rate, bits_per_sample, bitrate, imported_at)
     VALUES((?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?),
-      (?), (?), (?), (?), (?), (?), (?), (?), (?), (?))''', [
+      (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?))''', [
       track.filename,
       track.filesize,
       track.lastModified,
@@ -121,6 +140,7 @@ class TraxDatabase extends ChangeNotifier {
       track.safeTags.sampleRate,
       track.safeTags.bitsPerSample,
       track.safeTags.bitrate,
+      DateTime.now().millisecondsSinceEpoch,
     ]);
 
     // update
@@ -171,7 +191,7 @@ class TraxDatabase extends ChangeNotifier {
       genre TEXT, copyright TEXT, comment TEXT, year TEXT, compilation INTEGER,
       volume_index INTEGER, volume_count INTEGER, track_index INTEGER, track_count INTEGER,
       duration INTEGER, num_channels INTEGER, sample_rate INTEGER,
-      bits_per_sample INTEGER, bitrate INTEGER
+      bits_per_sample INTEGER, bitrate INTEGER, imported_at INTEGER
     );
     ''');
 
@@ -206,7 +226,10 @@ class TraxDatabase extends ChangeNotifier {
     _database!.execute('UPDATE info SET version=(?)', [version]);
   }
 
-  LinkedHashMap<String, List<Track>> _dehydrateAlbums(ResultSet resultSet) {
+  LinkedHashMap<String, List<Track>> _dehydrateAlbums(
+    ResultSet resultSet,
+    AlbumOrdering ordering,
+  ) {
     LinkedHashMap<String, List<Track>> albums = LinkedHashMap();
     for (final Row row in resultSet) {
       String album = row['album'].toString();
@@ -216,13 +239,21 @@ class TraxDatabase extends ChangeNotifier {
       albums[album]!.add(_dehydrateTrack(row));
     }
 
-    // now sort by year of 1st track
+    // now sort
     List<String> titles = albums.keys.toList();
-    titles.sort((a, b) {
-      int y1 = albums[a]!.first.tags?.year ?? 0;
-      int y2 = albums[b]!.first.tags?.year ?? 0;
-      return (y1 != y2) ? y1.compareTo(y2) : a.compareTo(b);
-    });
+    if (ordering != AlbumOrdering.none) {
+      titles.sort((a, b) {
+        if (ordering == AlbumOrdering.chrono) {
+          int y1 = albums[a]!.first.tags?.year ?? 0;
+          int y2 = albums[b]!.first.tags?.year ?? 0;
+          return (y1 != y2) ? y1.compareTo(y2) : a.compareTo(b);
+        } else if (ordering == AlbumOrdering.alpha) {
+          return a.compareTo(b);
+        } else {
+          return 0;
+        }
+      });
+    }
 
     // now rebuild the list
     return LinkedHashMap.fromIterable(

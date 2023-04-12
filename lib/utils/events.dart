@@ -13,3 +13,8 @@ class BackgroundActionEndEvent {
   final BackgroundAction action;
   BackgroundActionEndEvent(this.action);
 }
+
+class SelectArtistEvent {
+  final String artist;
+  SelectArtistEvent(this.artist);
+}

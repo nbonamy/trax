@@ -1,12 +1,17 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../browser/browser.dart';
 import '../data/database.dart';
+import '../editor/editor.dart';
 import '../model/menu_actions.dart';
 import '../model/preferences.dart';
+import '../model/track.dart';
+import '../processors/saver.dart';
 import '../processors/scanner.dart';
 import '../utils/events.dart';
 
@@ -147,6 +152,10 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
 
   void _onMenu(MenuAction action) async {
     switch (action) {
+      case MenuAction.fileImport:
+        _import();
+        break;
+
       case MenuAction.fileRefresh:
         _runScan();
         break;
@@ -161,6 +170,37 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         _menuActionStream.sink.add(action);
         break;
     }
+  }
+
+  void _import() async {
+    // get some files
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowMultiple: true,
+      allowedExtensions: ['mp3', 'm4a', 'flac'],
+    );
+    if (result == null) return;
+
+    // we need to parse them
+    List<Track> tracks = [];
+    TagLib tagLib = TagLib();
+    eventBus.fire(BackgroundActionStartEvent(BackgroundAction.import));
+    for (String? filepath in result.paths) {
+      if (filepath == null) continue;
+      Track track = Track.parse(filepath, tagLib);
+      tracks.add(track);
+    }
+    eventBus.fire(BackgroundActionEndEvent(BackgroundAction.import));
+
+    // now show import
+    // ignore: use_build_context_synchronously
+    TagEditorWidget.show(
+      context,
+      _menuActionStream.stream,
+      EditorMode.import,
+      tracks,
+      [],
+    );
   }
 
   void _runScan() {

@@ -1,7 +1,7 @@
-import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:pasteboard/pasteboard.dart';
@@ -24,7 +24,7 @@ import 'lyrics.dart';
 
 class TagEditorWidget extends StatefulWidget {
   final MenuActionStream menuActionStream;
-  final UnmodifiableListView<Track> selection;
+  final List<Track> selection;
   final EditorMode editorMode;
   final List<Track> allTracks;
   const TagEditorWidget({
@@ -37,6 +37,31 @@ class TagEditorWidget extends StatefulWidget {
 
   @override
   State<TagEditorWidget> createState() => _TagEditorWidgetState();
+
+  static void show(
+    BuildContext context,
+    MenuActionStream menuActionStream,
+    EditorMode editorMode,
+    List<Track> selection,
+    List<Track> allTracks,
+  ) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          child: TagEditorWidget(
+            editorMode: editorMode,
+            menuActionStream: menuActionStream,
+            selection: selection,
+            allTracks: allTracks,
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {

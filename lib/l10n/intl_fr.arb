@@ -39,6 +39,9 @@
 
   "compilations": "Compilations",
 
+  "welcome": "Bienvenue",
+  "addedRecently": "Ajoutés récemment",
+
   "editorDetails": "Détails",
   "editorArtwork": "Jaquette",
   "editorLyrics": "Paroles",

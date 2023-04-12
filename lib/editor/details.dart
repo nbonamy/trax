@@ -286,39 +286,35 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     int? maxLength,
     int? minLines,
   }) {
-    return _row(
-      label,
-      6,
-      [
-        SizedBox(
-          width: width,
-          child: _textField(
-            keyboardType,
-            maxLength,
-            controller1,
-            placeholder,
-            minLines,
-          ),
+    return _row(label, 6, [
+      SizedBox(
+        width: width,
+        child: _textField(
+          keyboardType,
+          maxLength,
+          controller1,
+          placeholder,
+          minLines,
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 6, left: 4, right: 4),
-          child: Text(
-            separator,
-            style: const TextStyle(fontSize: 13),
-          ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 6, left: 4, right: 4),
+        child: Text(
+          separator,
+          style: const TextStyle(fontSize: 13),
         ),
-        SizedBox(
-          width: width,
-          child: _textField(
-            keyboardType,
-            maxLength,
-            controller2,
-            placeholder,
-            minLines,
-          ),
+      ),
+      SizedBox(
+        width: width,
+        child: _textField(
+          keyboardType,
+          maxLength,
+          controller2,
+          placeholder,
+          minLines,
         ),
-      ],
-    );
+      ),
+    ]);
   }
 
   Widget _dropDowndRow(
@@ -375,44 +371,57 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       isMixed = true;
     }
     FocusNode focusNode = FocusNode();
-    return KeyboardListener(
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        controller.selection =
+            TextSelection(baseOffset: 0, extentOffset: controller.text.length);
+      } else {
+        controller.selection =
+            const TextSelection(baseOffset: 0, extentOffset: 0);
+      }
+    });
+    focusNode.onKeyEvent = (node, event) {
+      if (event.logicalKey == LogicalKeyboardKey.backspace &&
+          controller.text.isEmpty &&
+          _mixedValue.contains(controller)) {
+        _userCleared.add(controller);
+        _mixedValue.remove(controller);
+      }
+      return KeyEventResult.ignored;
+    };
+    return MacosTextField(
       focusNode: focusNode,
-      onKeyEvent: (key) {
-        if (key.logicalKey == LogicalKeyboardKey.backspace &&
-            controller.text.isEmpty) {
-          _userCleared.add(controller);
-        }
+      padding: const EdgeInsets.symmetric(
+        vertical: 2.0,
+        horizontal: 4.0,
+      ),
+      textAlignVertical: TextAlignVertical.center,
+      keyboardType: keyboardType,
+      maxLength: maxLength,
+      controller: controller,
+      placeholder: isMixed ? placeholder : null,
+      minLines: minLines ?? 1,
+      maxLines: minLines ?? 1,
+      inputFormatters: [
+        if (keyboardType == TextInputType.number)
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+      ],
+      onChanged: (_) {
+        _mixedValue.remove(controller);
       },
-      child: MacosTextField(
-        padding: const EdgeInsets.symmetric(
-          vertical: 2.0,
-          horizontal: 4.0,
+      onEditingComplete: () {
+        widget.onComplete();
+      },
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: const Color.fromRGBO(192, 192, 192, 1.0),
+          width: 0.8,
         ),
-        textAlignVertical: TextAlignVertical.center,
-        keyboardType: keyboardType,
-        maxLength: maxLength,
-        controller: controller,
-        placeholder: isMixed ? placeholder : null,
-        minLines: minLines ?? 1,
-        maxLines: minLines ?? 1,
-        inputFormatters: [
-          if (keyboardType == TextInputType.number)
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-        ],
-        onEditingComplete: () {
-          widget.onComplete();
-        },
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: const Color.fromRGBO(192, 192, 192, 1.0),
-            width: 0.8,
-          ),
-        ),
-        focusedDecoration: BoxDecoration(
-          border: Border.all(
-            color: const Color.fromRGBO(197, 216, 249, 1.0),
-            width: 0.8,
-          ),
+      ),
+      focusedDecoration: BoxDecoration(
+        border: Border.all(
+          color: const Color.fromRGBO(197, 216, 249, 1.0),
+          width: 0.8,
         ),
       ),
     );

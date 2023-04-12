@@ -5,8 +5,6 @@ import 'package:provider/provider.dart';
 
 import 'track.dart';
 
-typedef Selection = UnmodifiableListView<String>;
-
 class SelectionModel extends ChangeNotifier {
   final List<Track> _selection = [];
 

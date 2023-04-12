@@ -7,8 +7,9 @@ class SystemPath {
   static String? home() {
     switch (Platform.operatingSystem) {
       case 'linux':
-      case 'macos':
         return Platform.environment['HOME'];
+      case 'macos':
+        return p.join('/Users', Platform.environment['USER']);
       case 'windows':
         return Platform.environment['USERPROFILE'];
       case 'android':

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
+import 'package:provider/provider.dart';
 
 import '../components/search_box.dart';
 import '../components/status_bar.dart';
+import '../data/database.dart';
 import '../model/menu_actions.dart';
 import '../model/selection.dart';
+import '../screens/start.dart';
+import '../screens/welcome.dart';
 import '../utils/consts.dart';
 import '../utils/events.dart';
 import 'content.dart';
@@ -29,6 +33,11 @@ class BrowserWidgetState extends State<BrowserWidget> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget window = MacosWindow(
       backgroundColor: Colors.white,
@@ -38,35 +47,45 @@ class BrowserWidgetState extends State<BrowserWidget> {
         decoration: const BoxDecoration(color: Consts.sideBarBgColor),
         top: const SearchBoxWidget(),
         builder: (context, controller) {
-          return Column(
-            children: [
-              Expanded(
-                child: BrowserSidebar(
-                  scrollController: controller,
-                  onSelectArtist: onSelectArtist,
-                  artist: _artist,
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => onSelectArtist(null),
+            child: Column(
+              children: [
+                Expanded(
+                  child: BrowserSidebar(
+                    scrollController: controller,
+                    onSelectArtist: onSelectArtist,
+                    artist: _artist,
+                  ),
                 ),
-              ),
-              if (_statusMessage != null)
-                StatusBarWidget(message: _statusMessage!)
-            ],
+                if (_statusMessage != null)
+                  StatusBarWidget(message: _statusMessage!)
+              ],
+            ),
           );
         },
       ),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => SelectionModel.of(context).clear(),
-        child: BrowserContent(
-          artist: _artist,
-          menuActionStream: widget.menuActionStream,
-        ),
+        child: _artist == null
+            ? Consumer<TraxDatabase>(
+                builder: (context, database, child) => database.isEmpty
+                    ? const WelcomeWidget()
+                    : const StartWidget(),
+              )
+            : BrowserContent(
+                artist: _artist,
+                menuActionStream: widget.menuActionStream,
+              ),
       ),
     );
 
     return window;
   }
 
-  void onSelectArtist(String artist) {
+  void onSelectArtist(String? artist) {
     setState(() {
       SelectionModel.of(context).clear(notify: false);
       _artist = artist;
@@ -81,9 +100,10 @@ class BrowserWidgetState extends State<BrowserWidget> {
       if (event.action == BackgroundAction.import) {
         setState(() => _statusMessage = 'Parsing imported files');
       }
-    }
-    if (event is BackgroundActionEndEvent) {
+    } else if (event is BackgroundActionEndEvent) {
       setState(() => _statusMessage = null);
+    } else if (event is SelectArtistEvent) {
+      onSelectArtist(event.artist);
     }
   }
 }
