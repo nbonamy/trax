@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:trax/model/preferences.dart';
 
-class DraggableCard extends StatefulWidget {
+class DraggableWidget extends StatefulWidget {
   final Widget child;
   final String? preferenceKey;
-  const DraggableCard({
+  const DraggableWidget({
     Key? key,
     required this.child,
     this.preferenceKey,
   }) : super(key: key);
 
   @override
-  State<DraggableCard> createState() => _DraggableCardState();
+  State<DraggableWidget> createState() => _DraggableWidgetState();
 }
 
-class _DraggableCardState extends State<DraggableCard>
+class _DraggableWidgetState extends State<DraggableWidget>
     with SingleTickerProviderStateMixin {
   Alignment _dragAlignment = Alignment.center;
 
@@ -33,8 +33,8 @@ class _DraggableCardState extends State<DraggableCard>
     return GestureDetector(
       onPanUpdate: (details) => setState(() {
         _dragAlignment += Alignment(
-          details.delta.dx / (size.width / 4),
-          details.delta.dy / (size.height / 4),
+          details.delta.dx / (size.width / 3.15), // should be /2...
+          details.delta.dy / (size.height / 3.15), // should be /2...
         );
       }),
       onPanEnd: (details) {
@@ -45,9 +45,7 @@ class _DraggableCardState extends State<DraggableCard>
       },
       child: Align(
         alignment: _dragAlignment,
-        child: Card(
-          child: widget.child,
-        ),
+        child: widget.child,
       ),
     );
   }

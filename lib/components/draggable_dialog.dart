@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 
-import 'draggable_card.dart';
+import 'draggable_widget.dart';
 
-class DialogWidget extends StatelessWidget {
+class DraggableDialog extends StatelessWidget {
   static const kDialogBorderRadius = 8.0;
   final double width;
   final double height;
@@ -11,7 +10,7 @@ class DialogWidget extends StatelessWidget {
   final Widget body;
   final Widget footer;
   final String? preferenceKey;
-  const DialogWidget({
+  const DraggableDialog({
     super.key,
     required this.width,
     required this.height,
@@ -23,7 +22,7 @@ class DialogWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableCard(
+    return DraggableWidget(
       preferenceKey: preferenceKey,
       child: Container(
         width: width,
