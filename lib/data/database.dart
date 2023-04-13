@@ -301,7 +301,7 @@ class TraxDatabase extends ChangeNotifier {
         copyright: row['copyright'],
         comment: row['comment'],
         year: int.parse(row['year']),
-        compilation: row['compilation'] == 1,
+        compilation: row['compilation'],
         volumeIndex: row['volume_index'],
         volumeCount: row['volume_count'],
         trackIndex: row['track_index'],

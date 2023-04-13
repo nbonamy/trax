@@ -66,6 +66,7 @@
   "tagYear": "Year",
   "tagVolumeIndex": "Disc number",
   "tagTrackIndex": "Track",
+  "tagCompilation": "Compilation",
   "tagCopyright": "Copyright",
   "tagComment": "Comment",
 

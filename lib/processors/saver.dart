@@ -139,7 +139,7 @@ class TagSaver {
   String _targetFilename(Track track, bool keepMediaOrganized) {
     String filepath = rootFolder;
     if (keepMediaOrganized) {
-      if (track.safeTags.compilation) {
+      if (track.safeTags.compilation == 1) {
         filepath = p.join(filepath, Consts.compilationsFolder);
         filepath = p.join(filepath, track.displayAlbum);
       } else {

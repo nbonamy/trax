@@ -186,6 +186,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       if (track.safeTags.trackCount != tags.trackCount) {
         tags.trackCount = TagSaver.kMixedValueInt;
       }
+      if (track.safeTags.compilation != tags.compilation) {
+        tags.compilation = TagSaver.kMixedValueInt;
+      }
       if (track.safeTags.copyright != tags.copyright) {
         tags.copyright = TagSaver.kMixedValueStr;
       }
@@ -212,7 +215,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           currentTrack?.filename ?? widget.selection.first.filename),
       builder: (context, snapshot) => DraggableDialog(
         width: 500,
-        height: 565,
+        height: 580,
         preferenceKey: 'editor.alignment',
         header: Row(
           children: [

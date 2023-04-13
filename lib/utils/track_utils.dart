@@ -23,7 +23,7 @@ extension TrackUtils on Track {
   }
 
   String get displayAlbumArtist {
-    return safeTags.compilation ? 'Compilation' : displayArtist;
+    return safeTags.compilation == 1 ? 'Compilation' : displayArtist;
   }
 
   String get displayGenre {

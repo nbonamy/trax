@@ -47,8 +47,10 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   late List<String> _genres;
   late String _genreValue;
 
-  final List<TextEditingController> _userCleared = [];
-  final List<TextEditingController> _mixedValue = [];
+  bool? _compilationValue;
+
+  final Set<TextEditingController> _userCleared = {};
+  final Set<TextEditingController> _mixedValue = {};
   TextEditingController? _focusedController;
 
   String get genreStr {
@@ -101,6 +103,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _tags.volumeCount = getInt(_volumeCountController);
     _tags.trackIndex = getInt(_trackIndexController);
     _tags.trackCount = getInt(_trackCountController);
+    _tags.compilation = _compilationValue == null
+        ? TagSaver.kMixedValueInt
+        : (_compilationValue! ? 1 : 0);
     return _tags;
   }
 
@@ -142,6 +147,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _trackCountController.text = _tags.trackCount == TagSaver.kMixedValueInt
         ? TagSaver.kMixedValueStr
         : TrackUtils.getDisplayInteger(_tags.trackCount);
+    _compilationValue = _tags.compilation == TagSaver.kMixedValueInt
+        ? null
+        : (_tags.compilation == 1);
 
     // update genres
     _genreInitialized = false;
@@ -244,6 +252,14 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           placeholder: mixedNumPlaceholder,
           keyboardType: TextInputType.number,
         ),
+        _checkBoxRow(
+          t.tagCompilation,
+          value: _compilationValue,
+          onChanged: (b) => setState(() {
+            _compilationValue = b;
+          }),
+          description: 'Album is a compilation of songs by various artists',
+        ),
         _textFieldRow(
           t.tagCopyright,
           _copyrightController,
@@ -332,7 +348,29 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     bool expanded = false,
   }) {
     Widget dropdown = _dropdown(value, values, onChanged);
-    return _row(label, 3, [expanded ? Expanded(child: dropdown) : dropdown]);
+    return _row(label, 6, [expanded ? Expanded(child: dropdown) : dropdown]);
+  }
+
+  Widget _checkBoxRow(
+    String label, {
+    required bool? value,
+    required ValueChanged? onChanged,
+    String? description,
+  }) {
+    Widget checkbox = _checkbox(value, onChanged);
+    return _row(
+      label,
+      4,
+      [
+        checkbox,
+        if (description != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(left: 8, top: 4),
+            child: Text(description, style: const TextStyle(fontSize: 13)),
+          )
+        ]
+      ],
+    );
   }
 
   Widget _row(String label, double paddingTop, List<Widget> widgets) {
@@ -340,7 +378,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       direction: Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _label(label, 6),
+        _label(label, paddingTop),
         ...widgets,
       ],
     );
@@ -350,7 +388,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     return SizedBox(
       width: 100,
       child: Padding(
-        padding: EdgeInsets.only(top: paddingTop, right: 4),
+        padding: EdgeInsets.only(top: paddingTop, right: 6),
         child: Text(
           label.toLowerCase(),
           textAlign: TextAlign.right,
@@ -371,8 +409,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     int? minLines,
   ) {
     // check controller value
-    bool isMixed = _mixedValue.contains(controller);
-    if (!isMixed && controller.text == TagSaver.kMixedValueStr) {
+    bool isMixed = false;
+    if (_mixedValue.contains(controller) ||
+        controller.text == TagSaver.kMixedValueStr) {
       _mixedValue.add(controller);
       controller.text = '';
       isMixed = true;
@@ -448,6 +487,19 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
         items: values
             .map((i) => MacosPopupMenuItem(value: i, child: Text(i)))
             .toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
+
+  Widget _checkbox(
+    bool? value,
+    ValueChanged<bool>? onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: MacosCheckbox(
+        value: value,
         onChanged: onChanged,
       ),
     );
