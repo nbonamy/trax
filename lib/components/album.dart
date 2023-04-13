@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
@@ -26,19 +25,6 @@ class AlbumWidget extends StatefulWidget {
 
 class _AlbumWidgetState extends State<AlbumWidget> {
   final TagLib _tagLib = TagLib();
-  late Uint8List? _artworkBytes;
-
-  @override
-  void initState() {
-    super.initState();
-    _getArtwork();
-  }
-
-  @override
-  void didUpdateWidget(AlbumWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _getArtwork();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +42,14 @@ class _AlbumWidgetState extends State<AlbumWidget> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AlbumArtworkWidget(
-              size: _artworkSize(constraints),
-              bytes: _artworkBytes,
-              trackCount: trackCount,
-              playtime: playtimeMinutes,
+            FutureBuilder(
+              future: _tagLib.getArtworkBytes(widget.tracks.first.filename),
+              builder: (context, snapshot) => AlbumArtworkWidget(
+                size: _artworkSize(constraints),
+                bytes: snapshot.data,
+                trackCount: trackCount,
+                playtime: playtimeMinutes,
+              ),
             ),
             SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
             Expanded(
@@ -91,11 +80,5 @@ class _AlbumWidgetState extends State<AlbumWidget> {
   double _artworkSize(BoxConstraints constraints) {
     double size = constraints.maxWidth / 2 - 50.0;
     return size < 150.0 ? 0.0 : min(size, 300.0);
-  }
-
-  void _getArtwork() {
-    setState(() {
-      _artworkBytes = _tagLib.getArtworkBytes(widget.tracks.first.filename);
-    });
   }
 }

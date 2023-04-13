@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:typed_data';
 
 import 'package:extended_wrap/extended_wrap.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,35 +27,37 @@ class RecentlyAddedWidget extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
           children: recents.keys.toList().take(20).map((a) {
             Track track = recents[a]!.first;
-            Uint8List? artworkBytes = tagLib.getArtworkBytes(track.filename);
-            return MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => eventBus.fire(SelectArtistAlbumEvent(
-                  track.safeTags.artist,
-                  track.safeTags.album,
-                )),
-                child: SizedBox(
-                  width: 192,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ArtworkWidget(bytes: artworkBytes, size: 192),
-                      const SizedBox(height: 8),
-                      Text(
-                        track.displayAlbum,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: CupertinoColors.systemGrey,
+            return FutureBuilder(
+              future: tagLib.getArtworkBytes(track.filename),
+              builder: (context, snapshot) => MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () => eventBus.fire(SelectArtistAlbumEvent(
+                    track.safeTags.artist,
+                    track.safeTags.album,
+                  )),
+                  child: SizedBox(
+                    width: 192,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ArtworkWidget(bytes: snapshot.data, size: 192),
+                        const SizedBox(height: 8),
+                        Text(
+                          track.displayAlbum,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: CupertinoColors.systemGrey,
+                          ),
                         ),
-                      ),
-                      Text(
-                        track.displayAlbumArtist,
-                        style: const TextStyle(
-                          color: CupertinoColors.systemGrey2,
+                        Text(
+                          track.displayAlbumArtist,
+                          style: const TextStyle(
+                            color: CupertinoColors.systemGrey2,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

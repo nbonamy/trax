@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -80,10 +78,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   late String _activeTitle;
   late String _activeAlbum;
   late String _activeArtist;
-  Uint8List? _artworkBytes;
+  late Tags tags;
 
   int _activeIndex = -1;
-  late Tags tags;
 
   bool get singleTrackMode =>
       widget.editorMode == EditorMode.edit && widget.selection.length == 1;
@@ -133,7 +130,6 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     _activeTitle = track.displayTitle;
     _activeAlbum = track.displayAlbum;
     _activeArtist = track.displayArtist;
-    _artworkBytes = _tagLib.getArtworkBytes(track.filename);
 
     // now copy tags
     tags = Tags.copy(track.safeTags);
@@ -211,99 +207,103 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     );
 
     // return
-    return DraggableDialog(
-      width: 500,
-      height: 565,
-      preferenceKey: 'editor.alignment',
-      header: Row(
-        children: [
-          ArtworkWidget(
-            bytes: _artworkBytes,
-            size: kArtworkSize,
-            radius: 4.0,
-            placeholderBorderColor: CupertinoColors.systemGrey3,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_activeTitle.isNotEmpty)
-                  Text(
-                    _activeTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: activeHeaderStyle,
-                  ),
-                if (_activeAlbum.isNotEmpty)
-                  Text(_activeAlbum,
+    return FutureBuilder(
+      future: _tagLib.getArtworkBytes(
+          currentTrack?.filename ?? widget.selection.first.filename),
+      builder: (context, snapshot) => DraggableDialog(
+        width: 500,
+        height: 565,
+        preferenceKey: 'editor.alignment',
+        header: Row(
+          children: [
+            ArtworkWidget(
+              bytes: snapshot.data,
+              size: kArtworkSize,
+              radius: 4.0,
+              placeholderBorderColor: CupertinoColors.systemGrey3,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_activeTitle.isNotEmpty)
+                    Text(
+                      _activeTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: _activeTitle.isEmpty ? activeHeaderStyle : null),
-                if (_activeArtist.isNotEmpty)
-                  Text(_activeArtist,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: _activeTitle.isEmpty && _activeAlbum.isEmpty
-                          ? activeHeaderStyle
-                          : null),
-              ],
+                      style: activeHeaderStyle,
+                    ),
+                  if (_activeAlbum.isNotEmpty)
+                    Text(_activeAlbum,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _activeTitle.isEmpty ? activeHeaderStyle : null),
+                  if (_activeArtist.isNotEmpty)
+                    Text(_activeArtist,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _activeTitle.isEmpty && _activeAlbum.isEmpty
+                            ? activeHeaderStyle
+                            : null),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      body: TabView(
-        controller: _tabsController,
-        labels: [
-          t.editorDetails,
-          t.editorArtwork,
-          if (singleTrackMode) t.editorLyrics,
-          if (singleTrackMode) t.editorFile,
-        ],
-        children: [
-          EditorDetailsWidget(
-            key: _detailsKey,
-            tags: tags,
-            singleTrackMode: singleTrackMode,
-            onComplete: _onSave,
-          ),
-          EditorArtworkWidget(
-            key: _artworkKey,
-            bytes: _artworkBytes,
-            singleTrackMode: singleTrackMode,
-          ),
-          if (singleTrackMode)
-            EditorLyricsWidget(
-              key: _lyricsKey,
-              singleTrackMode: singleTrackMode,
-            ),
-          if (singleTrackMode)
-            EditorFileWidget(
-              singleTrackMode: singleTrackMode,
-            ),
-        ],
-      ),
-      footer: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          if (singleTrackMode) ...[
-            Button(
-              '〈',
-              _canPrev() ? _prevTrack : null,
-              noBorder: true,
-            ),
-            const SizedBox(width: 4),
-            Button(
-              '〉',
-              _canNext() ? _nextTrack : null,
-              noBorder: true,
-            ),
-            const Spacer(),
           ],
-          Button(t.cancel, _onClose),
-          const SizedBox(width: 8),
-          Button(t.ok, _onSave, defaultButton: true),
-        ],
+        ),
+        body: TabView(
+          controller: _tabsController,
+          labels: [
+            t.editorDetails,
+            t.editorArtwork,
+            if (singleTrackMode) t.editorLyrics,
+            if (singleTrackMode) t.editorFile,
+          ],
+          children: [
+            EditorDetailsWidget(
+              key: _detailsKey,
+              tags: tags,
+              singleTrackMode: singleTrackMode,
+              onComplete: _onSave,
+            ),
+            EditorArtworkWidget(
+              key: _artworkKey,
+              bytes: snapshot.data,
+              singleTrackMode: singleTrackMode,
+            ),
+            if (singleTrackMode)
+              EditorLyricsWidget(
+                key: _lyricsKey,
+                singleTrackMode: singleTrackMode,
+              ),
+            if (singleTrackMode)
+              EditorFileWidget(
+                singleTrackMode: singleTrackMode,
+              ),
+          ],
+        ),
+        footer: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (singleTrackMode) ...[
+              Button(
+                '〈',
+                _canPrev() ? _prevTrack : null,
+                noBorder: true,
+              ),
+              const SizedBox(width: 4),
+              Button(
+                '〉',
+                _canNext() ? _nextTrack : null,
+                noBorder: true,
+              ),
+              const Spacer(),
+            ],
+            Button(t.cancel, _onClose),
+            const SizedBox(width: 8),
+            Button(t.ok, _onSave, defaultButton: true),
+          ],
+        ),
       ),
     );
   }
