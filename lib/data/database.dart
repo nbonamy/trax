@@ -16,6 +16,13 @@ enum AlbumOrdering {
   chrono,
 }
 
+class LibraryInfo {
+  int tracks = 0;
+  int duration = 0;
+  int artists = 0;
+  int albums = 0;
+}
+
 class TraxDatabase extends ChangeNotifier {
   static const int _latestSchemaVersion = 1;
   String? databaseFile;
@@ -35,6 +42,21 @@ class TraxDatabase extends ChangeNotifier {
     _database = sqlite3.open(dbFile);
     _checkSchemaVersion();
     //clear();
+  }
+
+  LibraryInfo info() {
+    LibraryInfo info = LibraryInfo();
+    ResultSet resultSet = _database!.select('SELECT COUNT(*) FROM tracks');
+    info.tracks = resultSet.first[0];
+    resultSet = _database!.select('SELECT SUM(duration) FROM tracks');
+    info.duration = resultSet.first[0];
+    resultSet = _database!.select(
+        'SELECT COUNT(DISTINCT artist) FROM tracks WHERE compilation=0');
+    info.artists = resultSet.first[0];
+    resultSet = _database!.select(
+        'SELECT COUNT(*) FROM (SELECT DISTINCT artist, album FROM TRACKS WHERE compilation=0)');
+    info.albums = resultSet.first[0];
+    return info;
   }
 
   bool get isEmpty {

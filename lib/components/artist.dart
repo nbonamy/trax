@@ -48,7 +48,7 @@ class ArtistWidget extends StatelessWidget {
               Expanded(
                 child: Text(
                   TrackUtils.getDisplayArtist(name),
-                  maxLines: 1,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

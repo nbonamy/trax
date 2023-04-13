@@ -1,16 +1,11 @@
-import 'dart:collection';
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:taglib_ffi/taglib_ffi.dart';
 
-import '../components/artwork.dart';
+import '../components/recents.dart';
+import '../components/title.dart';
 import '../data/database.dart';
-import '../model/track.dart';
-import '../utils/events.dart';
-import '../utils/track_utils.dart';
+import '../utils/time_utils.dart';
 
 class StartWidget extends StatelessWidget {
   const StartWidget({super.key});
@@ -18,72 +13,45 @@ class StartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppLocalizations t = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.all(128),
-      child: Flex(
-        direction: Axis.vertical,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            t.addedRecently,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 48,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Consumer<TraxDatabase>(
-            builder: (context, database, child) {
-              TagLib tagLib = TagLib();
-              LinkedHashMap<String, List<Track>> recents = database.recents();
-              return Wrap(
-                clipBehavior: Clip.hardEdge,
-                children: recents.keys.toList().take(12).map((a) {
-                  Track track = recents[a]!.first;
-                  Uint8List? artworkBytes =
-                      tagLib.getArtworkBytes(track.filename);
-                  return Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () => eventBus.fire(SelectArtistAlbumEvent(
-                          track.safeTags.artist,
-                          track.safeTags.album,
-                        )),
-                        child: SizedBox(
-                          width: 192,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ArtworkWidget(bytes: artworkBytes, size: 192),
-                              const SizedBox(height: 8),
-                              Text(
-                                track.displayAlbum,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: CupertinoColors.systemGrey,
-                                ),
-                              ),
-                              Text(
-                                track.displayArtist,
-                                style: const TextStyle(
-                                  color: CupertinoColors.systemGrey2,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 128),
+        child: Flex(
+          direction: Axis.vertical,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TitleWidget(title: t.startLibrary),
+            Consumer<TraxDatabase>(builder: (context, database, child) {
+              LibraryInfo info = database.info();
+              TextStyle infoStyle = const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: CupertinoColors.inactiveGray,
               );
-            },
-          ),
-        ],
+              String durationStr = info.duration.formatDuration(
+                suffixHours: t.statsDurationHours,
+                suffixMinutes: t.statsDurationMinutes,
+              );
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${t.statsTracks(info.tracks).toUpperCase()} / ${durationStr.toUpperCase()}',
+                    style: infoStyle,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${t.statsArtists(info.artists).toUpperCase()} / ${t.statsAlbums(info.albums).toUpperCase()}',
+                    style: infoStyle,
+                  ),
+                ],
+              );
+            }),
+            const SizedBox(height: 32),
+            TitleWidget(title: t.addedRecently),
+            const RecentlyAddedWidget(),
+          ],
+        ),
       ),
     );
   }

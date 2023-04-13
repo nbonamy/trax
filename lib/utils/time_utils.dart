@@ -1,5 +1,10 @@
 extension TimeFormatting on int {
-  String formatDuration({bool skipHours = false}) {
+  String formatDuration({
+    bool skipHours = false,
+    String suffixHours = ':',
+    String suffixMinutes = ':',
+    String suffixSeconds = '',
+  }) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     Duration duration = Duration(seconds: this);
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
@@ -7,7 +12,7 @@ extension TimeFormatting on int {
     if (skipHours) {
       return '$twoDigitMinutes:$twoDigitSeconds';
     } else {
-      return '${duration.inHours}:$twoDigitMinutes:$twoDigitSeconds';
+      return '${duration.inHours}$suffixHours$twoDigitMinutes$suffixMinutes$twoDigitSeconds$suffixSeconds';
     }
   }
 }

@@ -6,6 +6,7 @@ import '../components/search_box.dart';
 import '../components/status_bar.dart';
 import '../data/database.dart';
 import '../model/selection.dart';
+import '../model/track.dart';
 import '../screens/start.dart';
 import '../screens/welcome.dart';
 import '../utils/consts.dart';
@@ -68,16 +69,22 @@ class BrowserWidgetState extends State<BrowserWidget> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => SelectionModel.of(context).clear(),
-        child: _artist == null
-            ? Consumer<TraxDatabase>(
-                builder: (context, database, child) => database.isEmpty
-                    ? const WelcomeWidget()
-                    : const StartWidget(),
-              )
-            : BrowserContent(
+        child: Consumer<TraxDatabase>(
+          builder: (context, database, child) {
+            if (_artist == null ||
+                (_artist! != Track.kArtistCompilations &&
+                    !database.artistExists(_artist!))) {
+              return database.isEmpty
+                  ? const WelcomeWidget()
+                  : const StartWidget();
+            } else {
+              return BrowserContent(
                 artist: _artist,
                 initialAlbum: _initialAlbum,
-              ),
+              );
+            }
+          },
+        ),
       ),
     );
 

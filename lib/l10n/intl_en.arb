@@ -43,7 +43,14 @@
   "compilations": "Compilations",
 
   "welcome": "Welcome",
+  "startLibrary": "Your Library",
   "addedRecently": "Added recently",
+
+  "statsTracks": "{count} tracks",
+  "statsArtists": "{count} artists",
+  "statsAlbums": "{count} albums",
+  "statsDurationHours": " hours ",
+  "statsDurationMinutes": " minutes ",
 
   "editorDetails": "Details",
   "editorArtwork": "Artwork",
