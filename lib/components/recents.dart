@@ -33,7 +33,9 @@ class RecentlyAddedWidget extends StatelessWidget {
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () => eventBus.fire(SelectArtistAlbumEvent(
-                    track.safeTags.artist,
+                    track.safeTags.compilation
+                        ? Track.kArtistCompilations
+                        : track.safeTags.artist,
                     track.safeTags.album,
                   )),
                   child: SizedBox(
