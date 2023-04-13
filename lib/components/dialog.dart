@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:macos_ui/macos_ui.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:macos_ui/macos_ui.dart';
 
 import '../utils/consts.dart';
+import 'app_icon.dart';
 
 typedef DialogCallback = void Function(BuildContext);
 typedef PromptCallback = void Function(BuildContext, String);
@@ -25,7 +25,7 @@ class TraxDialog {
       context: context,
       barrierColor: barrierColor,
       builder: (context) => MacosAlertDialog(
-        appIcon: const Icon(CupertinoIcons.music_note, size: 56),
+        appIcon: const AppIcon(),
         title: Text(
           title ?? AppLocalizations.of(context)?.appName ?? Consts.appName,
           style: MacosTheme.of(context)

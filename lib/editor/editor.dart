@@ -5,6 +5,7 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../components/app_icon.dart';
 import '../components/artwork.dart';
 import '../components/button.dart';
 import '../components/draggable_dialog.dart';
@@ -319,7 +320,30 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     if (await _save()) {
       widget.onComplete?.call();
       _onClose();
+    } else {
+      _showError();
     }
+  }
+
+  void _showError() {
+    AppLocalizations t = AppLocalizations.of(context)!;
+    showMacosAlertDialog(
+      context: context,
+      builder: (context) => MacosAlertDialog(
+        appIcon: const AppIcon(),
+        message: Text(t.saveError),
+        primaryButton: SizedBox(
+          width: 100,
+          child: Button(
+            t.ok,
+            () => Navigator.of(context).pop(),
+            verticalPadding: 6,
+            defaultButton: true,
+          ),
+        ),
+        title: Text(t.appName),
+      ),
+    );
   }
 
   bool _canPrev() {
@@ -396,7 +420,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       if (track.tags == null) continue;
       Tags initialTags = Tags.copy(track.tags!);
       tagSaver.mergeTags(initialTags, updatedTags);
-      await tagSaver.update(
+      bool rc = await tagSaver.update(
         widget.editorMode,
         track,
         initialTags,
@@ -405,6 +429,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         _artworkKey.currentState?.bytes,
         notify: widget.notify && widget.selection.last == track,
       );
+      if (!rc) return false;
     }
 
     // done

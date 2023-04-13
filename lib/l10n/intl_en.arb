@@ -5,6 +5,8 @@
   "cancel": "Cancel",
   "save": "Save",
 
+  "saveError": "An error occured while updating metadata",
+
   "menuAppSettings": "Settings...",
   
   "menuFile": "File",
@@ -86,6 +88,6 @@
   "settingsImportFileOpDesc": "files to Music folder when adding to Library",
   "settingsKeepOrganizedDesc": "Keep Music Media folder organized",
 
-  "appName": "trax"
+  "appName": "Trax"
 
 }

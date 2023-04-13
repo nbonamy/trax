@@ -36,53 +36,60 @@ class TagSaver {
     Uint8List? artworkBytes, {
     bool notify = true,
   }) async {
-    // track
-    bool updated = false;
-
-    // copy before?
-    if (editorMode == EditorMode.import &&
-        preferences.importFileOp == ImportFileOp.copy) {
-      String tempFilePath =
-          SystemPath.temporaryFile(extension: p.extension(track.filename));
-      await File(track.filename).copy(tempFilePath);
-      track.filename = tempFilePath;
-    }
-
-    // tag update?
-    bool tagsUpdated = updatedTags.equals(track.tags) == false;
-    if (editorMode == EditorMode.import || tagsUpdated) {
-      // now update
-      if (tagsUpdated) {
-        tagLib.setAudioTags(track.filename, updatedTags);
-        track.tags = updatedTags;
-      }
-
-      // move?
-      String fullpath = _targetFilename(track, preferences.keepMediaOrganized);
-      bool moved = await _moveTrack(track, fullpath);
-      if (moved == false) {
-        // save because move has not
-        database.insert(track, notify: false);
-      }
-
+    try {
       // track
-      updated = true;
-    }
+      bool updated = false;
 
-    // update artwork
-    if (artworkAction == ArtworkAction.deleted) {
-      tagLib.setArtwork(track.filename, Uint8List(0));
-      updated = true;
-    } else if (artworkAction == ArtworkAction.updated) {
-      tagLib.setArtwork(track.filename, artworkBytes!);
-      updated = true;
-    }
+      // copy before?
+      if (editorMode == EditorMode.import &&
+          preferences.importFileOp == ImportFileOp.copy) {
+        String tempFilePath =
+            SystemPath.temporaryFile(extension: p.extension(track.filename));
+        await File(track.filename).copy(tempFilePath);
+        track.filename = tempFilePath;
+      }
 
-    // done
-    if (notify && updated) {
-      database.notify();
+      // tag update?
+      bool tagsUpdated = updatedTags.equals(track.tags) == false;
+      if (editorMode == EditorMode.import || tagsUpdated) {
+        // now update
+        if (tagsUpdated) {
+          if (tagLib.setAudioTags(track.filename, updatedTags) == false) {
+            return false;
+          }
+          track.tags = updatedTags;
+        }
+
+        // move?
+        String fullpath =
+            _targetFilename(track, preferences.keepMediaOrganized);
+        bool moved = await _moveTrack(track, fullpath);
+        if (moved == false) {
+          // save because move has not
+          database.insert(track, notify: false);
+        }
+
+        // track
+        updated = true;
+      }
+
+      // update artwork
+      if (artworkAction == ArtworkAction.deleted) {
+        tagLib.setArtwork(track.filename, Uint8List(0));
+        updated = true;
+      } else if (artworkAction == ArtworkAction.updated) {
+        tagLib.setArtwork(track.filename, artworkBytes!);
+        updated = true;
+      }
+
+      // done
+      if (notify && updated) {
+        database.notify();
+      }
+      return true;
+    } catch (e) {
+      return false;
     }
-    return true;
   }
 
   void mergeTags(Tags initialTags, Tags updatedTags) {

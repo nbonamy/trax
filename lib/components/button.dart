@@ -4,6 +4,7 @@ import 'package:macos_ui/macos_ui.dart';
 class Button extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
+  final double verticalPadding;
   final double? horizontalPadding;
   final bool defaultButton;
   final bool noBorder;
@@ -11,6 +12,7 @@ class Button extends StatelessWidget {
     this.label,
     this.onPressed, {
     super.key,
+    this.verticalPadding = 2,
     this.horizontalPadding,
     this.defaultButton = false,
     this.noBorder = false,
@@ -21,7 +23,7 @@ class Button extends StatelessWidget {
     PushButton button = PushButton(
       buttonSize: ButtonSize.large,
       padding: EdgeInsets.symmetric(
-        vertical: 2,
+        vertical: verticalPadding,
         horizontal: horizontalPadding ?? (noBorder ? 0 : 24),
       ),
       color: defaultButton ? null : CupertinoColors.white,

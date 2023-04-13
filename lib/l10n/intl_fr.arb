@@ -5,6 +5,8 @@
   "cancel": "Annuler",
   "save": "Sauvegarder",
   
+  "saveError": "Une erreur est survenue lors de la sauvegarde",
+
   "menuAppSettings": "Configuration...",
   
   "menuFile": "Fichier",
@@ -86,7 +88,6 @@
   "settingsImportFileOpDesc": "les fichiers lors de l'ajout dans la Collection",
   "settingsKeepOrganizedDesc": "Garder le dossier Musique organisé",
 
-  "appName": "trax"
-
+  "appName": "Trax"
 
 }

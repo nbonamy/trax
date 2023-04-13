@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import '../components/app_icon.dart';
 import '../components/button.dart';
 import '../components/draggable_dialog.dart';
 import '../model/preferences.dart';
@@ -57,7 +59,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       // contentsBgColor: const Color.fromRGBO(246, 240, 236, 1.0),
       header: Row(
         children: const [
-          Icon(CupertinoIcons.music_note, size: 80),
+          AppIcon(size: 80),
           SizedBox(width: 16),
           Text(
             'Settings',
@@ -78,7 +80,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               'Browse...',
               () async {
                 String? folder = await FilePicker.platform.getDirectoryPath(
-                  initialDirectory: _musicFolder,
+                  initialDirectory: Directory(_musicFolder).existsSync()
+                      ? _musicFolder
+                      : null,
                 );
                 setState(() {
                   _musicFolder = folder ?? _musicFolder;
