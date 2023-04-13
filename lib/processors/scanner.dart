@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:isolate';
+
 import 'package:easy_isolate/easy_isolate.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
@@ -176,7 +178,7 @@ void mediaParser(
 
   // message is a queue
   String filename = message;
-  //print('start parsing $filename');
+  //log('start parsing $filename');
   TagLib tagLib = TagLib();
   Track track = Track.parse(filename, tagLib);
   mainSendPort.send({'command': 'insert', 'track': track});

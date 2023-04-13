@@ -185,6 +185,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
       case MenuAction.fileRebuild:
         TraxDatabase.of(context).clear();
         TraxDatabase.of(context).notify();
+        eventBus.fire(SelectArtistAlbumEvent(null, null));
         _runScan();
         break;
 

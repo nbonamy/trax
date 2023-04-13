@@ -22,6 +22,10 @@ extension TrackUtils on Track {
     return getDisplayArtist(safeTags.artist);
   }
 
+  String get displayAlbumArtist {
+    return safeTags.compilation ? 'Compilation' : displayArtist;
+  }
+
   String get displayGenre {
     return getDisplayGenre(safeTags.genre);
   }

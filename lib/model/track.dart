@@ -45,6 +45,8 @@ class Track {
   });
 
   static bool isTrack(String filename) {
+    // skip ._ files
+    if (p.basename(filename).startsWith('._')) return false;
     return getFormat(filename) != Format.notAudio;
   }
 

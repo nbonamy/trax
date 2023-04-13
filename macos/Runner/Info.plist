@@ -28,5 +28,21 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>To access Music files</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>To access Music files</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>To access Music files</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>To access Music files</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>To access Music files</string>
+	<key>kTCCServiceMediaLibrary</key>
+	<string>To access Music files</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>To access Music files</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>To access Music files</string>
 </dict>
 </plist>

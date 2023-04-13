@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:event_bus/event_bus.dart';
+
 import '../model/menu_actions.dart';
 
 extension MenuBus on EventBus {
@@ -34,7 +35,7 @@ class SelectArtistEvent {
 }
 
 class SelectArtistAlbumEvent {
-  final String artist;
-  final String album;
+  final String? artist;
+  final String? album;
   SelectArtistAlbumEvent(this.artist, this.album);
 }
