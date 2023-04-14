@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../components/album.dart';
@@ -9,10 +10,12 @@ import '../components/header_artist.dart';
 import '../data/database.dart';
 import '../editor/editor.dart';
 import '../model/menu_actions.dart';
+import '../model/preferences.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
 import '../utils/file_utils.dart';
+import '../utils/path_utils.dart';
 import '../utils/platform_keyboard.dart';
 
 class BrowserContent extends StatefulWidget {
@@ -181,6 +184,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       case MenuAction.editDelete:
         _deleteFiles(
           selectionModel.get.map((t) => t.filename).toList(),
+          Preferences.of(context).musicFolder,
         );
         break;
       case MenuAction.trackInfo:
@@ -191,11 +195,15 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     }
   }
 
-  _deleteFiles(List<String> files) async {
+  _deleteFiles(List<String> files, String rootFolder) async {
     bool? rc = await FileUtils.confirmDelete(context, files);
     if (rc != null && rc) {
       for (String filename in files) {
+        // delete from database
         database.delete(filename, notify: false);
+
+        // check if directory empty
+        PathUtils.deleteEmptyFolder(p.dirname(filename), rootFolder);
       }
       database.notify();
     }

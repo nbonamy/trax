@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -45,5 +46,43 @@ class SystemPath {
     Directory tempPath = Directory.systemTemp;
     int randomId = 100000000 + Random().nextInt(9999999);
     return p.join(tempPath.path, '$randomId$extension');
+  }
+}
+
+class PathUtils {
+  static void deleteEmptyFolder(String startingFolder, String stopAtFolder) {
+    Directory dir = Directory(startingFolder);
+    while (true) {
+      if (dir.existsSync() == false) break;
+      if (FileSystemEntity.identicalSync(dir.path, stopAtFolder)) break;
+      if (dir.isEmptySync() == false) break;
+      dir.listSync().forEach((element) {
+        element.deleteSync();
+      });
+      dir.deleteSync();
+      Directory parent = dir.parent;
+      if (parent.path == dir.path) break;
+      dir = parent;
+    }
+  }
+}
+
+extension IsEmpty on Directory {
+  bool isEmptySync() {
+    // general case
+    List<FileSystemEntity> items = listSync(followLinks: false);
+    if (items.isEmpty) return true;
+
+    // special cases
+    if (Platform.operatingSystem == 'macos') {
+      if (items.length > 1) return false;
+      FileSystemEntity item = items.first;
+      if (item is File && p.basename(item.path) == '.DS_Store') {
+        return true;
+      }
+    }
+
+    // too bad
+    return false;
   }
 }

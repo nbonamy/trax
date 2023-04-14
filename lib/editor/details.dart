@@ -459,6 +459,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       maxLength: maxLength,
       controller: controller,
       results: results?.map((e) => SearchResultItem(e)).toList(),
+      showResultsWhenEmpty: false,
       placeholder: isMixed ? placeholder : null,
       minLines: minLines ?? 1,
       maxLines: minLines ?? 1,
