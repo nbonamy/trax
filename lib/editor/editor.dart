@@ -11,6 +11,7 @@ import '../components/button.dart';
 import '../components/draggable_dialog.dart';
 import '../components/tab_view.dart';
 import '../data/database.dart';
+import '../model/editable_tags.dart';
 import '../model/menu_actions.dart';
 import '../model/preferences.dart';
 import '../model/track.dart';
@@ -79,7 +80,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   late String _activeTitle;
   late String _activeAlbum;
   late String _activeArtist;
-  late Tags tags;
+  late EditableTags tags;
 
   int _activeIndex = -1;
 
@@ -133,7 +134,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     _activeArtist = track.displayArtist;
 
     // now copy tags
-    tags = Tags.copy(track.safeTags);
+    tags = EditableTags.fromTags(track.safeTags);
   }
 
   void loadTracksData(List<Track> tracks) {
@@ -153,47 +154,50 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         _activeArtist = '';
       }
 
+      // get editable tags
+      EditableTags editableTags = track.editableTags;
+
       // now compare each field
-      if (track.safeTags.title != tags.title) {
+      if (editableTags.title != tags.title) {
         tags.title = TagSaver.kMixedValueStr;
       }
-      if (track.safeTags.album != tags.album) {
+      if (editableTags.album != tags.album) {
         tags.album = TagSaver.kMixedValueStr;
       }
-      if (track.safeTags.artist != tags.artist) {
+      if (editableTags.artist != tags.artist) {
         tags.artist = TagSaver.kMixedValueStr;
       }
-      if (track.safeTags.performer != tags.performer) {
+      if (editableTags.performer != tags.performer) {
         tags.performer = TagSaver.kMixedValueStr;
       }
-      if (track.safeTags.composer != tags.composer) {
+      if (editableTags.composer != tags.composer) {
         tags.composer = TagSaver.kMixedValueStr;
       }
-      if (track.safeTags.genre != tags.genre) {
+      if (editableTags.genre != tags.genre) {
         tags.genre = TagSaver.kMixedValueStr;
       }
-      if (track.safeTags.year != tags.year) {
+      if (editableTags.year != tags.year) {
         tags.year = TagSaver.kMixedValueInt;
       }
-      if (track.safeTags.volumeIndex != tags.volumeIndex) {
+      if (editableTags.volumeIndex != tags.volumeIndex) {
         tags.volumeIndex = TagSaver.kMixedValueInt;
       }
-      if (track.safeTags.volumeCount != tags.volumeCount) {
+      if (editableTags.volumeCount != tags.volumeCount) {
         tags.volumeIndex = TagSaver.kMixedValueInt;
       }
-      if (track.safeTags.trackIndex != tags.trackIndex) {
+      if (editableTags.trackIndex != tags.trackIndex) {
         tags.trackIndex = TagSaver.kMixedValueInt;
       }
-      if (track.safeTags.trackCount != tags.trackCount) {
+      if (editableTags.trackCount != tags.trackCount) {
         tags.trackCount = TagSaver.kMixedValueInt;
       }
-      if (track.safeTags.compilation != tags.compilation) {
-        tags.compilation = TagSaver.kMixedValueInt;
+      if (editableTags.editedCompilation != tags.editedCompilation) {
+        tags.editedCompilation = null;
       }
-      if (track.safeTags.copyright != tags.copyright) {
+      if (editableTags.copyright != tags.copyright) {
         tags.copyright = TagSaver.kMixedValueStr;
       }
-      if (track.safeTags.comment != tags.comment) {
+      if (editableTags.comment != tags.comment) {
         tags.comment = TagSaver.kMixedValueStr;
       }
     }
@@ -404,7 +408,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
   Future<bool> _saveMultiple() async {
     // get and check data
-    Tags? updatedTags = _detailsKey.currentState?.tags;
+    EditableTags? updatedTags = _detailsKey.currentState?.tags;
     ArtworkAction? artworkAction = _artworkKey.currentState?.action;
     if (updatedTags == null || artworkAction == null) return false;
 

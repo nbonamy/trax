@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../model/editable_tags.dart';
 import '../processors/saver.dart';
 import '../utils/consts.dart';
 import '../utils/track_utils.dart';
@@ -14,7 +14,7 @@ extension Int on TextEditingController {
 }
 
 class EditorDetailsWidget extends StatefulWidget {
-  final Tags tags;
+  final EditableTags tags;
   final bool singleTrackMode;
   final VoidCallback onComplete;
   const EditorDetailsWidget({
@@ -29,7 +29,7 @@ class EditorDetailsWidget extends StatefulWidget {
 }
 
 class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
-  late Tags _tags;
+  late EditableTags _tags;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _albumController = TextEditingController();
   final TextEditingController _artistController = TextEditingController();
@@ -47,8 +47,6 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   late List<String> _genres;
   late String _genreValue;
 
-  bool? _compilationValue;
-
   final Set<TextEditingController> _userCleared = {};
   final Set<TextEditingController> _mixedValue = {};
   TextEditingController? _focusedController;
@@ -63,7 +61,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     }
   }
 
-  Tags get tags {
+  EditableTags get tags {
     String getText(TextEditingController controller) {
       if (!widget.singleTrackMode) {
         if (_userCleared.contains(controller)) {
@@ -103,9 +101,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _tags.volumeCount = getInt(_volumeCountController);
     _tags.trackIndex = getInt(_trackIndexController);
     _tags.trackCount = getInt(_trackCountController);
-    _tags.compilation = _compilationValue == null
-        ? TagSaver.kMixedValueInt
-        : (_compilationValue! ? 1 : 0);
+    if (_tags.editedCompilation != null) {
+      _tags.compilation = _tags.editedCompilation!;
+    }
     return _tags;
   }
 
@@ -123,7 +121,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
 
   void loadData() {
     _userCleared.clear();
-    _tags = Tags.copy(widget.tags);
+    _tags = EditableTags.copy(widget.tags);
     _titleController.text = _tags.title;
     _albumController.text = _tags.album;
     _artistController.text = _tags.artist;
@@ -147,9 +145,6 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _trackCountController.text = _tags.trackCount == TagSaver.kMixedValueInt
         ? TagSaver.kMixedValueStr
         : TrackUtils.getDisplayInteger(_tags.trackCount);
-    _compilationValue = _tags.compilation == TagSaver.kMixedValueInt
-        ? null
-        : (_tags.compilation == 1);
 
     // update genres
     _genreInitialized = false;
@@ -254,9 +249,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
         ),
         _checkBoxRow(
           t.tagCompilation,
-          value: _compilationValue,
+          value: tags.editedCompilation,
           onChanged: (b) => setState(() {
-            _compilationValue = b;
+            tags.editedCompilation = b;
           }),
           description: 'Album is a compilation of songs by various artists',
         ),

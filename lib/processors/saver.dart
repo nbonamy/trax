@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../data/database.dart';
+import '../model/editable_tags.dart';
 import '../model/preferences.dart';
 import '../model/track.dart';
 import '../utils/consts.dart';
@@ -57,7 +58,7 @@ class TagSaver {
           if (tagLib.setAudioTags(track.filename, updatedTags) == false) {
             return false;
           }
-          track.tags = updatedTags;
+          track.tags = EditableTags.safeFromTags(updatedTags);
         }
 
         // move?
@@ -92,7 +93,7 @@ class TagSaver {
     }
   }
 
-  void mergeTags(Tags initialTags, Tags updatedTags) {
+  void mergeTags(Tags initialTags, EditableTags updatedTags) {
     initialTags.title = _mergeTagStr(initialTags.title, updatedTags.title);
     initialTags.album = _mergeTagStr(initialTags.album, updatedTags.album);
     initialTags.artist = _mergeTagStr(initialTags.artist, updatedTags.artist);
@@ -114,6 +115,8 @@ class TagSaver {
         _mergeTagInt(initialTags.trackIndex, updatedTags.trackIndex);
     initialTags.trackCount =
         _mergeTagInt(initialTags.trackCount, updatedTags.trackCount);
+    initialTags.compilation =
+        _mergeTagBool(initialTags.compilation, updatedTags.editedCompilation);
   }
 
   String _mergeTagStr(String initialValue, String updatedValue) {
@@ -125,6 +128,11 @@ class TagSaver {
   int _mergeTagInt(int initialValue, int updatedValue) {
     if (updatedValue == TagSaver.kClearedValueInt) return 0;
     if (updatedValue == TagSaver.kMixedValueInt) return initialValue;
+    return updatedValue;
+  }
+
+  bool _mergeTagBool(bool initialValue, bool? updatedValue) {
+    if (updatedValue == null) return initialValue;
     return updatedValue;
   }
 
@@ -146,7 +154,7 @@ class TagSaver {
   String _targetFilename(Track track, bool keepMediaOrganized) {
     String filepath = rootFolder;
     if (keepMediaOrganized) {
-      if (track.safeTags.compilation == 1) {
+      if (track.safeTags.compilation) {
         filepath = p.join(filepath, Consts.compilationsFolder);
         filepath = p.join(filepath, track.displayAlbum);
       } else {

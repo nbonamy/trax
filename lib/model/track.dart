@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:path/path.dart' as p;
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import 'editable_tags.dart';
+
 enum Format { notAudio, mp3, flac, mp4, vorbis }
 
 extension FormatEx on String {
@@ -18,10 +20,6 @@ class Track {
   int lastModified = 0;
   int filesize = 0;
   Tags? tags;
-
-  Tags get safeTags {
-    return tags ?? Tags();
-  }
 
   factory Track.parse(String filename, TagLib? tagLib) {
     File f = File(filename);
@@ -43,6 +41,14 @@ class Track {
     required this.format,
     this.tags,
   });
+
+  Tags get safeTags {
+    return tags ?? Tags();
+  }
+
+  EditableTags get editableTags {
+    return tags == null ? EditableTags() : EditableTags.fromTags(tags!);
+  }
 
   static bool isTrack(String filename) {
     // skip ._ files
