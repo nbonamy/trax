@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 import 'dart:math';
 
@@ -10,6 +11,19 @@ enum Format { notAudio, mp3, flac, mp4, vorbis }
 
 extension FormatEx on String {
   Format toFormat() => Format.values.firstWhere((d) => d.toString() == this);
+}
+
+typedef TrackList = List<Track>;
+typedef AlbumList = LinkedHashMap<String, TrackList>;
+
+extension TrackListExt on TrackList {
+  int get duration =>
+      fold(0, (duration, track) => duration + track.safeTags.duration);
+}
+
+extension AlumbListExt on AlbumList {
+  TrackList get allTracks =>
+      values.fold([], (all, tracks) => [...all, ...tracks]);
 }
 
 class Track {

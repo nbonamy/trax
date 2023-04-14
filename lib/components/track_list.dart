@@ -6,7 +6,7 @@ import '../utils/track_utils.dart';
 import 'track.dart';
 
 class TrackListWidget extends StatelessWidget {
-  final List<Track> tracks;
+  final TrackList tracks;
   final Function onSelectTrack;
   final Function onExecuteTrack;
   final bool shrinkWrap;

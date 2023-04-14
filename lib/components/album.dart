@@ -10,7 +10,7 @@ import 'track_list.dart';
 
 class AlbumWidget extends StatefulWidget {
   final String title;
-  final List<Track> tracks;
+  final TrackList tracks;
   final Function onSelectTrack;
   final Function onExecuteTrack;
   const AlbumWidget({
@@ -63,6 +63,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                     title: widget.title,
                     genre: widget.tracks.first.safeTags.genre,
                     year: widget.tracks.first.safeTags.year,
+                    duration: widget.tracks.duration,
                   ),
                   const SizedBox(height: 24),
                   TrackListWidget(

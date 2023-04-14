@@ -86,8 +86,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
                 child: HeaderArtistWidget(
                   artist: widget.artist!,
                   albumCount: _albums.length,
-                  trackCount: _albums.values
-                      .fold(0, (count, tracks) => count + tracks.length),
+                  trackCount: _albums.allTracks.length,
                 ),
               ),
               Expanded(
@@ -98,7 +97,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
                   itemCount: _albums.length,
                   itemBuilder: (context, index) {
                     String title = _albums.keys.elementAt(index);
-                    List<Track>? tracks = _albums[title];
+                    TrackList? tracks = _albums[title];
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: _kHorizontalPadding,
@@ -155,7 +154,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
         selectionModel.set([lastSelected], notify: false);
       }
       bool inBetween = false;
-      for (List<Track> tracks in _albums.values) {
+      for (TrackList tracks in _albums.values) {
         for (Track t in tracks) {
           if (inBetween) {
             selectionModel.add(t);
@@ -212,8 +211,8 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
 
   void _showEditor(
     EditorMode editorMode,
-    List<Track> selection,
-    List<Track> allTracks,
+    TrackList selection,
+    TrackList allTracks,
   ) {
     showDialog(
       context: context,

@@ -29,6 +29,7 @@ class StartWidget extends StatelessWidget {
                   color: CupertinoColors.inactiveGray,
                 );
                 String durationStr = info.duration.formatDuration(
+                  skipSeconds: true,
                   suffixHours: t.statsDurationHours,
                   suffixMinutes: t.statsDurationMinutes,
                 );

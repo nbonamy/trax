@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'track.dart';
 
 class SelectionModel extends ChangeNotifier {
-  final List<Track> _selection = [];
+  final TrackList _selection = [];
 
   bool get isEmpty {
     return _selection.isEmpty;
@@ -53,7 +53,7 @@ class SelectionModel extends ChangeNotifier {
     }
   }
 
-  void set(List<Track> items, {bool notify = true}) {
+  void set(TrackList items, {bool notify = true}) {
     _selection.clear();
     _selection.addAll(items);
     if (notify) {

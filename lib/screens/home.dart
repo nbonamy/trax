@@ -209,7 +209,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     if (result == null) return;
 
     // we need to parse them
-    List<Track> tracks = [];
+    TrackList tracks = [];
     TagLib tagLib = TagLib();
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.import));
     for (String? filepath in result.paths) {

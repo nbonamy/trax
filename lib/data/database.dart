@@ -10,14 +10,6 @@ import '../model/track.dart';
 import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
 
-typedef TrackList = List<Track>;
-typedef AlbumList = LinkedHashMap<String, TrackList>;
-
-extension All on AlbumList {
-  List<Track> get allTracks =>
-      values.fold([], (all, tracks) => [...all, ...tracks]);
-}
-
 enum AlbumOrdering {
   none,
   alpha,
@@ -317,7 +309,7 @@ class TraxDatabase extends ChangeNotifier {
     }
 
     // and tracks
-    for (List<Track> tracks in albums.values) {
+    for (TrackList tracks in albums.values) {
       tracks.sort((a, b) {
         if (a.safeTags.volumeIndex == b.safeTags.volumeIndex) {
           if (a.safeTags.trackIndex == b.safeTags.trackIndex) {

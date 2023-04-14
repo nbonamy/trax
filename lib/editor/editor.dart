@@ -23,9 +23,9 @@ import 'file.dart';
 import 'lyrics.dart';
 
 class TagEditorWidget extends StatefulWidget {
-  final List<Track> selection;
+  final TrackList selection;
   final EditorMode editorMode;
-  final List<Track> allTracks;
+  final TrackList allTracks;
   final Function? onComplete;
   final bool notify;
   const TagEditorWidget({
@@ -43,8 +43,8 @@ class TagEditorWidget extends StatefulWidget {
   static void show(
     BuildContext context,
     EditorMode editorMode,
-    List<Track> selection, {
-    List<Track> allTracks = const [],
+    TrackList selection, {
+    TrackList allTracks = const [],
     Function? onComplete,
     bool notify = true,
   }) {
@@ -137,7 +137,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     tags = EditableTags.fromTags(track.safeTags);
   }
 
-  void loadTracksData(List<Track> tracks) {
+  void loadTracksData(TrackList tracks) {
     // init with 1st track
     loadTrackData(tracks.first);
 
