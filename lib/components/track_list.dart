@@ -7,13 +7,15 @@ import 'track.dart';
 
 class TrackListWidget extends StatelessWidget {
   final List<Track> tracks;
-  final Function onSelect;
+  final Function onSelectTrack;
+  final Function onExecuteTrack;
   final bool shrinkWrap;
   final bool primary;
   const TrackListWidget({
     super.key,
     required this.tracks,
-    required this.onSelect,
+    required this.onSelectTrack,
+    required this.onExecuteTrack,
     this.shrinkWrap = true,
     this.primary = true,
   });
@@ -33,7 +35,8 @@ class TrackListWidget extends StatelessWidget {
         } else {
           return TrackWidget(
             track: tracks[index - 1],
-            onSelect: onSelect,
+            onTap: onSelectTrack,
+            onDoubleTap: onExecuteTrack,
           );
         }
       },

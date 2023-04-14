@@ -107,20 +107,24 @@ class TraxDatabase extends ChangeNotifier {
     return artists;
   }
 
-  List<String> artistNames() {
+  List<String> allArtists() {
     return _allColumnValues('artist');
   }
 
-  List<String> albumNames() {
+  List<String> allAlbums() {
     return _allColumnValues('album');
   }
 
-  List<String> performerNames() {
+  List<String> allPerformers() {
     return _allColumnValues('performer');
   }
 
-  List<String> composerNames() {
+  List<String> allComposers() {
     return _allColumnValues('composer');
+  }
+
+  List<String> allGenres() {
+    return _allColumnValues('genre');
   }
 
   LinkedHashMap<String, List<Track>> albums(String artist) {

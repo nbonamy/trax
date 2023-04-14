@@ -11,12 +11,14 @@ import 'track_list.dart';
 class AlbumWidget extends StatefulWidget {
   final String title;
   final List<Track> tracks;
-  final Function onSelect;
+  final Function onSelectTrack;
+  final Function onExecuteTrack;
   const AlbumWidget({
     super.key,
     required this.title,
     required this.tracks,
-    required this.onSelect,
+    required this.onSelectTrack,
+    required this.onExecuteTrack,
   });
 
   @override
@@ -65,7 +67,8 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                   const SizedBox(height: 24),
                   TrackListWidget(
                     tracks: widget.tracks,
-                    onSelect: widget.onSelect,
+                    onSelectTrack: widget.onSelectTrack,
+                    onExecuteTrack: widget.onExecuteTrack,
                     primary: false,
                   ),
                 ],

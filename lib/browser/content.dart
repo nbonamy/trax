@@ -106,7 +106,8 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
                   child: AlbumWidget(
                     title: title,
                     tracks: tracks ?? [],
-                    onSelect: _select,
+                    onSelectTrack: _select,
+                    onExecuteTrack: _execute,
                   ),
                 );
               },
@@ -135,6 +136,11 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     } else {
       selectionModel.set([track]);
     }
+  }
+
+  void _execute(Track track) {
+    SelectionModel.of(context).set([track]);
+    _showEditor(EditorMode.edit, [track], allTracks);
   }
 
   void _extendSelect(Track track) {

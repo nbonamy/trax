@@ -9,11 +9,13 @@ import '../utils/track_utils.dart';
 
 class TrackWidget extends StatelessWidget {
   final Track track;
-  final Function onSelect;
+  final Function onTap;
+  final Function onDoubleTap;
   const TrackWidget({
     super.key,
     required this.track,
-    required this.onSelect,
+    required this.onTap,
+    required this.onDoubleTap,
   });
 
   @override
@@ -27,7 +29,8 @@ class TrackWidget extends StatelessWidget {
         Color fgColor2 =
             selected ? fgColor : fgColor.withOpacity(Consts.fadedOpacity);
         return GestureDetector(
-          onTap: () => onSelect(track),
+          onTapDown: (_) => onTap(track),
+          onDoubleTap: () => onDoubleTap(track),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             color: bgColor,

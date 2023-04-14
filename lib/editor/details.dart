@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:provider/provider.dart';
 
 import '../data/database.dart';
 import '../model/editable_tags.dart';
@@ -37,6 +36,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   final TextEditingController _artistController = TextEditingController();
   final TextEditingController _performerController = TextEditingController();
   final TextEditingController _composerController = TextEditingController();
+  final TextEditingController _genreController = TextEditingController();
   final TextEditingController _copyrightController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
   final TextEditingController _yearController = TextEditingController();
@@ -45,23 +45,15 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   final TextEditingController _trackIndexController = TextEditingController();
   final TextEditingController _trackCountController = TextEditingController();
 
-  bool _genreInitialized = false;
-  late List<String> _genres;
-  late String _genreValue;
-
   final Set<TextEditingController> _userCleared = {};
   final Set<TextEditingController> _mixedValue = {};
   TextEditingController? _focusedController;
 
-  String get genreStr {
-    if (_genreValue == TagSaver.kMixedValueStr) {
-      return AppLocalizations.of(context)!.tagsMixed;
-    } else if (_genreValue == TagSaver.kClearedValueStr) {
-      return '';
-    } else {
-      return _genreValue;
-    }
-  }
+  List<String> _allAlbums = [];
+  List<String> _allArtists = [];
+  List<String> _allPerformers = [];
+  List<String> _allComposers = [];
+  List<String> _allGenres = [];
 
   EditableTags get tags {
     String getText(TextEditingController controller) {
@@ -95,7 +87,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _tags.artist = getText(_artistController);
     _tags.performer = getText(_performerController);
     _tags.composer = getText(_composerController);
-    _tags.genre = _genreValue;
+    _tags.genre = getText(_genreController);
     _tags.copyright = getText(_copyrightController);
     _tags.comment = getText(_commentController);
     _tags.year = getInt(_yearController);
@@ -112,6 +104,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   @override
   void initState() {
     super.initState();
+    loadCache();
     loadData();
   }
 
@@ -119,6 +112,26 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   void didUpdateWidget(EditorDetailsWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     loadData();
+  }
+
+  void loadCache() {
+    TraxDatabase database = TraxDatabase.of(context);
+    _allAlbums = database.allAlbums();
+    _allArtists = database.allArtists();
+    _allPerformers = database.allPerformers();
+    _allComposers = database.allComposers();
+
+    // all genres is a mix
+    _allGenres = List.from(Consts.genres);
+    List<String> dbGenres = database.allGenres();
+    for (String genre in dbGenres) {
+      if (_allGenres.contains(genre) == false) {
+        _allGenres.add(genre);
+      }
+    }
+
+    // so now sort
+    _allGenres.sort();
   }
 
   void loadData() {
@@ -129,7 +142,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _artistController.text = _tags.artist;
     _performerController.text = _tags.performer;
     _composerController.text = _tags.composer;
-    _genreValue = _tags.genre;
+    _genreController.text = _tags.genre;
     _copyrightController.text = _tags.copyright;
     _commentController.text = _tags.comment;
     _yearController.text = _tags.year == TagSaver.kMixedValueInt
@@ -147,9 +160,6 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     _trackCountController.text = _tags.trackCount == TagSaver.kMixedValueInt
         ? TagSaver.kMixedValueStr
         : TrackUtils.getDisplayInteger(_tags.trackCount);
-
-    // update genres
-    _genreInitialized = false;
 
     // focus
     if (_focusedController != null) {
@@ -171,110 +181,91 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     String mixedNumPlaceholder = widget.singleTrackMode ? '' : '-';
     String indexSeparator = t.indexOfCount;
 
-    // update genres
-    if (!_genreInitialized) {
-      _genres = List.from(Consts.genres);
-      if (_genres.contains(genreStr) == false) {
-        _genres.add(genreStr);
-      }
-      _genreInitialized = true;
-    }
-
     // return
-    return Consumer<TraxDatabase>(
-      builder: (context, database, child) => Column(
-        children: [
-          _textFieldRow(
-            t.tagTitle,
-            _titleController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _textFieldRow(
-            t.tagAlbum,
-            _albumController,
-            placeholder: mixedTextPlaceholder,
-            results: database.albumNames(),
-          ),
-          _textFieldRow(
-            t.tagArtist,
-            _artistController,
-            placeholder: mixedTextPlaceholder,
-            results: database.artistNames(),
-          ),
-          _textFieldRow(
-            t.tagPerformer,
-            _performerController,
-            placeholder: mixedTextPlaceholder,
-            results: database.performerNames(),
-          ),
-          _textFieldRow(
-            t.tagComposer,
-            _composerController,
-            placeholder: mixedTextPlaceholder,
-            results: database.composerNames(),
-          ),
-          _dropDowndRow(
-            t.tagGenre,
-            value: genreStr,
-            values: _genres,
-            onChanged: (value) {
-              if (!widget.singleTrackMode) {
-                if (value.isEmpty) {
-                  value = TagSaver.kClearedValueStr;
-                } else if (value == t.tagsMixed) {
-                  value = TagSaver.kMixedValueStr;
-                }
-              }
-              setState(() => _genreValue = value);
-            },
-          ),
-          _textFieldRow(
-            t.tagYear,
-            _yearController,
-            placeholder: mixedNumPlaceholder,
-            keyboardType: TextInputType.number,
-            maxLength: 4,
-            width: 60,
-          ),
-          _textFieldsRow(
-            t.tagVolumeIndex,
-            indexSeparator,
-            40,
-            _volumeIndexController,
-            _volumeCountController,
-            placeholder: mixedNumPlaceholder,
-            keyboardType: TextInputType.number,
-          ),
-          _textFieldsRow(
-            t.tagTrackIndex,
-            indexSeparator,
-            40,
-            _trackIndexController,
-            _trackCountController,
-            placeholder: mixedNumPlaceholder,
-            keyboardType: TextInputType.number,
-          ),
-          _checkBoxRow(
-            t.tagCompilation,
-            value: tags.editedCompilation,
-            onChanged: (b) => setState(() {
-              tags.editedCompilation = b;
-            }),
-            description: 'Album is a compilation of songs by various artists',
-          ),
-          _textFieldRow(
-            t.tagCopyright,
-            _copyrightController,
-            placeholder: mixedTextPlaceholder,
-          ),
-          _textFieldRow(
-            t.tagComment,
-            _commentController,
-            placeholder: mixedTextPlaceholder,
-            minLines: 3,
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        _textFieldRow(
+          t.tagTitle,
+          _titleController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagAlbum,
+          _albumController,
+          placeholder: mixedTextPlaceholder,
+          results: _allAlbums,
+        ),
+        _textFieldRow(
+          t.tagArtist,
+          _artistController,
+          placeholder: mixedTextPlaceholder,
+          results: _allArtists,
+        ),
+        _textFieldRow(
+          t.tagPerformer,
+          _performerController,
+          placeholder: mixedTextPlaceholder,
+          results: _allPerformers,
+        ),
+        _textFieldRow(
+          t.tagComposer,
+          _composerController,
+          placeholder: mixedTextPlaceholder,
+          results: _allComposers,
+        ),
+        _textFieldRow(
+          t.tagGenre,
+          _genreController,
+          placeholder: mixedTextPlaceholder,
+          results: _allGenres,
+          showResultsWhenEmpty: true,
+        ),
+        _textFieldRow(
+          t.tagYear,
+          _yearController,
+          placeholder: mixedNumPlaceholder,
+          keyboardType: TextInputType.number,
+          maxLength: 4,
+          width: 60,
+        ),
+        _textFieldsRow(
+          t.tagVolumeIndex,
+          indexSeparator,
+          40,
+          _volumeIndexController,
+          _volumeCountController,
+          placeholder: mixedNumPlaceholder,
+          keyboardType: TextInputType.number,
+        ),
+        _textFieldsRow(
+          t.tagTrackIndex,
+          indexSeparator,
+          40,
+          _trackIndexController,
+          _trackCountController,
+          placeholder: mixedNumPlaceholder,
+          keyboardType: TextInputType.number,
+        ),
+        _checkBoxRow(
+          t.tagCompilation,
+          description: 'Album is a compilation of songs by various artists',
+          value: tags.editedCompilation,
+          onChanged: (b) => setState(() {
+            tags.editedCompilation = b;
+          }),
+        ),
+        _textFieldRow(
+          t.tagCopyright,
+          _copyrightController,
+          placeholder: mixedTextPlaceholder,
+        ),
+        _textFieldRow(
+          t.tagComment,
+          _commentController,
+          placeholder: mixedTextPlaceholder,
+          minLines: 3,
+        ),
+      ],
     );
   }
 
@@ -284,6 +275,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     String? placeholder,
     TextInputType? keyboardType,
     List<String>? results,
+    bool showResultsWhenEmpty = false,
     int? maxLength,
     int? minLines,
     double? width,
@@ -294,7 +286,8 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       controller,
       placeholder,
       minLines,
-      results,
+      results: results,
+      showResultsWhenEmpty: showResultsWhenEmpty,
     );
     return _row(label, 6, [
       width == null
@@ -323,7 +316,6 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           controller1,
           placeholder,
           minLines,
-          null,
         ),
       ),
       Padding(
@@ -341,22 +333,21 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           controller2,
           placeholder,
           minLines,
-          null,
         ),
       ),
     ]);
   }
 
-  Widget _dropDowndRow(
-    String label, {
-    required String value,
-    required List<String> values,
-    required ValueChanged? onChanged,
-    bool expanded = false,
-  }) {
-    Widget dropdown = _dropdown(value, values, onChanged);
-    return _row(label, 6, [expanded ? Expanded(child: dropdown) : dropdown]);
-  }
+  // Widget _dropDowndRow(
+  //   String label, {
+  //   required String value,
+  //   required List<String> values,
+  //   required ValueChanged? onChanged,
+  //   bool expanded = false,
+  // }) {
+  //   Widget dropdown = _dropdown(value, values, onChanged);
+  //   return _row(label, 6, [expanded ? Expanded(child: dropdown) : dropdown]);
+  // }
 
   Widget _checkBoxRow(
     String label, {
@@ -413,9 +404,10 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     int? maxLength,
     TextEditingController controller,
     String? placeholder,
-    int? minLines,
+    int? minLines, {
     List<String>? results,
-  ) {
+    bool showResultsWhenEmpty = false,
+  }) {
     // check controller value
     bool isMixed = false;
     if (_mixedValue.contains(controller) ||
@@ -459,7 +451,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       maxLength: maxLength,
       controller: controller,
       results: results?.map((e) => SearchResultItem(e)).toList(),
-      showResultsWhenEmpty: false,
+      showResultsWhenEmpty: showResultsWhenEmpty,
       placeholder: isMixed ? placeholder : null,
       minLines: minLines ?? 1,
       maxLines: minLines ?? 1,
@@ -488,19 +480,19 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     );
   }
 
-  Widget _dropdown(
-      String value, List<String> values, ValueChanged<dynamic>? onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: MacosPopupButton(
-        value: value,
-        items: values
-            .map((i) => MacosPopupMenuItem(value: i, child: Text(i)))
-            .toList(),
-        onChanged: onChanged,
-      ),
-    );
-  }
+  // Widget _dropdown(
+  //     String value, List<String> values, ValueChanged<dynamic>? onChanged) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 4),
+  //     child: MacosPopupButton(
+  //       value: value,
+  //       items: values
+  //           .map((i) => MacosPopupMenuItem(value: i, child: Text(i)))
+  //           .toList(),
+  //       onChanged: onChanged,
+  //     ),
+  //   );
+  // }
 
   Widget _checkbox(
     bool? value,
