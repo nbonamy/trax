@@ -59,7 +59,9 @@ class BrowserWidgetState extends State<BrowserWidget> {
                   ),
                 ),
                 if (_statusMessage != null)
-                  StatusBarWidget(message: _statusMessage!)
+                  StatusBarWidget(
+                    message: _statusMessage!,
+                  )
               ],
             ),
           );
@@ -68,20 +70,14 @@ class BrowserWidgetState extends State<BrowserWidget> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => SelectionModel.of(context).clear(),
-        child: DatabaseBuilder<bool>(
-          future: (database) async {
-            if (_artist == null) return false;
-            if (_artist == Track.kArtistCompilations) return true;
-            return database.artistExists(_artist!);
-          },
-          builder: (context, database, exists) {
-            if (!exists) {
-              return FutureBuilder<bool>(
-                  future: database.isEmpty,
-                  builder: (context, snapshot) =>
-                      (snapshot.hasData == false || snapshot.data!)
-                          ? const WelcomeWidget()
-                          : const StartWidget());
+        child: Builder(
+          builder: (context) {
+            if (_artist == null || _artist == Track.kArtistsHome) {
+              return DatabaseBuilder<bool>(
+                future: (database) => database.isEmpty,
+                builder: (context, database, isEmpty) =>
+                    isEmpty ? const WelcomeWidget() : const StartWidget(),
+              );
             } else {
               return BrowserContent(
                 artist: _artist,
@@ -97,8 +93,8 @@ class BrowserWidgetState extends State<BrowserWidget> {
   }
 
   void onSelectArtist(String? artist, {String? album}) {
+    SelectionModel.of(context).clear(notify: false);
     setState(() {
-      SelectionModel.of(context).clear(notify: false);
       _artist = artist;
       _initialAlbum = album;
     });

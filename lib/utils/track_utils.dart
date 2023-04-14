@@ -55,7 +55,9 @@ extension TrackUtils on Track {
   }
 
   static String getDisplayArtist(String artist) {
-    if (artist == Track.kArtistCompilations) {
+    if (artist == Track.kArtistsHome) {
+      return _t?.home ?? artist;
+    } else if (artist == Track.kArtistCompilations) {
       return _t?.compilations ?? artist;
     } else {
       return _defaultValue(artist, _t?.unknownArtist);

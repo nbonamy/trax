@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
 import 'album_artwork.dart';
@@ -26,8 +25,6 @@ class AlbumWidget extends StatefulWidget {
 }
 
 class _AlbumWidgetState extends State<AlbumWidget> {
-  final TagLib _tagLib = TagLib();
-
   @override
   Widget build(BuildContext context) {
     int trackCount = widget.tracks.length;
@@ -44,14 +41,11 @@ class _AlbumWidgetState extends State<AlbumWidget> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            FutureBuilder(
-              future: _tagLib.getArtworkBytes(widget.tracks.first.filename),
-              builder: (context, snapshot) => AlbumArtworkWidget(
-                size: _artworkSize(constraints),
-                bytes: snapshot.data,
-                trackCount: trackCount,
-                playtime: playtimeMinutes,
-              ),
+            AlbumArtworkWidget(
+              track: widget.tracks.first,
+              size: _artworkSize(constraints),
+              trackCount: trackCount,
+              playtime: playtimeMinutes,
             ),
             SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
             Expanded(
@@ -63,7 +57,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                     title: widget.title,
                     genre: widget.tracks.first.safeTags.genre,
                     year: widget.tracks.first.safeTags.year,
-                    duration: widget.tracks.duration,
+                    duration: 0, //widget.tracks.duration,
                   ),
                   const SizedBox(height: 24),
                   TrackListWidget(

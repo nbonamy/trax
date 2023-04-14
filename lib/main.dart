@@ -10,6 +10,7 @@ import 'data/database.dart';
 import 'model/preferences.dart';
 import 'model/selection.dart';
 import 'screens/home.dart';
+import 'utils/artwork_provider.dart';
 import 'utils/consts.dart';
 import 'utils/track_utils.dart';
 
@@ -71,7 +72,10 @@ class TraxApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => SelectionModel(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ArtworkProvider(),
+        ),
       ],
       builder: (context, _) {
         final appTheme = context.watch<AppTheme>();

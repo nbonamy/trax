@@ -13,11 +13,13 @@ typedef DatabaseBuilderBuilder<T> = Widget Function(
 class DatabaseBuilder<T> extends StatelessWidget {
   final DatabaseFuture<T> future;
   final DatabaseBuilderBuilder<T> builder;
+  final T? initialData;
   final Widget? placeholder;
   const DatabaseBuilder({
     super.key,
     required this.future,
     required this.builder,
+    this.initialData,
     this.placeholder,
   });
 
@@ -26,6 +28,7 @@ class DatabaseBuilder<T> extends StatelessWidget {
     return Consumer<TraxDatabase>(
       builder: (context, database, child) => FutureBuilder<T>(
         future: future(database),
+        initialData: initialData,
         builder: (context, snapshot) {
           if (snapshot.hasData == false || snapshot.data == null) {
             return placeholder ?? Container();

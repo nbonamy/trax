@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../components/artist.dart';
 import '../components/database_builder.dart';
 import '../data/database.dart';
+import '../model/track.dart';
 
 class BrowserSidebar extends StatefulWidget {
   final ScrollController scrollController;
@@ -40,14 +41,22 @@ class _BrowserSidebarState extends State<BrowserSidebar> {
         future: (database) => database.artists(),
         builder: (context, database, artists) => ListView.builder(
           controller: widget.scrollController,
-          itemCount: artists.length,
+          itemCount: artists.length + 1,
           itemBuilder: (context, index) {
-            String artist = artists[index];
-            return ArtistWidget(
-              name: artist,
-              selected: widget.artist != null && artist == widget.artist,
-              onSelectArtist: widget.onSelectArtist,
-            );
+            if (index == 0) {
+              return ArtistWidget(
+                name: Track.kArtistsHome,
+                selected: widget.artist == null,
+                onSelectArtist: widget.onSelectArtist,
+              );
+            } else {
+              String artist = artists[index - 1];
+              return ArtistWidget(
+                name: artist,
+                selected: widget.artist != null && artist == widget.artist,
+                onSelectArtist: widget.onSelectArtist,
+              );
+            }
           },
         ),
       ),

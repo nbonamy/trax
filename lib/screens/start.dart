@@ -22,6 +22,7 @@ class StartWidget extends StatelessWidget {
             TitleWidget(title: t.startLibrary),
             DatabaseBuilder(
               future: (database) => database.info(),
+              placeholder: const SizedBox(height: 46),
               builder: (context, database, info) {
                 TextStyle infoStyle = const TextStyle(
                   fontSize: 16,

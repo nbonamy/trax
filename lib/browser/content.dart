@@ -81,8 +81,9 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
           child: Column(
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: _kHorizontalPadding),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: _kHorizontalPadding,
+                ),
                 child: HeaderArtistWidget(
                   artist: widget.artist!,
                   albumCount: _albums.length,

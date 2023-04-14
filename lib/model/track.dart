@@ -27,6 +27,7 @@ extension AlumbListExt on AlbumList {
 }
 
 class Track {
+  static const String kArtistsHome = '_home_';
   static const String kArtistCompilations = '_compilations_';
 
   String filename;
