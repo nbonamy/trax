@@ -114,16 +114,16 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     loadData();
   }
 
-  void loadCache() {
+  void loadCache() async {
     TraxDatabase database = TraxDatabase.of(context);
-    _allAlbums = database.allAlbums();
-    _allArtists = database.allArtists();
-    _allPerformers = database.allPerformers();
-    _allComposers = database.allComposers();
+    _allAlbums = await database.allAlbums();
+    _allArtists = await database.allArtists();
+    _allPerformers = await database.allPerformers();
+    _allComposers = await database.allComposers();
 
     // all genres is a mix
     _allGenres = List.from(Consts.genres);
-    List<String> dbGenres = database.allGenres();
+    List<String> dbGenres = await database.allGenres();
     for (String genre in dbGenres) {
       if (_allGenres.contains(genre) == false) {
         _allGenres.add(genre);

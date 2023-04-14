@@ -46,7 +46,7 @@ void runScan(
       } else if (message == kCompleteMessage) {
         scanCompleted = true;
       } else {
-        bool newArtist = mainHandler(tagLib, database, message, null, []);
+        bool newArtist = await mainHandler(tagLib, database, message, null, []);
         queue.remove(message['track'].filename);
         if (newArtist) {
           onUpdate();
@@ -85,25 +85,25 @@ Future<void> createScanner(
     directoryScanner,
     initialMessage: {
       'rootFolder': rootFolder,
-      'files': database.files(),
+      'files': await database.files(),
     },
   );
 }
 
-bool mainHandler(
+Future<bool> mainHandler(
   TagLib tagLib,
   TraxDatabase database,
   dynamic message,
   SendPort? parserSendPort,
   List<String> queue,
-) {
+) async {
   if (message is Map == false || message.containsKey('command') == false) {
     return false;
   }
 
   switch (message['command']) {
     case 'check':
-      if (checkFile(database, tagLib, message['filename'])) {
+      if (await checkFile(database, tagLib, message['filename'])) {
         queue.add(message['filename']);
         parserSendPort?.send(message['filename']);
         return true;
@@ -113,7 +113,7 @@ bool mainHandler(
     case 'insert':
       Track track = message['track'] as Track;
       if (track.tags != null && track.tags!.valid) {
-        bool newArtist = !database.artistExists(track.tags!.artist);
+        bool newArtist = !(await database.artistExists(track.tags!.artist));
         database.insert(track, notify: false);
         return newArtist;
       } else {
@@ -128,9 +128,10 @@ bool mainHandler(
   }
 }
 
-bool checkFile(TraxDatabase database, TagLib tagLib, String filename) {
+Future<bool> checkFile(
+    TraxDatabase database, TagLib tagLib, String filename) async {
   // check if cached version is up-to-date
-  Track? cached = database.getTrack(filename);
+  Track? cached = await database.getTrack(filename);
   if (cached != null) {
     Track track = Track.parse(filename, null);
     if (track.filesize == cached.filesize &&

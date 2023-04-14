@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:provider/provider.dart';
 
+import '../components/database_builder.dart';
 import '../components/search_box.dart';
 import '../components/status_bar.dart';
-import '../data/database.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../screens/start.dart';
@@ -69,14 +68,20 @@ class BrowserWidgetState extends State<BrowserWidget> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => SelectionModel.of(context).clear(),
-        child: Consumer<TraxDatabase>(
-          builder: (context, database, child) {
-            if (_artist == null ||
-                (_artist! != Track.kArtistCompilations &&
-                    !database.artistExists(_artist!))) {
-              return database.isEmpty
-                  ? const WelcomeWidget()
-                  : const StartWidget();
+        child: DatabaseBuilder<bool>(
+          future: (database) async {
+            if (_artist == null) return false;
+            if (_artist == Track.kArtistCompilations) return true;
+            return database.artistExists(_artist!);
+          },
+          builder: (context, database, exists) {
+            if (!exists) {
+              return FutureBuilder<bool>(
+                  future: database.isEmpty,
+                  builder: (context, snapshot) =>
+                      (snapshot.hasData == false || snapshot.data!)
+                          ? const WelcomeWidget()
+                          : const StartWidget());
             } else {
               return BrowserContent(
                 artist: _artist,

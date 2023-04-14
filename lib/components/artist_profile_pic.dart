@@ -18,6 +18,14 @@ class ArtistProfilePic extends StatelessWidget {
         color: Colors.black.withOpacity(
           0.2,
         ),
+        // gradient: const LinearGradient(
+        //   begin: Alignment.bottomCenter,
+        //   end: Alignment.topCenter,
+        //   colors: [
+        //     Color.fromRGBO(135, 140, 150, 1.0),
+        //     Color.fromRGBO(164, 170, 182, 1.0),
+        //   ],
+        // ),
       ),
       child: MacosIcon(
         CupertinoIcons.music_mic,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../components/artist.dart';
+import '../components/database_builder.dart';
 import '../data/database.dart';
 
 class BrowserSidebar extends StatefulWidget {
@@ -19,17 +20,15 @@ class BrowserSidebar extends StatefulWidget {
 }
 
 class _BrowserSidebarState extends State<BrowserSidebar> {
-  List<String> artists = [];
   @override
   void initState() {
     super.initState();
-    _loadArtists();
-    TraxDatabase.of(context).addListener(_loadArtists);
+    TraxDatabase.of(context).addListener(_refresh);
   }
 
   @override
   void dispose() {
-    TraxDatabase.of(context).removeListener(_loadArtists);
+    TraxDatabase.of(context).removeListener(_refresh);
     super.dispose();
   }
 
@@ -37,24 +36,25 @@ class _BrowserSidebarState extends State<BrowserSidebar> {
   Widget build(BuildContext context) {
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: ListView.builder(
-        controller: widget.scrollController,
-        itemCount: artists.length,
-        itemBuilder: (context, index) {
-          String artist = artists[index];
-          return ArtistWidget(
-            name: artist,
-            selected: widget.artist != null && artist == widget.artist,
-            onSelectArtist: widget.onSelectArtist,
-          );
-        },
+      child: DatabaseBuilder(
+        future: (database) => database.artists(),
+        builder: (context, database, artists) => ListView.builder(
+          controller: widget.scrollController,
+          itemCount: artists.length,
+          itemBuilder: (context, index) {
+            String artist = artists[index];
+            return ArtistWidget(
+              name: artist,
+              selected: widget.artist != null && artist == widget.artist,
+              onSelectArtist: widget.onSelectArtist,
+            );
+          },
+        ),
       ),
     );
   }
 
-  void _loadArtists() {
-    setState(() {
-      artists = TraxDatabase.of(context).artists();
-    });
+  void _refresh() {
+    setState(() {});
   }
 }

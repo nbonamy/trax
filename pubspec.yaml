@@ -24,7 +24,6 @@ dependencies:
   path_provider: ^2.0.14
   provider: ^6.0.2
   shared_preferences: ^2.0.15
-  sqlite3: ^1.10.1
   taglib_ffi:
     path: ../taglib_ffi
   window_manager: ^0.3.2
@@ -36,6 +35,7 @@ dependencies:
   file_picker: ^5.2.7
   scrollable_positioned_list: ^0.3.5
   extended_wrap: ^0.1.5
+  sqflite: ^2.2.6
 
 dev_dependencies:
   flutter_test:

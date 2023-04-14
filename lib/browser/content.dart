@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_collection_literals
+
 import 'dart:collection';
 import 'dart:math';
 
@@ -6,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../components/album.dart';
+import '../components/database_builder.dart';
 import '../components/header_artist.dart';
 import '../data/database.dart';
 import '../editor/editor.dart';
@@ -35,86 +38,85 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   static const double _kVerticalPadding = 16.0;
   static const double _kHorizontalPadding = 64.0;
   final ItemScrollController _itemScrollController = ItemScrollController();
-  LinkedHashMap<String, List<Track>> _albums = LinkedHashMap();
+  AlbumList _albums = LinkedHashMap();
   late TraxDatabase database;
-
-  List<Track> get allTracks =>
-      _albums.values.fold([], (all, tracks) => [...all, ...tracks]);
 
   @override
   void initState() {
     super.initState();
     initMenuSubscription();
     database = TraxDatabase.of(context);
-    database.addListener(_loadAlbums);
-    _loadAlbums();
-  }
-
-  @override
-  void didUpdateWidget(BrowserContent oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _loadAlbums();
+    database.addListener(_refresh);
   }
 
   @override
   void didChangeDependencies() {
-    database.removeListener(_loadAlbums);
+    database.removeListener(_refresh);
     database = TraxDatabase.of(context);
-    database.addListener(_loadAlbums);
+    database.addListener(_refresh);
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     cancelMenuSubscription();
-    database.removeListener(_loadAlbums);
+    database.removeListener(_refresh);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.artist == null || _albums.isEmpty) {
+    if (widget.artist == null) {
       return Container();
     }
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: _kVerticalPadding),
-      child: Column(
-        children: [
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: _kHorizontalPadding),
-            child: HeaderArtistWidget(
-              artist: widget.artist!,
-              albumCount: _albums.length,
-              trackCount: _albums.values
-                  .fold(0, (count, tracks) => count + tracks.length),
-            ),
+    return DatabaseBuilder<AlbumList>(
+      future: (database) => database.albums(widget.artist!),
+      builder: (context, database, albums) {
+        _albums = albums;
+        if (_albums.isEmpty) {
+          return Container();
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: _kVerticalPadding),
+          child: Column(
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: _kHorizontalPadding),
+                child: HeaderArtistWidget(
+                  artist: widget.artist!,
+                  albumCount: _albums.length,
+                  trackCount: _albums.values
+                      .fold(0, (count, tracks) => count + tracks.length),
+                ),
+              ),
+              Expanded(
+                child: ScrollablePositionedList.builder(
+                  itemScrollController: _itemScrollController,
+                  initialScrollIndex: max(0,
+                      _albums.keys.toList().indexOf(widget.initialAlbum ?? '')),
+                  itemCount: _albums.length,
+                  itemBuilder: (context, index) {
+                    String title = _albums.keys.elementAt(index);
+                    List<Track>? tracks = _albums[title];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: _kHorizontalPadding,
+                      ),
+                      child: AlbumWidget(
+                        title: title,
+                        tracks: tracks ?? [],
+                        onSelectTrack: _select,
+                        onExecuteTrack: _execute,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: ScrollablePositionedList.builder(
-              itemScrollController: _itemScrollController,
-              initialScrollIndex: max(
-                  0, _albums.keys.toList().indexOf(widget.initialAlbum ?? '')),
-              itemCount: _albums.length,
-              itemBuilder: (context, index) {
-                String title = _albums.keys.elementAt(index);
-                List<Track>? tracks = _albums[title];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: _kHorizontalPadding,
-                  ),
-                  child: AlbumWidget(
-                    title: title,
-                    tracks: tracks ?? [],
-                    onSelectTrack: _select,
-                    onExecuteTrack: _execute,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -140,7 +142,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
 
   void _execute(Track track) {
     SelectionModel.of(context).set([track]);
-    _showEditor(EditorMode.edit, [track], allTracks);
+    _showEditor(EditorMode.edit, [track], _albums.allTracks);
   }
 
   void _extendSelect(Track track) {
@@ -169,15 +171,8 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     }
   }
 
-  void _loadAlbums() {
-    if (widget.artist == null) {
-      _albums.clear();
-      setState(() {});
-    } else {
-      setState(() {
-        _albums = database.albums(widget.artist!);
-      });
-    }
+  void _refresh() async {
+    setState(() {});
   }
 
   @override
@@ -185,7 +180,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     SelectionModel selectionModel = SelectionModel.of(context);
     switch (action) {
       case MenuAction.editSelectAll:
-        selectionModel.set(allTracks);
+        selectionModel.set(_albums.allTracks);
         break;
       case MenuAction.editDelete:
         _deleteFiles(
@@ -194,7 +189,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
         );
         break;
       case MenuAction.trackInfo:
-        _showEditor(EditorMode.edit, selectionModel.get, allTracks);
+        _showEditor(EditorMode.edit, selectionModel.get, _albums.allTracks);
         break;
       default:
         break;

@@ -1,14 +1,22 @@
 import 'dart:collection';
 import 'dart:developer';
 
-import 'package:flutter/widgets.dart' hide Row;
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
 import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
+
+typedef TrackList = List<Track>;
+typedef AlbumList = LinkedHashMap<String, TrackList>;
+
+extension All on AlbumList {
+  List<Track> get allTracks =>
+      values.fold([], (all, tracks) => [...all, ...tracks]);
+}
 
 enum AlbumOrdering {
   none,
@@ -39,57 +47,59 @@ class TraxDatabase extends ChangeNotifier {
   Future<void> init() async {
     String dbFile = databaseFile ?? await SystemPath.dbFile();
     log('Database file: $dbFile');
-    _database = sqlite3.open(dbFile);
+    _database = await openDatabase(dbFile);
     _checkSchemaVersion();
     //clear();
   }
 
-  LibraryInfo info() {
+  Future<LibraryInfo> info() async {
     LibraryInfo info = LibraryInfo();
-    ResultSet resultSet = _database!.select('SELECT COUNT(*) FROM tracks');
-    info.tracks = resultSet.first[0];
-    resultSet = _database!.select('SELECT SUM(duration) FROM tracks');
-    info.duration = resultSet.first[0];
-    resultSet = _database!.select(
-        'SELECT COUNT(DISTINCT artist) FROM tracks WHERE compilation=0');
-    info.artists = resultSet.first[0];
-    resultSet = _database!.select(
-        'SELECT COUNT(*) FROM (SELECT DISTINCT artist, album FROM TRACKS WHERE compilation=0)');
-    info.albums = resultSet.first[0];
+    List<Map> resultSet =
+        await _database!.rawQuery('SELECT COUNT(*) AS count FROM tracks');
+    info.tracks = resultSet.first['count'];
+    resultSet =
+        await _database!.rawQuery('SELECT SUM(duration) AS total FROM tracks');
+    info.duration = resultSet.first['total'];
+    resultSet = await _database!.rawQuery(
+        'SELECT COUNT(DISTINCT artist) AS count FROM tracks WHERE compilation=0');
+    info.artists = resultSet.first['count'];
+    resultSet = await _database!.rawQuery(
+        'SELECT COUNT(*) AS count FROM (SELECT DISTINCT artist, album FROM TRACKS WHERE compilation=0)');
+    info.albums = resultSet.first['count'];
     return info;
   }
 
-  bool get isEmpty {
-    final ResultSet resultSet =
-        _database!.select('SELECT COUNT(*) FROM tracks');
-    return resultSet.first[0] == 0;
+  Future<bool> get isEmpty async {
+    final List<Map> resultSet =
+        await _database!.rawQuery('SELECT COUNT(*) AS count FROM tracks');
+    return resultSet.first['count'] == 0;
   }
 
-  bool artistExists(String artist) {
-    final ResultSet resultSet = _database!.select(
-        'SELECT COUNT(*) FROM tracks WHERE artist=(?) AND compilation=0',
+  Future<bool> artistExists(String artist) async {
+    final List<Map> resultSet = await _database!.rawQuery(
+        'SELECT COUNT(*) AS count FROM tracks WHERE artist=(?) AND compilation=0',
         [artist]);
-    return resultSet.first[0] != 0;
+    return resultSet.first['count'] != 0;
   }
 
-  List<String> files() {
-    final ResultSet resultSet =
-        _database!.select('SELECT DISTINCT filename FROM tracks');
-    return resultSet.rows.map((r) => r[0].toString()).toList();
+  Future<List<String>> files() async {
+    final List<Map> resultSet =
+        await _database!.rawQuery('SELECT DISTINCT filename FROM tracks');
+    return resultSet.map((r) => r['filename'].toString()).toList();
   }
 
-  List<String> artists() {
-    final ResultSet resultSet = _database!.select(
+  Future<List<String>> artists() async {
+    final List<Map> resultSet = await _database!.rawQuery(
         'SELECT DISTINCT artist, compilation FROM tracks ORDER BY artist');
     Set<String> artistLc = {};
     List<String> artists = [];
-    for (Row row in resultSet) {
-      if (row[1] == 1) {
+    for (Map row in resultSet) {
+      if (row['compilation'] == 1) {
         if (artists.contains(Track.kArtistCompilations) == false) {
           artists.add(Track.kArtistCompilations);
         }
       } else {
-        String artist = row[0].toString();
+        String artist = row['artist'].toString();
         if (artistLc.contains(artist.toLowerCase()) == false) {
           artists.add(artist);
           artistLc.add(artist.toLowerCase());
@@ -107,55 +117,55 @@ class TraxDatabase extends ChangeNotifier {
     return artists;
   }
 
-  List<String> allArtists() {
+  Future<List<String>> allArtists() {
     return _allColumnValues('artist');
   }
 
-  List<String> allAlbums() {
+  Future<List<String>> allAlbums() {
     return _allColumnValues('album');
   }
 
-  List<String> allPerformers() {
+  Future<List<String>> allPerformers() {
     return _allColumnValues('performer');
   }
 
-  List<String> allComposers() {
+  Future<List<String>> allComposers() {
     return _allColumnValues('composer');
   }
 
-  List<String> allGenres() {
+  Future<List<String>> allGenres() {
     return _allColumnValues('genre');
   }
 
-  LinkedHashMap<String, List<Track>> albums(String artist) {
+  Future<AlbumList> albums(String artist) async {
     if (artist == Track.kArtistCompilations) return compilations();
-    final ResultSet resultSet = _database!.select(
+    final List<Map> resultSet = await _database!.rawQuery(
         'SELECT * FROM tracks WHERE LOWER(artist)=LOWER((?))', [artist]);
     return _dehydrateAlbums(resultSet, AlbumOrdering.chrono);
   }
 
-  LinkedHashMap<String, List<Track>> compilations() {
-    final ResultSet resultSet =
-        _database!.select('SELECT * FROM tracks WHERE compilation=1');
+  Future<AlbumList> compilations() async {
+    final List<Map> resultSet =
+        await _database!.rawQuery('SELECT * FROM tracks WHERE compilation=1');
     return _dehydrateAlbums(resultSet, AlbumOrdering.alpha);
   }
 
-  LinkedHashMap<String, List<Track>> recents() {
-    final ResultSet resultSet = _database!.select(
+  Future<AlbumList> recents() async {
+    final List<Map> resultSet = await _database!.rawQuery(
         'SELECT * FROM tracks WHERE imported_at>(UNIXEPOCH()-30*24*60*60)*1000 ORDER BY imported_at DESC');
     return _dehydrateAlbums(resultSet, AlbumOrdering.none);
   }
 
-  Track? getTrack(String filename) {
-    final ResultSet resultSet = _database!
-        .select('SELECT * FROM tracks WHERE filename=(?)', [filename]);
+  Future<Track?> getTrack(String filename) async {
+    final List<Map> resultSet = await _database!
+        .rawQuery('SELECT * FROM tracks WHERE filename=(?)', [filename]);
     if (resultSet.length != 1) return null;
     return _dehydrateTrack(resultSet.first);
   }
 
-  void insert(Track track, {bool notify = true}) {
+  void insert(Track track, {bool notify = true}) async {
     // now insert
-    _database!.execute('''
+    await _database!.execute('''
     INSERT OR REPLACE INTO tracks(filename, filesize, last_modification, format,
       title, album, artist, performer, composer,
       genre, copyright, comment, year, compilation,
@@ -195,12 +205,12 @@ class TraxDatabase extends ChangeNotifier {
     }
   }
 
-  void delete(String filename, {bool notify = true}) {
+  void delete(String filename, {bool notify = true}) async {
     _database!.execute('DELETE FROM tracks WHERE filename=(?)', [filename]);
     if (notify) notifyListeners();
   }
 
-  void clear() {
+  void clear() async {
     _database!.execute('DELETE FROM tracks');
   }
 
@@ -208,17 +218,18 @@ class TraxDatabase extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _checkSchemaVersion() {
+  void _checkSchemaVersion() async {
     try {
-      final ResultSet resultSet = _database!.select('SELECT * FROM info');
-      final Row row = resultSet.first;
+      final List<Map> resultSet =
+          await _database!.rawQuery('SELECT * FROM info');
+      final Map row = resultSet.first;
       final int version = int.parse(row['version'].toString());
       if (version != _latestSchemaVersion) {
         _updateSchema(version);
       }
-    } on SqliteException catch (e) {
-      if (e.extendedResultCode == 1 && e.message.contains('no such table')) {
-        _createSchema();
+    } on DatabaseException catch (e) {
+      if (e.isNoSuchTableError('info')) {
+        await _createSchema();
       } else {
         rethrow;
       }
@@ -227,9 +238,9 @@ class TraxDatabase extends ChangeNotifier {
     }
   }
 
-  void _createSchema() {
+  Future<void> _createSchema() async {
     // tracks table
-    _database!.execute('''
+    await _database!.execute('''
     CREATE TABLE tracks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       filename TEXT, filesize INTEGER, last_modification INTEGER, format TEXT,
@@ -242,22 +253,22 @@ class TraxDatabase extends ChangeNotifier {
     ''');
 
     // indexes
-    _database!.execute('''
+    await _database!.execute('''
       CREATE UNIQUE INDEX tracks_idx1 ON tracks(filename);
     ''');
-    _database!.execute('''
+    await _database!.execute('''
       CREATE INDEX tracks_idx2 ON tracks(artist, compilation);
     ''');
 
     // tracks table
-    _database!.execute('''
+    await _database!.execute('''
     CREATE TABLE info (
       version INTEGER
     );
     ''');
 
     // insert
-    _database!.execute(
+    await _database!.execute(
         'INSERT INTO info(version) VALUES((?))', [_latestSchemaVersion]);
   }
 
@@ -272,12 +283,12 @@ class TraxDatabase extends ChangeNotifier {
     _database!.execute('UPDATE info SET version=(?)', [version]);
   }
 
-  LinkedHashMap<String, List<Track>> _dehydrateAlbums(
-    ResultSet resultSet,
+  AlbumList _dehydrateAlbums(
+    List<Map> resultSet,
     AlbumOrdering ordering,
   ) {
-    LinkedHashMap<String, List<Track>> albums = LinkedHashMap();
-    for (final Row row in resultSet) {
+    AlbumList albums = LinkedHashMap();
+    for (final Map row in resultSet) {
       String album = row['album'].toString();
       String key = albums.keys.toList().firstWhere(
         (k) => k.toLowerCase() == album.toLowerCase(),
@@ -328,7 +339,7 @@ class TraxDatabase extends ChangeNotifier {
     );
   }
 
-  Track _dehydrateTrack(Row row) {
+  Track _dehydrateTrack(Map row) {
     return Track(
       filename: row['filename'],
       filesize: row['filesize'],
@@ -358,9 +369,9 @@ class TraxDatabase extends ChangeNotifier {
     );
   }
 
-  List<String> _allColumnValues(String column) {
-    final ResultSet resultSet = _database!
-        .select('SELECT DISTINCT $column FROM tracks ORDER BY LOWER($column)');
-    return resultSet.rows.map((r) => r[0].toString()).toList();
+  Future<List<String>> _allColumnValues(String column) async {
+    final List<Map> resultSet = await _database!.rawQuery(
+        'SELECT DISTINCT $column FROM tracks ORDER BY LOWER($column)');
+    return resultSet.map((r) => r[column].toString()).toList();
   }
 }
