@@ -81,6 +81,7 @@ class TraxDatabase extends ChangeNotifier {
   List<String> artists() {
     final ResultSet resultSet = _database!.select(
         'SELECT DISTINCT artist, compilation FROM tracks ORDER BY artist');
+    Set<String> artistLc = {};
     List<String> artists = [];
     for (Row row in resultSet) {
       if (row[1] == 1) {
@@ -88,7 +89,11 @@ class TraxDatabase extends ChangeNotifier {
           artists.add(Track.kArtistCompilations);
         }
       } else {
-        artists.add(row[0]);
+        String artist = row[0].toString();
+        if (artistLc.contains(artist.toLowerCase()) == false) {
+          artists.add(artist);
+          artistLc.add(artist.toLowerCase());
+        }
       }
     }
     artists.sort((a, b) {
@@ -121,14 +126,13 @@ class TraxDatabase extends ChangeNotifier {
   LinkedHashMap<String, List<Track>> albums(String artist) {
     if (artist == Track.kArtistCompilations) return compilations();
     final ResultSet resultSet = _database!.select(
-        'SELECT * FROM tracks WHERE artist=(?) ORDER BY album, volume_index, track_index, title',
-        [artist]);
+        'SELECT * FROM tracks WHERE LOWER(artist)=LOWER((?))', [artist]);
     return _dehydrateAlbums(resultSet, AlbumOrdering.chrono);
   }
 
   LinkedHashMap<String, List<Track>> compilations() {
-    final ResultSet resultSet = _database!.select(
-        'SELECT * FROM tracks WHERE compilation=1 ORDER BY album, volume_index, track_index, title');
+    final ResultSet resultSet =
+        _database!.select('SELECT * FROM tracks WHERE compilation=1');
     return _dehydrateAlbums(resultSet, AlbumOrdering.alpha);
   }
 
@@ -271,13 +275,17 @@ class TraxDatabase extends ChangeNotifier {
     LinkedHashMap<String, List<Track>> albums = LinkedHashMap();
     for (final Row row in resultSet) {
       String album = row['album'].toString();
-      if (albums.containsKey(album) == false) {
-        albums[album] = [];
-      }
-      albums[album]!.add(_dehydrateTrack(row));
+      String key = albums.keys.toList().firstWhere(
+        (k) => k.toLowerCase() == album.toLowerCase(),
+        orElse: () {
+          albums[album] = [];
+          return album;
+        },
+      );
+      albums[key]!.add(_dehydrateTrack(row));
     }
 
-    // now sort
+    // now sort albums
     List<String> titles = albums.keys.toList();
     if (ordering != AlbumOrdering.none) {
       titles.sort((a, b) {
@@ -289,6 +297,21 @@ class TraxDatabase extends ChangeNotifier {
           return a.compareTo(b);
         } else {
           return 0;
+        }
+      });
+    }
+
+    // and tracks
+    for (List<Track> tracks in albums.values) {
+      tracks.sort((a, b) {
+        if (a.safeTags.volumeIndex == b.safeTags.volumeIndex) {
+          if (a.safeTags.trackIndex == b.safeTags.trackIndex) {
+            return a.displayTitle.compareTo(b.displayTitle);
+          } else {
+            return a.safeTags.trackIndex.compareTo(b.safeTags.trackIndex);
+          }
+        } else {
+          return a.safeTags.volumeIndex.compareTo(b.safeTags.volumeIndex);
         }
       });
     }
@@ -333,7 +356,7 @@ class TraxDatabase extends ChangeNotifier {
 
   List<String> _allColumnValues(String column) {
     final ResultSet resultSet = _database!
-        .select('SELECT DISTINCT $column FROM tracks ORDER BY $column');
+        .select('SELECT DISTINCT $column FROM tracks ORDER BY LOWER($column)');
     return resultSet.rows.map((r) => r[0].toString()).toList();
   }
 }
