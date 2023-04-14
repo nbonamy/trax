@@ -110,19 +110,18 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
-                label: t.menuEditSelectAll,
-                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyA),
-                onSelected: () => _onMenu(MenuAction.editSelectAll),
-              ),
-              PlatformMenuItem(
                 label: t.menuEditPaste,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyV),
                 onSelected: () => _onMenu(MenuAction.editPaste),
               ),
+            ],
+          ),
+          PlatformMenuItemGroup(
+            members: [
               PlatformMenuItem(
-                label: t.menuEditDelete,
-                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.backspace),
-                onSelected: () => _onMenu(MenuAction.editDelete),
+                label: t.menuEditSelectAll,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyA),
+                onSelected: () => _onMenu(MenuAction.editSelectAll),
               ),
             ],
           ),
@@ -138,6 +137,24 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyI),
                 onSelected: () => _onMenu(MenuAction.trackInfo),
               ),
+            ],
+          ),
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuEditDelete,
+                shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.backspace),
+                onSelected: () => _onMenu(MenuAction.editDelete),
+              ),
+            ],
+          ),
+        ],
+      ),
+      PlatformMenu(
+        label: t.menuView,
+        menus: [
+          PlatformMenuItemGroup(
+            members: [
               PlatformMenuItem(
                 label: t.menuTrackPrev,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyP),
@@ -152,16 +169,6 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
           ),
         ],
       ),
-      // PlatformMenu(
-      //   label: t.menuView,
-      //   menus: [
-      //     // PlatformMenuItem(
-      //     //   label: t.menuViewInspector,
-      //     //   shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyI),
-      //     //   onSelected: () => _onMenu(MenuAction.viewInspector),
-      //     // ),
-      //   ],
-      // ),
     ];
   }
 
