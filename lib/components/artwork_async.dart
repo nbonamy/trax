@@ -24,8 +24,9 @@ class AsyncArtwork extends StatelessWidget {
       builder: (context, artworkProvider, child) => FutureBuilder(
         future: artworkProvider.getArwork(track),
         builder: (context, snapshot) => ArtworkWidget(
-          //logTag: track.filename,
-          bytes: snapshot.data,
+          bytes: snapshot.connectionState == ConnectionState.done
+              ? snapshot.data
+              : null,
           size: size,
           radius: radius,
           placeholderBorderColor: placeholderBorderColor,

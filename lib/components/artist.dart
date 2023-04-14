@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../model/track.dart';
 import '../utils/consts.dart';
 import '../utils/track_utils.dart';
 import 'artist_profile_pic.dart';
@@ -29,21 +31,13 @@ class ArtistWidget extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              const ArtistProfilePic(),
-              /*FutureBuilder<String?>(
-                future: _artistProfilePic(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData == false || snapshot.data == null) {
-                    return const ArtistProfilePic();
-                  }
-                  return CachedNetworkImage(
-                    imageUrl: snapshot.data!,
-                    imageBuilder: (context, provider) {},
-                    placeholder: (_, __) => const ArtistProfilePic(),
-                    errorWidget: (_, __, ___) => const ArtistProfilePic(),
-                  );
-                },
-              ),*/
+              ArtistProfilePic(
+                iconData: name == Track.kArtistsHome
+                    ? CupertinoIcons.home
+                    : name == Track.kArtistCompilations
+                        ? CupertinoIcons.smallcircle_circle_fill
+                        : null,
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -58,19 +52,4 @@ class ArtistWidget extends StatelessWidget {
       ),
     );
   }
-
-  // Future<String?> _artistProfilePic() async {
-  //   try {
-  //     String url =
-  //         'https://scrapper.bonamy.fr/lastfm.php?artist=${Uri.encodeComponent(name)}&exact=true';
-  //     Response response = await get(Uri.parse(url));
-  //     Map json = jsonDecode(response.body);
-  //     if (json.containsKey('results')) {
-  //       return json['results'][0];
-  //     }
-  //   } catch (e) {
-  //     //print(e);
-  //   }
-  //   return null;
-  // }
 }

@@ -21,6 +21,8 @@ class BrowserSidebar extends StatefulWidget {
 }
 
 class _BrowserSidebarState extends State<BrowserSidebar> {
+  List<String> _artists = [];
+
   @override
   void initState() {
     super.initState();
@@ -39,31 +41,37 @@ class _BrowserSidebarState extends State<BrowserSidebar> {
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: DatabaseBuilder(
         future: (database) => database.artists(),
-        builder: (context, database, artists) => ListView.builder(
-          controller: widget.scrollController,
-          itemCount: artists.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return ArtistWidget(
-                name: Track.kArtistsHome,
-                selected: widget.artist == null,
-                onSelectArtist: widget.onSelectArtist,
-              );
-            } else {
-              String artist = artists[index - 1];
-              return ArtistWidget(
-                name: artist,
-                selected: widget.artist != null && artist == widget.artist,
-                onSelectArtist: widget.onSelectArtist,
-              );
-            }
-          },
-        ),
+        cachedValue: _artists.isEmpty ? null : _artists,
+        builder: (context, database, artists) {
+          _artists = artists;
+          return ListView.builder(
+            controller: widget.scrollController,
+            itemCount: artists.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return ArtistWidget(
+                  name: Track.kArtistsHome,
+                  selected: widget.artist == Track.kArtistsHome,
+                  onSelectArtist: widget.onSelectArtist,
+                );
+              } else {
+                String artist = artists[index - 1];
+                return ArtistWidget(
+                  name: artist,
+                  selected: widget.artist != null && artist == widget.artist,
+                  onSelectArtist: widget.onSelectArtist,
+                );
+              }
+            },
+          );
+        },
       ),
     );
   }
 
   void _refresh() {
-    setState(() {});
+    setState(() {
+      _artists = [];
+    });
   }
 }

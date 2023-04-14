@@ -58,8 +58,10 @@ class ArtworkProvider extends ChangeNotifier {
     // we need to grab it
     String filename = track.filename;
     Uint8List? artworkBytes = await _tagLib.getArtworkBytes(filename);
-    _cache[cacheKey.toString()] = _CacheEntry(cacheKey, artworkBytes);
-    _purge();
+    if (artworkBytes != null) {
+      _cache[cacheKey.toString()] = _CacheEntry(cacheKey, artworkBytes);
+      _purge();
+    }
     return artworkBytes;
   }
 

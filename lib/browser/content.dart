@@ -50,6 +50,12 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   }
 
   @override
+  void didUpdateWidget(covariant BrowserContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _albums = AlbumList();
+  }
+
+  @override
   void didChangeDependencies() {
     database.removeListener(_refresh);
     database = TraxDatabase.of(context);
@@ -64,6 +70,12 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     super.dispose();
   }
 
+  void _refresh() async {
+    setState(() {
+      _albums = AlbumList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.artist == null) {
@@ -71,6 +83,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     }
     return DatabaseBuilder<AlbumList>(
       future: (database) => database.albums(widget.artist!),
+      cachedValue: _albums.isEmpty ? null : _albums,
       builder: (context, database, albums) {
         _albums = albums;
         if (_albums.isEmpty) {
@@ -169,10 +182,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
         }
       }
     }
-  }
-
-  void _refresh() async {
-    setState(() {});
   }
 
   @override

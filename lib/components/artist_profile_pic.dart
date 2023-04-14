@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 class ArtistProfilePic extends StatelessWidget {
-  const ArtistProfilePic({Key? key}) : super(key: key);
+  final Widget? profilePic;
+  final IconData? iconData;
+  const ArtistProfilePic({
+    Key? key,
+    this.profilePic,
+    this.iconData,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +33,12 @@ class ArtistProfilePic extends StatelessWidget {
         //   ],
         // ),
       ),
-      child: MacosIcon(
-        CupertinoIcons.music_mic,
-        size: 24,
-        color: Colors.black.withOpacity(0.7),
-      ),
+      child: profilePic ??
+          MacosIcon(
+            iconData ?? CupertinoIcons.music_mic,
+            size: 24,
+            color: Colors.black.withOpacity(0.7),
+          ),
     );
   }
 }
