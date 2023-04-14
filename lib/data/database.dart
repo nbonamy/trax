@@ -102,6 +102,22 @@ class TraxDatabase extends ChangeNotifier {
     return artists;
   }
 
+  List<String> artistNames() {
+    return _allColumnValues('artist');
+  }
+
+  List<String> albumNames() {
+    return _allColumnValues('album');
+  }
+
+  List<String> performerNames() {
+    return _allColumnValues('performer');
+  }
+
+  List<String> composerNames() {
+    return _allColumnValues('composer');
+  }
+
   LinkedHashMap<String, List<Track>> albums(String artist) {
     if (artist == Track.kArtistCompilations) return compilations();
     final ResultSet resultSet = _database!.select(
@@ -313,5 +329,11 @@ class TraxDatabase extends ChangeNotifier {
         bitrate: row['bitrate'],
       ),
     );
+  }
+
+  List<String> _allColumnValues(String column) {
+    final ResultSet resultSet = _database!
+        .select('SELECT DISTINCT $column FROM tracks ORDER BY $column');
+    return resultSet.rows.map((r) => r[0].toString()).toList();
   }
 }

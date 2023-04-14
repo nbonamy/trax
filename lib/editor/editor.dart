@@ -220,7 +220,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           currentTrack?.filename ?? widget.selection.first.filename),
       builder: (context, snapshot) => DraggableDialog(
         width: 500,
-        height: 580,
+        height: 585,
         preferenceKey: 'editor.alignment',
         header: Row(
           children: [

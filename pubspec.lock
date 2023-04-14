@@ -256,11 +256,18 @@ packages:
   macos_ui:
     dependency: "direct main"
     description:
-      name: macos_ui
-      sha256: "57208eec8180656acd379e1c754e9b6d8830f32a020b94571ae2188f8112075b"
+      path: "../macos_ui"
+      relative: true
+    source: path
+    version: "2.0.0-beta.1"
+  macos_window_utils:
+    dependency: transitive
+    description:
+      name: macos_window_utils
+      sha256: "510de576b5432dd9ef9e4c258abcc021c6dfbb17a78a344688848a6784b352b8"
       url: "https://pub.dev"
     source: hosted
-    version: "1.12.2"
+    version: "1.1.2"
   matcher:
     dependency: transitive
     description:
@@ -560,7 +567,7 @@ packages:
       path: "../taglib_ffi"
       relative: true
     source: path
-    version: "0.0.7"
+    version: "0.0.8"
   term_glyph:
     dependency: transitive
     description:
@@ -627,4 +634,4 @@ packages:
     version: "1.0.0"
 sdks:
   dart: ">=2.19.6 <3.0.0"
-  flutter: ">=3.3.0"
+  flutter: ">=3.7.0"
