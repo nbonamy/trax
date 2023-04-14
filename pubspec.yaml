@@ -17,6 +17,9 @@ dependencies:
   intl: any
   macos_ui:
     path: ../macos_ui
+  contextual_menu:
+    git:
+      url: https://github.com/nbonamy/contextual_menu
   path: ^1.8.2
   path_provider: ^2.0.14
   provider: ^6.0.2

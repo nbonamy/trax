@@ -1,4 +1,6 @@
 PODS:
+  - contextual_menu (0.0.1):
+    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
@@ -26,6 +28,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - contextual_menu (from `Flutter/ephemeral/.symlinks/plugins/contextual_menu/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - macos_ui (from `Flutter/ephemeral/.symlinks/plugins/macos_ui/macos`)
   - macos_window_utils (from `Flutter/ephemeral/.symlinks/plugins/macos_window_utils/macos`)
@@ -42,6 +45,8 @@ SPEC REPOS:
     - FMDB
 
 EXTERNAL SOURCES:
+  contextual_menu:
+    :path: Flutter/ephemeral/.symlinks/plugins/contextual_menu/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   macos_ui:
@@ -64,6 +69,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
+  contextual_menu: 6d35fb15942c0d8769f5eae8d3bda653994a6f5a
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   macos_ui: 6229a8922cd97bafb7d9636c8eb8dfb0744183ca
