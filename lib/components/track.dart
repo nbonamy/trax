@@ -27,7 +27,6 @@ class TrackWidget extends StatelessWidget {
     return Consumer<SelectionModel>(
       builder: (context, selectionModel, child) {
         AppLocalizations t = AppLocalizations.of(context)!;
-        SelectionModel selectionModel = SelectionModel.of(context);
         bool selected = selectionModel.contains(track);
         Color bgColor = selected ? Colors.blue : Colors.transparent;
         Color fgColor = selected ? Colors.white : Colors.black;
