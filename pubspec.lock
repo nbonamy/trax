@@ -265,10 +265,12 @@ packages:
   macos_ui:
     dependency: "direct main"
     description:
-      path: "../macos_ui"
-      relative: true
-    source: path
-    version: "2.0.0-beta.1"
+      path: "."
+      ref: autocomplete
+      resolved-ref: a05cc8acfe5cafd2c3d4befa44196e79bfc00b39
+      url: "https://github.com/nbonamy/macos_ui"
+    source: git
+    version: "2.0.0-beta.2"
   macos_window_utils:
     dependency: transitive
     description:
@@ -577,7 +579,7 @@ packages:
       path: "../taglib_ffi"
       relative: true
     source: path
-    version: "0.0.8"
+    version: "0.0.9"
   term_glyph:
     dependency: transitive
     description:
