@@ -52,6 +52,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   @override
   void didUpdateWidget(covariant BrowserContent oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _itemScrollController.jumpTo(index: 0);
     _albums = AlbumList();
   }
 
@@ -99,8 +100,10 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
                 ),
                 child: HeaderArtistWidget(
                   artist: widget.artist!,
-                  albumCount: _albums.length,
+                  albums: _albums.keys.toList(),
                   trackCount: _albums.allTracks.length,
+                  onAlbumSelected: (i) =>
+                      _itemScrollController.jumpTo(index: i),
                 ),
               ),
               Expanded(
