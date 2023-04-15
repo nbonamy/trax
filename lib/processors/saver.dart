@@ -32,6 +32,7 @@ class TagSaver {
     EditorMode editorMode,
     Track track,
     Tags updatedTags,
+    String? updatedLyrics,
     ArtworkAction artworkAction,
     Preferences preferences,
     Uint8List? artworkBytes, {
@@ -80,6 +81,12 @@ class TagSaver {
         updated = true;
       } else if (artworkAction == ArtworkAction.updated) {
         tagLib.setArtwork(track.filename, artworkBytes!);
+        updated = true;
+      }
+
+      // update lyrics
+      if (updatedLyrics != null && track.lyrics != updatedLyrics) {
+        tagLib.setLyrics(track.filename, updatedLyrics);
         updated = true;
       }
 

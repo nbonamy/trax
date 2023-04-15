@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:macos_ui/macos_ui.dart';
+import 'package:taglib_ffi/taglib_ffi.dart';
+
+import '../model/track.dart';
 
 class EditorLyricsWidget extends StatefulWidget {
-  final bool singleTrackMode;
+  final Track track;
   const EditorLyricsWidget({
     super.key,
-    required this.singleTrackMode,
+    required this.track,
   });
 
   @override
@@ -12,6 +16,10 @@ class EditorLyricsWidget extends StatefulWidget {
 }
 
 class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
+  final TextEditingController _controller = TextEditingController();
+
+  String get lyrics => _controller.text;
+
   @override
   void initState() {
     super.initState();
@@ -24,10 +32,25 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
     loadData();
   }
 
-  void loadData() {}
+  void loadData() {
+    widget.track.loadLyrics(TagLib());
+    _controller.text = widget.track.lyrics ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.red);
+    return Center(
+      child: MacosTextField(
+        controller: _controller,
+        minLines: 24,
+        maxLines: 24,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: const Color.fromRGBO(192, 192, 192, 1.0),
+            width: 0.8,
+          ),
+        ),
+      ),
+    );
   }
 }

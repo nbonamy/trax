@@ -34,7 +34,9 @@ class Track {
   Format format = Format.notAudio;
   int lastModified = 0;
   int filesize = 0;
+
   Tags? tags;
+  String? lyrics;
 
   factory Track.parse(String filename, TagLib? tagLib) {
     File f = File(filename);
@@ -56,6 +58,10 @@ class Track {
     required this.format,
     this.tags,
   });
+
+  void loadLyrics(TagLib tagLib) {
+    lyrics = tagLib.getLyrics(filename);
+  }
 
   String get formatString {
     switch (format) {

@@ -51,7 +51,7 @@ class TraxDatabase extends ChangeNotifier {
     info.tracks = resultSet.first['count'];
     resultSet =
         await _database!.rawQuery('SELECT SUM(duration) AS total FROM tracks');
-    info.duration = resultSet.first['total'];
+    info.duration = resultSet.first['total'] ?? 0;
     resultSet = await _database!.rawQuery(
         'SELECT COUNT(DISTINCT artist) AS count FROM tracks WHERE compilation=0');
     info.artists = resultSet.first['count'];

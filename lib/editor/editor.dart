@@ -282,7 +282,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
             if (singleTrackMode)
               EditorLyricsWidget(
                 key: _lyricsKey,
-                singleTrackMode: singleTrackMode,
+                track: currentTrack!,
               ),
             if (singleTrackMode)
               EditorFileWidget(
@@ -389,6 +389,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     ArtworkAction? artworkAction = _artworkKey.currentState?.action;
     if (updatedTags == null || artworkAction == null) return false;
 
+    // lyrics
+    String? updatedLyrics = _lyricsKey.currentState?.lyrics;
+
     // now save
     TagSaver tagSaver = TagSaver(
       _tagLib,
@@ -399,6 +402,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       widget.editorMode,
       currentTrack!,
       updatedTags,
+      updatedLyrics,
       artworkAction,
       Preferences.of(context),
       _artworkKey.currentState?.bytes,
@@ -428,6 +432,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         widget.editorMode,
         track,
         initialTags,
+        null,
         artworkAction,
         Preferences.of(context),
         _artworkKey.currentState?.bytes,
