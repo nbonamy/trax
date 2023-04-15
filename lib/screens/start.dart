@@ -4,7 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../components/database_builder.dart';
 import '../components/recents.dart';
 import '../components/title.dart';
-import '../utils/time_utils.dart';
+import '../utils/num_utils.dart';
 
 class StartWidget extends StatelessWidget {
   const StartWidget({super.key});

@@ -286,7 +286,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
               ),
             if (singleTrackMode)
               EditorFileWidget(
-                singleTrackMode: singleTrackMode,
+                track: currentTrack!,
               ),
           ],
         ),

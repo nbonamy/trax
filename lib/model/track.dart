@@ -57,6 +57,32 @@ class Track {
     this.tags,
   });
 
+  String get formatString {
+    switch (format) {
+      case Format.notAudio:
+        return 'Unknown';
+      case Format.mp3:
+        return 'MPEG-1, Layer 3';
+      case Format.flac:
+        return 'Free Lossless Audio Codec';
+      case Format.mp4:
+        return 'Apple Lossless Audio Codec';
+      case Format.vorbis:
+        return 'Ogg Vorbis';
+    }
+  }
+
+  String get channelsString {
+    if (safeTags.numChannels == 0) return 'Unknown';
+    if (safeTags.numChannels == 1) return 'Mono';
+    if (safeTags.numChannels == 2) return 'Stereo';
+    if (safeTags.numChannels == 3) return 'Multichannel 2.1';
+    if (safeTags.numChannels == 5) return 'Multichannel 5.0';
+    if (safeTags.numChannels == 6) return 'Multichannel 5.1';
+    if (safeTags.numChannels == 8) return 'Multichannel 7.1';
+    return '${safeTags.numChannels} channels';
+  }
+
   Tags get safeTags {
     return tags ?? Tags();
   }

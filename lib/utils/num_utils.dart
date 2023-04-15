@@ -1,4 +1,6 @@
-extension TimeFormatting on int {
+import 'dart:math';
+
+extension NumFormatting on int {
   String formatDuration({
     bool skipHours = false,
     bool skipSeconds = false,
@@ -17,5 +19,14 @@ extension TimeFormatting on int {
       durationStr = '$durationStr$twoDigitSeconds$suffixSeconds';
     }
     return durationStr;
+  }
+
+  String formatFilesize({
+    int decimals = 0,
+  }) {
+    const suffixes = ["B", "KB", "MB", "GB", "TB"];
+    if (this == 0) return '0${suffixes[0]}';
+    var i = (log(this) / log(1024)).floor();
+    return '${(this / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 }
