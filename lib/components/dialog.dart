@@ -4,11 +4,36 @@ import 'package:macos_ui/macos_ui.dart';
 
 import '../utils/consts.dart';
 import 'app_icon.dart';
+import 'button.dart';
 
 typedef DialogCallback = void Function(BuildContext);
 typedef PromptCallback = void Function(BuildContext, String);
 
 class TraxDialog {
+  static void inform({
+    required BuildContext context,
+    required String message,
+  }) {
+    AppLocalizations t = AppLocalizations.of(context)!;
+    showMacosAlertDialog(
+      context: context,
+      builder: (context) => MacosAlertDialog(
+        appIcon: const AppIcon(),
+        message: Text(message),
+        primaryButton: SizedBox(
+          width: 100,
+          child: Button(
+            t.ok,
+            () => Navigator.of(context).pop(),
+            verticalPadding: 6,
+            defaultButton: true,
+          ),
+        ),
+        title: Text(t.appName),
+      ),
+    );
+  }
+
   static Future confirm({
     required BuildContext context,
     String? title,

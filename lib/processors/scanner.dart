@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -8,24 +9,52 @@ import '../data/database.dart';
 import '../model/track.dart';
 
 const String kBootStrapMessage = 'bootstrap';
+const String kStopMessage = 'stop';
 const String kCompleteMessage = 'done';
 
-void runScan(
+bool _scanInProgress = false;
+bool _stopRequested = false;
+
+bool isScanRunning() {
+  return _scanInProgress;
+}
+
+void stopScan() {
+  _stopRequested = true;
+}
+
+Future<bool> runScan(
   String rootFolder,
   TraxDatabase database,
   Function onUpdate,
   Function onComplete,
 ) async {
+  // no double
+  if (_scanInProgress) {
+    return false;
+  }
+
+  // we need this
   final TagLib tagLib = TagLib();
+
+  // a new start
+  _stopRequested = false;
+  _scanInProgress = true;
 
   // we need a parser
   List<String> queue = [];
   bool scanCompleted = false;
   final Worker parser = Worker();
   await parser.init(
-    (message, parserSendPort) async {
+    (message, mainToParserPort) async {
+      //
+      // here we receive messages sent by parser
+      // using parserToMainPort.send(...)
+      //
+
       void checkCompletion() {
-        if (scanCompleted && queue.isEmpty) {
+        if (_stopRequested || (scanCompleted && queue.isEmpty)) {
+          _scanInProgress = false;
           onComplete();
         }
       }
@@ -37,7 +66,7 @@ void runScan(
           tagLib,
           queue,
           rootFolder,
-          parserSendPort,
+          mainToParserPort,
           () {
             scanCompleted = true;
             checkCompletion();
@@ -46,7 +75,14 @@ void runScan(
       } else if (message == kCompleteMessage) {
         scanCompleted = true;
       } else {
-        bool newArtist = await mainHandler(tagLib, database, message, null, []);
+        bool newArtist = await mainHandler(
+          tagLib,
+          database,
+          message,
+          null,
+          null,
+          [],
+        );
         queue.remove(message['track'].filename);
         if (newArtist) {
           onUpdate();
@@ -57,6 +93,9 @@ void runScan(
     mediaParser,
     initialMessage: kBootStrapMessage,
   );
+
+  // all good
+  return true;
 }
 
 Future<void> createScanner(
@@ -64,12 +103,17 @@ Future<void> createScanner(
   TagLib tagLib,
   List<String> queue,
   String rootFolder,
-  SendPort parserSendPort,
+  SendPort mainToParserPort,
   Function onComplete,
 ) async {
   Worker scanner = Worker();
   await scanner.init(
-    (message, scannerSendPort) {
+    (message, mainToScannerPort) {
+      //
+      // here we receive messages sent by scanner
+      // using scannerToMainPort.send(...)
+      //
+
       if (message == kCompleteMessage) {
         onComplete();
       } else {
@@ -77,7 +121,8 @@ Future<void> createScanner(
           tagLib,
           database,
           message,
-          parserSendPort,
+          mainToScannerPort,
+          mainToParserPort,
           queue,
         );
       }
@@ -94,18 +139,29 @@ Future<bool> mainHandler(
   TagLib tagLib,
   TraxDatabase database,
   dynamic message,
-  SendPort? parserSendPort,
+  SendPort? mainToScannerPort,
+  SendPort? mainToParserPort,
   List<String> queue,
 ) async {
+  // handle stop requests
+  if (_stopRequested) {
+    mainToScannerPort?.send(kStopMessage);
+    mainToParserPort?.send(kStopMessage);
+    queue.clear();
+    return false;
+  }
+
+  // make sure this is a command
   if (message is Map == false || message.containsKey('command') == false) {
     return false;
   }
 
+  // now run it
   switch (message['command']) {
     case 'check':
       if (await checkFile(database, tagLib, message['filename'])) {
         queue.add(message['filename']);
-        parserSendPort?.send(message['filename']);
+        mainToParserPort?.send(message['filename']);
         return true;
       } else {
         return false;
@@ -129,7 +185,10 @@ Future<bool> mainHandler(
 }
 
 Future<bool> checkFile(
-    TraxDatabase database, TagLib tagLib, String filename) async {
+  TraxDatabase database,
+  TagLib tagLib,
+  String filename,
+) async {
   // check if cached version is up-to-date
   Track? cached = await database.getTrack(filename);
   if (cached != null) {
@@ -145,34 +204,89 @@ Future<bool> checkFile(
 }
 
 void directoryScanner(
-    dynamic data, SendPort mainSendPort, SendErrorFunction onSendError) async {
+  dynamic message,
+  SendPort scannerToMainPort,
+  SendErrorFunction onSendError,
+) async {
+  //
+  // here we receive messages sent by main
+  // using mainToParser.send(...)
+  //
+
+  // if stop command
+  if (message == kStopMessage) {
+    _stopRequested = true;
+    return;
+  }
+
   // first check given files
-  List<String> files = data['files'];
+  List<String> files = message['files'];
   for (String filename in files) {
+    // if stopped
+    if (_stopRequested) {
+      break;
+    }
     File f = File(filename);
     if ((await f.exists()) == false) {
-      mainSendPort.send({'command': 'delete', 'filename': filename});
+      scannerToMainPort.send({'command': 'delete', 'filename': filename});
+    } else {
+      // send this to allow stop
+      scannerToMainPort.send('');
     }
   }
 
+  // stopped?
+  if (_stopRequested) {
+    scannerToMainPort.send(kCompleteMessage);
+    return;
+  }
+
   // list directories
-  Directory dir = Directory(data['rootFolder']);
-  var lister = dir.list(recursive: true);
-  lister.listen(
-    (file) {
+  Directory dir = Directory(message['rootFolder']);
+  Stream<FileSystemEntity> lister = dir.list(recursive: true);
+  late StreamSubscription<FileSystemEntity> subscription;
+  subscription = lister.listen(
+    (FileSystemEntity file) {
+      if (_stopRequested) {
+        scannerToMainPort.send(kCompleteMessage);
+        subscription.cancel();
+        return;
+      }
       if (file is File && Track.isTrack(file.path)) {
         //print('checking ${file.path}');
-        mainSendPort.send({'command': 'check', 'filename': file.path});
+        scannerToMainPort.send({'command': 'check', 'filename': file.path});
       }
     },
-    onDone: () => mainSendPort.send(kCompleteMessage),
+    cancelOnError: true,
+    onError: (_) => scannerToMainPort.send(kCompleteMessage),
+    onDone: () => scannerToMainPort.send(kCompleteMessage),
   );
 }
 
 void mediaParser(
-    dynamic message, SendPort mainSendPort, SendErrorFunction onSendError) {
+  dynamic message,
+  SendPort parserToMainPort,
+  SendErrorFunction onSendError,
+) {
+  //
+  // here we receive messages sent by main
+  // using mainToParser.send(...)
+  //
+
+  // init
   if (message == kBootStrapMessage) {
-    mainSendPort.send(kBootStrapMessage);
+    parserToMainPort.send(kBootStrapMessage);
+    return;
+  }
+
+  // if not stopped
+  if (_stopRequested) {
+    return;
+  }
+
+  // if stop command
+  if (message == kStopMessage) {
+    _stopRequested = true;
     return;
   }
 
@@ -181,6 +295,6 @@ void mediaParser(
   //log('start parsing $filename');
   TagLib tagLib = TagLib();
   Track track = Track.parse(filename, tagLib);
-  mainSendPort.send({'command': 'insert', 'track': track});
+  parserToMainPort.send({'command': 'insert', 'track': track});
   //print('done parsing $filename');
 }

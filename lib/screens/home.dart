@@ -6,6 +6,7 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../browser/browser.dart';
+import '../components/dialog.dart';
 import '../data/database.dart';
 import '../editor/editor.dart';
 import '../model/menu_actions.dart';
@@ -235,9 +236,19 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     );
   }
 
-  void _runScan() {
+  void _runScan() async {
+    // only one at a time
+    if (isScanRunning()) {
+      AppLocalizations t = AppLocalizations.of(context)!;
+      TraxDialog.inform(
+        context: context,
+        message: t.scanRunningError,
+      );
+      return;
+    }
+
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));
-    runScan(
+    bool started = await runScan(
       Preferences.of(context).musicFolder,
       TraxDatabase.of(context),
       () {
@@ -248,6 +259,9 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
       },
     );
+    if (!started) {
+      eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
+    }
   }
 
   @override

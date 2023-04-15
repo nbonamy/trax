@@ -5,9 +5,9 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
-import '../components/app_icon.dart';
 import '../components/artwork.dart';
 import '../components/button.dart';
+import '../components/dialog.dart';
 import '../components/draggable_dialog.dart';
 import '../components/tab_view.dart';
 import '../data/database.dart';
@@ -330,22 +330,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
   void _showError() {
     AppLocalizations t = AppLocalizations.of(context)!;
-    showMacosAlertDialog(
+    TraxDialog.inform(
       context: context,
-      builder: (context) => MacosAlertDialog(
-        appIcon: const AppIcon(),
-        message: Text(t.saveError),
-        primaryButton: SizedBox(
-          width: 100,
-          child: Button(
-            t.ok,
-            () => Navigator.of(context).pop(),
-            verticalPadding: 6,
-            defaultButton: true,
-          ),
-        ),
-        title: Text(t.appName),
-      ),
+      message: t.saveError,
     );
   }
 
