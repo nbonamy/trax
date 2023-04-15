@@ -8,6 +8,7 @@ import '../utils/platform_keyboard.dart';
 
 enum MenuAction {
   appSettings,
+  fileEdit,
   fileImport,
   fileRefresh,
   fileRebuild,

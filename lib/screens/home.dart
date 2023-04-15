@@ -80,6 +80,14 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
+                label: t.menuFileEdit,
+                onSelected: () => _onMenu(MenuAction.fileEdit),
+              ),
+            ],
+          ),
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
                 label: t.menuFileImport,
                 onSelected: () => _onMenu(MenuAction.fileImport),
               ),
@@ -180,6 +188,10 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         SettingsWidget.show(context);
         break;
 
+      case MenuAction.fileEdit:
+        _edit();
+        break;
+
       case MenuAction.fileImport:
         _import();
         break;
@@ -201,7 +213,15 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     }
   }
 
-  void _import() async {
+  void _edit() async {
+    _pickAndEdit(EditorMode.editOnly);
+  }
+
+  void _import() {
+    _pickAndEdit(EditorMode.import);
+  }
+
+  void _pickAndEdit(EditorMode editorMode) async {
     // get some files
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -225,7 +245,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     // ignore: use_build_context_synchronously
     TagEditorWidget.show(
       context,
-      EditorMode.import,
+      editorMode,
       tracks,
       notify: true,
       onComplete: () {

@@ -11,6 +11,7 @@
   "menuAppSettings": "Settings...",
   
   "menuFile": "File",
+  "menuFileEdit": "Edit files...",
   "menuFileImport": "Import...",
   "menuFileRefresh": "Refresh",
   "menuFileRebuild": "Rebuild",
