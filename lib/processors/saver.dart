@@ -85,9 +85,14 @@ class TagSaver {
       }
 
       // update lyrics
-      if (updatedLyrics != null && track.lyrics != updatedLyrics) {
-        tagLib.setLyrics(track.filename, updatedLyrics);
-        updated = true;
+      if (updatedLyrics != null) {
+        if (track.lyrics == null) {
+          track.loadLyrics(tagLib);
+        }
+        if (track.lyrics != updatedLyrics) {
+          tagLib.setLyrics(track.filename, updatedLyrics);
+          updated = true;
+        }
       }
 
       // done
