@@ -105,7 +105,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     // other
     _tabsController = MacosTabController(
       initialIndex: 0,
-      length: singleTrackMode ? 4 : 2,
+      length: singleTrackMode ? 4 : 3,
     );
 
     // now load data
@@ -264,7 +264,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           labels: [
             t.editorDetails,
             t.editorArtwork,
-            if (singleTrackMode) t.editorLyrics,
+            t.editorLyrics,
             if (singleTrackMode) t.editorFile,
           ],
           children: [
@@ -279,11 +279,10 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
               bytes: snapshot.data,
               singleTrackMode: singleTrackMode,
             ),
-            if (singleTrackMode)
-              EditorLyricsWidget(
-                key: _lyricsKey,
-                track: currentTrack!,
-              ),
+            EditorLyricsWidget(
+              key: _lyricsKey,
+              track: currentTrack,
+            ),
             if (singleTrackMode)
               EditorFileWidget(
                 track: currentTrack!,
@@ -416,6 +415,9 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     ArtworkAction? artworkAction = _artworkKey.currentState?.action;
     if (updatedTags == null || artworkAction == null) return false;
 
+    // lyrics
+    String? updatedLyrics = _lyricsKey.currentState?.lyrics;
+
     // saver
     TagSaver tagSaver = TagSaver(
       _tagLib,
@@ -432,7 +434,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         widget.editorMode,
         track,
         initialTags,
-        null,
+        updatedLyrics,
         artworkAction,
         Preferences.of(context),
         _artworkKey.currentState?.bytes,

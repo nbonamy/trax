@@ -81,6 +81,8 @@
   "artworkAdd": "Ajouter...",
   "artworkReplace": "Remplacer...",
 
+  "lyricsDelete": "Supprimer les paroles de toutes les pistes",
+
   "importFileOpCopy": "Copier",
   "importFileOpMove": "Déplacer",
 

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
 
 class EditorLyricsWidget extends StatefulWidget {
-  final Track track;
+  final Track? track;
   const EditorLyricsWidget({
     super.key,
-    required this.track,
+    this.track,
   });
 
   @override
@@ -16,9 +17,16 @@ class EditorLyricsWidget extends StatefulWidget {
 }
 
 class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
+  bool _deleteLyrics = false;
   final TextEditingController _controller = TextEditingController();
 
-  String get lyrics => _controller.text;
+  String? get lyrics {
+    if (widget.track == null) {
+      return _deleteLyrics ? '' : null;
+    } else {
+      return _controller.text;
+    }
+  }
 
   @override
   void initState() {
@@ -33,24 +41,39 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
   }
 
   void loadData() {
-    widget.track.loadLyrics(TagLib());
-    _controller.text = widget.track.lyrics ?? '';
+    if (widget.track != null) {
+      widget.track!.loadLyrics(TagLib());
+      _controller.text = widget.track!.lyrics ?? '';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations t = AppLocalizations.of(context)!;
     return Center(
-      child: MacosTextField(
-        controller: _controller,
-        minLines: 24,
-        maxLines: 24,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: const Color.fromRGBO(192, 192, 192, 1.0),
-            width: 0.8,
-          ),
-        ),
-      ),
+      child: (widget.track == null)
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MacosCheckbox(
+                  value: _deleteLyrics,
+                  onChanged: (v) => setState(() => _deleteLyrics = v),
+                ),
+                const SizedBox(width: 8),
+                Text(t.lyricsDelete),
+              ],
+            )
+          : MacosTextField(
+              controller: _controller,
+              minLines: 24,
+              maxLines: 24,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: const Color.fromRGBO(192, 192, 192, 1.0),
+                  width: 0.8,
+                ),
+              ),
+            ),
     );
   }
 }
