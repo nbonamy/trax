@@ -7,6 +7,7 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../data/database.dart';
 import '../model/track.dart';
+import '../utils/logger.dart';
 
 const String kBootStrapMessage = 'bootstrap';
 const String kStopMessage = 'stop';
@@ -24,6 +25,7 @@ void stopScan() {
 }
 
 Future<bool> runScan(
+  Logger logger,
   String rootFolder,
   TraxDatabase database,
   Function onUpdate,
@@ -31,8 +33,12 @@ Future<bool> runScan(
 ) async {
   // no double
   if (_scanInProgress) {
+    logger.w('[SCAN] Scan already in progress');
     return false;
   }
+
+  // log
+  logger.i('[SCAN] Starting new scan');
 
   // we need this
   final TagLib tagLib = TagLib();
@@ -54,6 +60,7 @@ Future<bool> runScan(
 
       void checkCompletion() {
         if (_stopRequested || (scanCompleted && queue.isEmpty)) {
+          logger.i('[SCAN] Scan completion detected');
           _scanInProgress = false;
           onComplete();
         }
@@ -62,6 +69,7 @@ Future<bool> runScan(
       // now we can start the scanner
       if (message == kBootStrapMessage) {
         await createScanner(
+          logger,
           database,
           tagLib,
           queue,
@@ -75,7 +83,8 @@ Future<bool> runScan(
       } else if (message == kCompleteMessage) {
         scanCompleted = true;
       } else {
-        bool newArtist = await mainHandler(
+        bool newArtist = await commandHandler(
+          logger,
           tagLib,
           database,
           message,
@@ -85,6 +94,7 @@ Future<bool> runScan(
         );
         queue.remove(message['track'].filename);
         if (newArtist) {
+          logger.d('[SCAN] new artist inserted');
           onUpdate();
         }
       }
@@ -99,6 +109,7 @@ Future<bool> runScan(
 }
 
 Future<void> createScanner(
+  Logger logger,
   TraxDatabase database,
   TagLib tagLib,
   List<String> queue,
@@ -117,7 +128,8 @@ Future<void> createScanner(
       if (message == kCompleteMessage) {
         onComplete();
       } else {
-        mainHandler(
+        commandHandler(
+          logger,
           tagLib,
           database,
           message,
@@ -135,7 +147,8 @@ Future<void> createScanner(
   );
 }
 
-Future<bool> mainHandler(
+Future<bool> commandHandler(
+  Logger logger,
   TagLib tagLib,
   TraxDatabase database,
   dynamic message,
@@ -145,40 +158,65 @@ Future<bool> mainHandler(
 ) async {
   // handle stop requests
   if (_stopRequested) {
+    logger.i('[SCAN] Stop scan requested');
     mainToScannerPort?.send(kStopMessage);
     mainToParserPort?.send(kStopMessage);
     queue.clear();
     return false;
   }
 
+  // dummy message
+  if (message == '') {
+    return false;
+  }
+
   // make sure this is a command
   if (message is Map == false || message.containsKey('command') == false) {
+    logger.w('[SCAN] Invalid command received');
     return false;
   }
 
   // now run it
   switch (message['command']) {
+    case 'info':
+      String logMessage = message['message'];
+      logger.i('[SCAN] $logMessage');
+      return false;
+
+    case 'perf':
+      String label = message['label'] ?? message['message'];
+      logger.perf(label);
+      return false;
+
     case 'check':
-      if (await checkFile(database, tagLib, message['filename'])) {
-        queue.add(message['filename']);
-        mainToParserPort?.send(message['filename']);
+      String filename = message['filename'];
+      logger.v('[SCAN] Checking file updated: $filename');
+      if (await checkFile(database, tagLib, filename)) {
+        logger.v('[SCAN] File requires parsing: $filename');
+        queue.add(filename);
+        mainToParserPort?.send(filename);
         return true;
       } else {
         return false;
       }
+
     case 'insert':
       Track track = message['track'] as Track;
       if (track.tags != null && track.tags!.valid) {
+        logger.v('[SCAN] Updating track: ${track.filename}');
         bool newArtist = !(await database.artistExists(track.tags!.artist));
         database.insert(track, notify: false);
         return newArtist;
       } else {
         return false;
       }
+
     case 'delete':
       String filename = message['filename'] as String;
+      logger.v('[SCAN] Deleting track: $filename');
       database.delete(filename);
       return false;
+
     default:
       return false;
   }
@@ -219,7 +257,14 @@ void directoryScanner(
     return;
   }
 
-  // first check given files
+  // perf
+  scannerToMainPort.send({
+    'command': 'perf',
+    'label': 'Checking deleted files',
+  });
+
+  // first check given files for deletion
+
   List<String> files = message['files'];
   for (String filename in files) {
     // if stopped
@@ -235,11 +280,23 @@ void directoryScanner(
     }
   }
 
+  // perf
+  scannerToMainPort.send({
+    'command': 'perf',
+    'label': 'Checking deleted files',
+  });
+
   // stopped?
   if (_stopRequested) {
     scannerToMainPort.send(kCompleteMessage);
     return;
   }
+
+  // info
+  scannerToMainPort.send({
+    'command': 'perf',
+    'message': 'Listing music folder contents',
+  });
 
   // list directories
   Directory dir = Directory(message['rootFolder']);
@@ -253,13 +310,24 @@ void directoryScanner(
         return;
       }
       if (file is File && Track.isTrack(file.path)) {
-        //print('checking ${file.path}');
         scannerToMainPort.send({'command': 'check', 'filename': file.path});
       }
     },
     cancelOnError: true,
-    onError: (_) => scannerToMainPort.send(kCompleteMessage),
-    onDone: () => scannerToMainPort.send(kCompleteMessage),
+    onError: (_) {
+      scannerToMainPort.send({
+        'command': 'perf',
+        'message': 'Listing music folder contents',
+      });
+      scannerToMainPort.send(kCompleteMessage);
+    },
+    onDone: () {
+      scannerToMainPort.send({
+        'command': 'perf',
+        'message': 'Listing music folder contents',
+      });
+      scannerToMainPort.send(kCompleteMessage);
+    },
   );
 }
 

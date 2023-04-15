@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
+import '../utils/logger.dart';
 import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
 
@@ -25,6 +25,7 @@ class LibraryInfo {
 
 class TraxDatabase extends ChangeNotifier {
   static const int _latestSchemaVersion = 1;
+  final Logger logger;
   String? databaseFile;
   Database? _database;
 
@@ -33,12 +34,13 @@ class TraxDatabase extends ChangeNotifier {
   }
 
   TraxDatabase({
+    required this.logger,
     this.databaseFile,
   });
 
   Future<void> init() async {
     String dbFile = databaseFile ?? await SystemPath.dbFile();
-    log('Database file: $dbFile');
+    logger.i('[DB] File: $dbFile');
     _database = await openDatabase(dbFile);
     _checkSchemaVersion();
     //clear();

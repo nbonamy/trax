@@ -12,12 +12,23 @@ import 'model/selection.dart';
 import 'screens/home.dart';
 import 'utils/artwork_provider.dart';
 import 'utils/consts.dart';
+import 'utils/logger.dart';
 import 'utils/track_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
+  // logger
+  Logger logger = Logger();
+
+  // load some stuff
+  TraxDatabase traxDatabase = TraxDatabase(logger: logger);
+  Preferences preferences = Preferences();
+  await preferences.init();
+  await traxDatabase.init();
+
+  // default options
   WindowOptions windowOptions = const WindowOptions(
     //size: rc.size,
     //center: true,
@@ -25,12 +36,6 @@ void main() async {
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
   );
-
-  // load some stuff
-  TraxDatabase traxDatabase = TraxDatabase();
-  Preferences preferences = Preferences();
-  await preferences.init();
-  await traxDatabase.init();
 
   // run
   windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -41,6 +46,7 @@ void main() async {
     await windowManager.focus();
 
     runApp(TraxApp(
+      logger: logger,
       preferences: preferences,
       database: traxDatabase,
     ));
@@ -48,10 +54,12 @@ void main() async {
 }
 
 class TraxApp extends StatelessWidget {
+  final Logger logger;
   final Preferences preferences;
   final TraxDatabase database;
   const TraxApp({
     super.key,
+    required this.logger,
     required this.preferences,
     required this.database,
   });
@@ -63,6 +71,9 @@ class TraxApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => AppTheme(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => logger,
         ),
         ChangeNotifierProvider(
           create: (_) => preferences,

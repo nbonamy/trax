@@ -15,6 +15,7 @@ import '../model/track.dart';
 import '../processors/saver.dart';
 import '../processors/scanner.dart';
 import '../utils/events.dart';
+import '../utils/logger.dart';
 import 'settings.dart';
 
 class TraxHomePage extends StatefulWidget {
@@ -249,6 +250,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
 
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));
     bool started = await runScan(
+      Logger.of(context),
       Preferences.of(context).musicFolder,
       TraxDatabase.of(context),
       () {
