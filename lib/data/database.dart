@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/widgets.dart';
+import 'package:mutex/mutex.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
@@ -29,6 +30,7 @@ class TraxDatabase extends ChangeNotifier {
   String? databaseFile;
   Database? _database;
   LibraryInfo? _cachedInfo;
+  final Mutex _cacheMutex = Mutex();
 
   static TraxDatabase of(BuildContext context) {
     return Provider.of<TraxDatabase>(context, listen: false);
@@ -53,19 +55,21 @@ class TraxDatabase extends ChangeNotifier {
       return _cachedInfo!;
     }
 
-    _cachedInfo = LibraryInfo();
-    List<Map> resultSet =
-        await _database!.rawQuery('SELECT COUNT(*) AS count FROM tracks');
-    _cachedInfo!.tracks = resultSet.first['count'];
-    resultSet =
-        await _database!.rawQuery('SELECT SUM(duration) AS total FROM tracks');
-    _cachedInfo!.duration = resultSet.first['total'] ?? 0;
-    resultSet = await _database!.rawQuery(
-        'SELECT COUNT(DISTINCT artist) AS count FROM tracks WHERE compilation=0');
-    _cachedInfo!.artists = resultSet.first['count'];
-    resultSet = await _database!.rawQuery(
-        'SELECT COUNT(*) AS count FROM (SELECT DISTINCT artist, album FROM TRACKS WHERE compilation=0)');
-    _cachedInfo!.albums = resultSet.first['count'];
+    await _cacheMutex.protect(() async {
+      _cachedInfo = LibraryInfo();
+      List<Map> resultSet =
+          await _database!.rawQuery('SELECT COUNT(*) AS count FROM tracks');
+      _cachedInfo!.tracks = resultSet.first['count'];
+      resultSet = await _database!
+          .rawQuery('SELECT SUM(duration) AS total FROM tracks');
+      _cachedInfo!.duration = resultSet.first['total'] ?? 0;
+      resultSet = await _database!.rawQuery(
+          'SELECT COUNT(DISTINCT artist) AS count FROM tracks WHERE compilation=0');
+      _cachedInfo!.artists = resultSet.first['count'];
+      resultSet = await _database!.rawQuery(
+          'SELECT COUNT(*) AS count FROM (SELECT DISTINCT artist, album FROM TRACKS WHERE compilation=0)');
+      _cachedInfo!.albums = resultSet.first['count'];
+    });
     return _cachedInfo!;
   }
 
@@ -381,6 +385,6 @@ class TraxDatabase extends ChangeNotifier {
   }
 
   void _invalidateCache() {
-    _cachedInfo = null;
+    _cacheMutex.protect(() async => _cachedInfo = null);
   }
 }

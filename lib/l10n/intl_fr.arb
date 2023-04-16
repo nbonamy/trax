@@ -41,6 +41,7 @@
   "deleteText": "{count,plural ,=1{Cet élément} other{{count} éléments}} vont être déplacés dans la Corbeille.",
   "@deleteText": { "placeholders": { "count": {} } },
   
+  "rebuildConfirm": "Etes-vous sûr de vouloir reconstruite votre collection ?",
   "overwriteConfirm": "Les fichiers existent déjà. Voulez-vous les remplacer ?",
 
   "unknownTitle": "Titre inconnu",

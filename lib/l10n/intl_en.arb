@@ -41,6 +41,7 @@
   "deleteText": "{count,plural ,=1{This item} other{{count} items}} will be moved to the Trash and can be recovered from there.",
   "@deleteText": { "placeholders": { "count": {} } },
 
+  "rebuildConfirm": "Are you sure you want to rebuild your entire library?",
   "overwriteConfirm": "Destination file(s) already exists. Do you want to overwrite them?",
 
   "unknownTitle": "Unknown title",

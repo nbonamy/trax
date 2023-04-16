@@ -72,9 +72,9 @@ Future<bool> runScan(
           logger,
           database,
           tagLib,
+          parser,
           queue,
           rootFolder,
-          mainToParserPort,
           () {
             scanCompleted = true;
             checkCompletion();
@@ -112,9 +112,9 @@ Future<void> createScanner(
   Logger logger,
   TraxDatabase database,
   TagLib tagLib,
+  Worker parser,
   List<String> queue,
   String rootFolder,
-  SendPort mainToParserPort,
   Function onComplete,
 ) async {
   Worker scanner = Worker();
@@ -134,7 +134,7 @@ Future<void> createScanner(
           database,
           message,
           mainToScannerPort,
-          mainToParserPort,
+          parser,
           queue,
         );
       }
@@ -153,14 +153,14 @@ Future<bool> commandHandler(
   TraxDatabase database,
   dynamic message,
   SendPort? mainToScannerPort,
-  SendPort? mainToParserPort,
+  Worker? parser,
   List<String> queue,
 ) async {
   // handle stop requests
   if (_stopRequested) {
     logger.i('[SCAN] Stop scan requested');
     mainToScannerPort?.send(kStopMessage);
-    mainToParserPort?.send(kStopMessage);
+    parser?.dispose(immediate: true);
     queue.clear();
     return false;
   }
@@ -189,18 +189,20 @@ Future<bool> commandHandler(
       return false;
 
     case 'check':
+      if (_stopRequested) return false;
       String filename = message['filename'];
       logger.v('[SCAN] Checking file updated: $filename');
       if (await checkFile(database, tagLib, filename)) {
         logger.v('[SCAN] File requires parsing: $filename');
         queue.add(filename);
-        mainToParserPort?.send(filename);
+        parser?.sendMessage(filename);
         return true;
       } else {
         return false;
       }
 
     case 'insert':
+      if (_stopRequested) return false;
       Track track = message['track'] as Track;
       if (track.tags != null && track.tags!.valid) {
         logger.v('[SCAN] Updating track: ${track.filename}');
@@ -212,6 +214,7 @@ Future<bool> commandHandler(
       }
 
     case 'delete':
+      if (_stopRequested) return false;
       String filename = message['filename'] as String;
       logger.v('[SCAN] Deleting track: $filename');
       database.delete(filename);
