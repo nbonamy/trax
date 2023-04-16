@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_collection_literals
 
 import 'dart:collection';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -195,6 +196,9 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   void onMenuAction(MenuAction action) {
     SelectionModel selectionModel = SelectionModel.of(context);
     switch (action) {
+      case MenuAction.fileReveal:
+        _revealInFinder();
+        break;
       case MenuAction.editSelectAll:
         selectionModel.set(_albums.allTracks);
         break;
@@ -210,6 +214,12 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       default:
         break;
     }
+  }
+
+  _revealInFinder() {
+    SelectionModel selectionModel = SelectionModel.of(context);
+    if (selectionModel.get.length != 1) return;
+    Process.run('open', ['-R', selectionModel.get.first.filename]);
   }
 
   _deleteFiles(List<String> files, String rootFolder) async {

@@ -11,9 +11,10 @@
   "menuAppSettings": "Settings...",
   
   "menuFile": "File",
-  "menuFileImport": "Import...",
+  "menuFileImport": "Add to Library...",
   "menuFileRefresh": "Refresh",
   "menuFileRebuild": "Rebuild",
+  "menuFileReveal": "Show in Finder",
   
   "menuEdit": "Edit",
   "menuEditSelectAll": "Select All",
@@ -22,6 +23,7 @@
 
   "menuTrack": "Track",
   "menuTrackInfo": "Info...",
+  "menuTrackPlay": "Play",
   "menuTrackPrev": "Previous track",
   "menuTrackNext": "Next track",
 

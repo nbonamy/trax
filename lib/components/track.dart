@@ -92,6 +92,19 @@ class TrackWidget extends StatelessWidget {
               MenuActionEvent(MenuAction.trackInfo),
             ),
           ),
+          if (selectionModel.get.length == 1) ...[
+            ctxm.MenuItem(
+              label: t.menuTrackPlay,
+              onClick: (_) => onDoubleTap(track),
+            ),
+            ctxm.MenuItem.separator(),
+            ctxm.MenuItem(
+              label: t.menuFileReveal,
+              onClick: (_) => eventBus.fire(
+                MenuActionEvent(MenuAction.fileReveal),
+              ),
+            ),
+          ],
           ctxm.MenuItem.separator(),
           ctxm.MenuItem(
             label: t.menuEditDelete,

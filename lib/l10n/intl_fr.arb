@@ -11,9 +11,10 @@
   "menuAppSettings": "Configuration...",
   
   "menuFile": "Fichier",
-  "menuFileImport": "Importer...",
+  "menuFileImport": "Ajouter à la librairie...",
   "menuFileRefresh": "Rafraîchir",
   "menuFileRebuild": "Reconstruire",
+  "menuFileReveal": "Révéler dans Finder",
 
   "menuEdit": "Edition",
   "menuEditSelectAll": "Tout sélectionner",
@@ -22,6 +23,7 @@
 
   "menuTrack": "Piste",
   "menuTrackInfo": "Info...",
+  "menuTrackPlay": "Jouer",
   "menuTrackPrev": "Piste précédente",
   "menuTrackNext": "Piste suivante",
 

@@ -94,13 +94,19 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               ),
               PlatformMenuItem(
                 label: t.menuFileRebuild,
-                shortcut: MenuUtils.cmdShortcut(
-                  LogicalKeyboardKey.keyR,
-                  shift: true,
-                ),
                 onSelected: () => _onMenu(
                   MenuAction.fileRebuild,
                 ),
+              ),
+            ],
+          ),
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuFileReveal,
+                shortcut:
+                    MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR, shift: true),
+                onSelected: () => _onMenu(MenuAction.fileReveal),
               ),
             ],
           ),
@@ -141,6 +147,14 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               ),
             ],
           ),
+          // PlatformMenuItemGroup(
+          //   members: [
+          //     PlatformMenuItem(
+          //       label: t.menuTrackPlay,
+          //       onSelected: () => _onMenu(MenuAction.trackPlay),
+          //     ),
+          //   ],
+          // ),
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
