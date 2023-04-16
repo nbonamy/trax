@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
+import '../utils/logger.dart';
 import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
 
@@ -25,40 +25,48 @@ class LibraryInfo {
 
 class TraxDatabase extends ChangeNotifier {
   static const int _latestSchemaVersion = 1;
+  final Logger logger;
   String? databaseFile;
   Database? _database;
+  LibraryInfo? _cachedInfo;
 
   static TraxDatabase of(BuildContext context) {
     return Provider.of<TraxDatabase>(context, listen: false);
   }
 
   TraxDatabase({
+    required this.logger,
     this.databaseFile,
   });
 
   Future<void> init() async {
     String dbFile = databaseFile ?? await SystemPath.dbFile();
-    log('Database file: $dbFile');
+    logger.i('[DB] File: $dbFile');
     _database = await openDatabase(dbFile);
     _checkSchemaVersion();
     //clear();
   }
 
   Future<LibraryInfo> info() async {
-    LibraryInfo info = LibraryInfo();
+    // is cached?
+    if (_cachedInfo != null) {
+      return _cachedInfo!;
+    }
+
+    _cachedInfo = LibraryInfo();
     List<Map> resultSet =
         await _database!.rawQuery('SELECT COUNT(*) AS count FROM tracks');
-    info.tracks = resultSet.first['count'];
+    _cachedInfo!.tracks = resultSet.first['count'];
     resultSet =
         await _database!.rawQuery('SELECT SUM(duration) AS total FROM tracks');
-    info.duration = resultSet.first['total'] ?? 0;
+    _cachedInfo!.duration = resultSet.first['total'] ?? 0;
     resultSet = await _database!.rawQuery(
         'SELECT COUNT(DISTINCT artist) AS count FROM tracks WHERE compilation=0');
-    info.artists = resultSet.first['count'];
+    _cachedInfo!.artists = resultSet.first['count'];
     resultSet = await _database!.rawQuery(
         'SELECT COUNT(*) AS count FROM (SELECT DISTINCT artist, album FROM TRACKS WHERE compilation=0)');
-    info.albums = resultSet.first['count'];
-    return info;
+    _cachedInfo!.albums = resultSet.first['count'];
+    return _cachedInfo!;
   }
 
   Future<bool> get isEmpty async {
@@ -191,6 +199,9 @@ class TraxDatabase extends ChangeNotifier {
       DateTime.now().millisecondsSinceEpoch,
     ]);
 
+    // done
+    _invalidateCache();
+
     // update
     if (notify) {
       notifyListeners();
@@ -199,11 +210,13 @@ class TraxDatabase extends ChangeNotifier {
 
   void delete(String filename, {bool notify = true}) async {
     _database!.execute('DELETE FROM tracks WHERE filename=(?)', [filename]);
+    _invalidateCache();
     if (notify) notifyListeners();
   }
 
   void clear() async {
     _database!.execute('DELETE FROM tracks');
+    _invalidateCache();
   }
 
   void notify() {
@@ -365,5 +378,9 @@ class TraxDatabase extends ChangeNotifier {
     final List<Map> resultSet = await _database!.rawQuery(
         'SELECT DISTINCT $column FROM tracks ORDER BY LOWER($column)');
     return resultSet.map((r) => r[column].toString()).toList();
+  }
+
+  void _invalidateCache() {
+    _cachedInfo = null;
   }
 }

@@ -5,11 +5,13 @@
   "cancel": "Cancel",
   "save": "Save",
 
-  "saveError": "An error occured while updating metadata",
+  "saveError": "An error occured while updating metadata.",
+  "scanRunningError": "A scan is already in progress.",
 
   "menuAppSettings": "Settings...",
   
   "menuFile": "File",
+  "menuFileEdit": "Edit files...",
   "menuFileImport": "Import...",
   "menuFileRefresh": "Refresh",
   "menuFileRebuild": "Rebuild",

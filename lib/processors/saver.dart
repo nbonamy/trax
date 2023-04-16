@@ -12,7 +12,7 @@ import '../utils/consts.dart';
 import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
 
-enum EditorMode { edit, import }
+enum EditorMode { edit, import, editOnly }
 
 enum ArtworkAction { untouched, updated, deleted }
 
@@ -63,12 +63,16 @@ class TagSaver {
         }
 
         // move?
-        String fullpath =
-            _targetFilename(track, preferences.keepMediaOrganized);
-        bool moved = await _moveTrack(track, fullpath);
-        if (moved == false) {
-          // save because move has not
-          database.insert(track, notify: false);
+        if (editorMode != EditorMode.editOnly) {
+          String fullpath = _targetFilename(
+            track,
+            preferences.keepMediaOrganized,
+          );
+          bool moved = await _moveTrack(track, fullpath);
+          if (moved == false) {
+            // save because move has not
+            database.insert(track, notify: false);
+          }
         }
 
         // track
@@ -96,7 +100,7 @@ class TagSaver {
       }
 
       // done
-      if (notify && updated) {
+      if (notify && updated && editorMode != EditorMode.editOnly) {
         database.notify();
       }
       return true;

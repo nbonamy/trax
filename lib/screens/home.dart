@@ -6,6 +6,7 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../browser/browser.dart';
+import '../components/dialog.dart';
 import '../data/database.dart';
 import '../editor/editor.dart';
 import '../model/menu_actions.dart';
@@ -14,6 +15,7 @@ import '../model/track.dart';
 import '../processors/saver.dart';
 import '../processors/scanner.dart';
 import '../utils/events.dart';
+import '../utils/logger.dart';
 import 'settings.dart';
 
 class TraxHomePage extends StatefulWidget {
@@ -75,6 +77,14 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
       PlatformMenu(
         label: t.menuFile,
         menus: [
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuFileEdit,
+                onSelected: () => _onMenu(MenuAction.fileEdit),
+              ),
+            ],
+          ),
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
@@ -178,6 +188,10 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         SettingsWidget.show(context);
         break;
 
+      case MenuAction.fileEdit:
+        _edit();
+        break;
+
       case MenuAction.fileImport:
         _import();
         break;
@@ -199,7 +213,15 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     }
   }
 
-  void _import() async {
+  void _edit() async {
+    _pickAndEdit(EditorMode.editOnly);
+  }
+
+  void _import() {
+    _pickAndEdit(EditorMode.import);
+  }
+
+  void _pickAndEdit(EditorMode editorMode) async {
     // get some files
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -223,7 +245,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     // ignore: use_build_context_synchronously
     TagEditorWidget.show(
       context,
-      EditorMode.import,
+      editorMode,
       tracks,
       notify: true,
       onComplete: () {
@@ -235,9 +257,20 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     );
   }
 
-  void _runScan() {
+  void _runScan() async {
+    // only one at a time
+    if (isScanRunning()) {
+      AppLocalizations t = AppLocalizations.of(context)!;
+      TraxDialog.inform(
+        context: context,
+        message: t.scanRunningError,
+      );
+      return;
+    }
+
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.scan));
-    runScan(
+    bool started = await runScan(
+      Logger.of(context),
       Preferences.of(context).musicFolder,
       TraxDatabase.of(context),
       () {
@@ -248,6 +281,9 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
       },
     );
+    if (!started) {
+      eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
+    }
   }
 
   @override
