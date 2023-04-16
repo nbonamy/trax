@@ -11,7 +11,6 @@
   "menuAppSettings": "Settings...",
   
   "menuFile": "File",
-  "menuFileEdit": "Edit files...",
   "menuFileImport": "Import...",
   "menuFileRefresh": "Refresh",
   "menuFileRebuild": "Rebuild",
@@ -26,9 +25,14 @@
   "menuTrackPrev": "Previous track",
   "menuTrackNext": "Next track",
 
+  "menuTools": "Tools",
+  "menuToolsEdit": "Edit tags in files...",
+
   "menuView": "View",
   
   "menuWindow": "Window",
+
+  "menuHelp": "Help",
 
   "deleteTitleSingle": "Are you sure you want to delete \"{name}\"?",
   "@deleteTitleSingle": { "placeholders": { "name": {} } },
