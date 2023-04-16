@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import '../audioplayer/toolbar.dart';
 import '../components/database_builder.dart';
 import '../components/search_box.dart';
 import '../components/status_bar.dart';
@@ -46,7 +47,6 @@ class BrowserWidgetState extends State<BrowserWidget> {
   @override
   Widget build(BuildContext context) {
     Widget window = MacosWindow(
-      backgroundColor: Colors.white,
       sidebar: Sidebar(
         minWidth: 250,
         padding: const EdgeInsets.all(16),
@@ -75,25 +75,38 @@ class BrowserWidgetState extends State<BrowserWidget> {
           );
         },
       ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => SelectionModel.of(context).clear(),
-        child: Builder(
-          builder: (context) {
-            if (_artist == null || _artist == Track.kArtistsHome) {
-              return DatabaseBuilder<bool>(
-                future: (database) => database.isEmpty,
-                builder: (context, database, isEmpty) =>
-                    isEmpty ? const WelcomeWidget() : const StartWidget(),
-              );
-            } else {
-              return BrowserContent(
-                artist: _artist,
-                initialAlbum: _initialAlbum,
-              );
-            }
-          },
-        ),
+      child: MacosScaffold(
+        toolBar: const AudioPlayerToolBar(),
+        children: [
+          ContentArea(
+            builder: (context, scrollController) => Container(
+              color: CupertinoColors.white,
+              child: Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () => SelectionModel.of(context).clear(),
+                  child: Builder(
+                    builder: (context) {
+                      if (_artist == null || _artist == Track.kArtistsHome) {
+                        return DatabaseBuilder<bool>(
+                          future: (database) => database.isEmpty,
+                          builder: (context, database, isEmpty) => isEmpty
+                              ? const WelcomeWidget()
+                              : const StartWidget(),
+                        );
+                      } else {
+                        return BrowserContent(
+                          artist: _artist,
+                          initialAlbum: _initialAlbum,
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
 

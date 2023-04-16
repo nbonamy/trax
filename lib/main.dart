@@ -11,6 +11,7 @@ import 'model/preferences.dart';
 import 'model/selection.dart';
 import 'screens/home.dart';
 import 'utils/artwork_provider.dart';
+import 'audioplayer/audio_player.dart';
 import 'utils/consts.dart';
 import 'utils/logger.dart';
 import 'utils/track_utils.dart';
@@ -86,6 +87,9 @@ class TraxApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ArtworkProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AudioPlayer(),
         ),
       ],
       builder: (context, _) {

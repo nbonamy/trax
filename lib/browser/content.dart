@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:trax/audioplayer/audio_player.dart';
 
 import '../components/album.dart';
 import '../components/database_builder.dart';
@@ -136,7 +137,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     );
   }
 
-  void _select(Track track) {
+  void _select(Track track, TrackList siblings) {
     // extended selection
     if (PlatformKeyboard.selectionExtendActive) {
       _extendSelect(track);
@@ -156,9 +157,12 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     }
   }
 
-  void _execute(Track track) {
-    SelectionModel.of(context).set([track]);
-    _showEditor(EditorMode.edit, [track], _albums.allTracks);
+  void _execute(Track track, TrackList siblings) {
+    AudioPlayer audioPlayer = AudioPlayer.of(context);
+    audioPlayer.play(
+      siblings,
+      initialIndex: siblings.indexOf(track),
+    );
   }
 
   void _extendSelect(Track track) {

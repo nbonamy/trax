@@ -7,11 +7,13 @@ import 'album_artwork.dart';
 import 'header_album.dart';
 import 'track_list.dart';
 
+typedef TrackCallback = void Function(Track, TrackList);
+
 class AlbumWidget extends StatefulWidget {
   final String title;
   final TrackList tracks;
-  final Function onSelectTrack;
-  final Function onExecuteTrack;
+  final TrackCallback onSelectTrack;
+  final TrackCallback onExecuteTrack;
   const AlbumWidget({
     super.key,
     required this.title,

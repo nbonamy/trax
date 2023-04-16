@@ -46,7 +46,12 @@ class ArtworkProvider extends ChangeNotifier {
   int get size =>
       _cache.values.fold(0, (size, entry) => size + (entry.bytes?.length ?? 0));
 
-  Future<Uint8List?> getArwork(Track track) async {
+  Future<Uint8List?> getArwork(Track? track) async {
+    // check
+    if (track == null) {
+      return null;
+    }
+
     // check cache
     _CacheKey cacheKey = _CacheKey.fromTrack(track);
     if (_cache.containsKey(cacheKey.toString())) {

@@ -6,16 +6,18 @@ import '../utils/artwork_provider.dart';
 import 'artwork.dart';
 
 class AsyncArtwork extends StatelessWidget {
-  final Track track;
+  final Track? track;
   final double size;
   final double radius;
-  final Color placeholderBorderColor;
+  final Widget? placeholder;
+  final Color defaultPlaceholderBorderColor;
   const AsyncArtwork({
     super.key,
     required this.track,
     required this.size,
     this.radius = 8.0,
-    this.placeholderBorderColor = CupertinoColors.lightBackgroundGray,
+    this.placeholder,
+    this.defaultPlaceholderBorderColor = CupertinoColors.lightBackgroundGray,
   });
 
   @override
@@ -29,7 +31,8 @@ class AsyncArtwork extends StatelessWidget {
               : null,
           size: size,
           radius: radius,
-          placeholderBorderColor: placeholderBorderColor,
+          placeholder: placeholder,
+          defaultPlaceholderBorderColor: defaultPlaceholderBorderColor,
         ),
       ),
     );

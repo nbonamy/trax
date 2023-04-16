@@ -12,48 +12,51 @@ class StartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppLocalizations t = AppLocalizations.of(context)!;
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 128),
-        child: Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TitleWidget(title: t.startLibrary),
-            DatabaseBuilder(
-              future: (database) => database.info(),
-              placeholder: const SizedBox(height: 46),
-              builder: (context, database, info) {
-                TextStyle infoStyle = const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: CupertinoColors.inactiveGray,
-                );
-                String durationStr = info.duration.formatDuration(
-                  skipSeconds: true,
-                  suffixHours: t.statsDurationHours,
-                  suffixMinutes: t.statsDurationMinutes,
-                );
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${t.statsTracks(info.tracks).toUpperCase()} / ${durationStr.toUpperCase()}',
-                      style: infoStyle,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${t.statsArtists(info.artists).toUpperCase()} / ${t.statsAlbums(info.albums).toUpperCase()}',
-                      style: infoStyle,
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 32),
-            TitleWidget(title: t.addedRecently),
-            const RecentlyAddedWidget(),
-          ],
+    return SizedBox(
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 128),
+          child: Flex(
+            direction: Axis.vertical,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TitleWidget(title: t.startLibrary),
+              DatabaseBuilder(
+                future: (database) => database.info(),
+                placeholder: const SizedBox(height: 46),
+                builder: (context, database, info) {
+                  TextStyle infoStyle = const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: CupertinoColors.inactiveGray,
+                  );
+                  String durationStr = info.duration.formatDuration(
+                    skipSeconds: true,
+                    suffixHours: t.statsDurationHours,
+                    suffixMinutes: t.statsDurationMinutes,
+                  );
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${t.statsTracks(info.tracks).toUpperCase()} / ${durationStr.toUpperCase()}',
+                        style: infoStyle,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${t.statsArtists(info.artists).toUpperCase()} / ${t.statsAlbums(info.albums).toUpperCase()}',
+                        style: infoStyle,
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 32),
+              TitleWidget(title: t.addedRecently),
+              const RecentlyAddedWidget(),
+            ],
+          ),
         ),
       ),
     );

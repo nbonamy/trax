@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import '../model/track.dart';
 import '../utils/consts.dart';
 import '../utils/track_utils.dart';
+import 'album.dart';
 import 'track.dart';
 
 class TrackListWidget extends StatelessWidget {
   final TrackList tracks;
-  final Function onSelectTrack;
-  final Function onExecuteTrack;
+  final TrackCallback onSelectTrack;
+  final TrackCallback onExecuteTrack;
   final bool shrinkWrap;
   final bool primary;
   const TrackListWidget({
@@ -35,8 +36,8 @@ class TrackListWidget extends StatelessWidget {
         } else {
           return TrackWidget(
             track: tracks[index - 1],
-            onTap: onSelectTrack,
-            onDoubleTap: onExecuteTrack,
+            onTap: (track) => onSelectTrack(track, tracks),
+            onDoubleTap: (track) => onExecuteTrack(track, tracks),
           );
         }
       },

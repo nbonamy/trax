@@ -228,7 +228,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
               bytes: snapshot.data,
               size: kArtworkSize,
               radius: 4.0,
-              placeholderBorderColor: CupertinoColors.systemGrey3,
+              defaultPlaceholderBorderColor: CupertinoColors.systemGrey3,
             ),
             const SizedBox(width: 16),
             Expanded(
