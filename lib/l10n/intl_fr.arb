@@ -11,7 +11,6 @@
   "menuAppSettings": "Configuration...",
   
   "menuFile": "Fichier",
-  "menuFileEdit": "Editer...",
   "menuFileImport": "Importer...",
   "menuFileRefresh": "Rafraîchir",
   "menuFileRebuild": "Reconstruire",
@@ -26,9 +25,14 @@
   "menuTrackPrev": "Piste précédente",
   "menuTrackNext": "Piste suivante",
 
+  "menuTools": "Outils",
+  "menuToolsEdit": "Editer les tags de fichiers...",
+
   "menuView": "Affichage",
 
   "menuWindow": "Fenêtres",
+
+  "menuHelp": "Aide",
 
   "deleteTitleSingle": "Etes-vous sûr de vouloir supprimer \"{name}\" ?",
   "@deleteTitleSingle": { "placeholders": { "name": {} } },

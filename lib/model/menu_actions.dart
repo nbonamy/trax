@@ -8,7 +8,6 @@ import '../utils/platform_keyboard.dart';
 
 enum MenuAction {
   appSettings,
-  fileEdit,
   fileImport,
   fileRefresh,
   fileRebuild,
@@ -18,6 +17,7 @@ enum MenuAction {
   trackInfo,
   trackPrevious,
   trackNext,
+  toolsEdit,
 }
 
 class MenuUtils {

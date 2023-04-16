@@ -80,14 +80,6 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
-                label: t.menuFileEdit,
-                onSelected: () => _onMenu(MenuAction.fileEdit),
-              ),
-            ],
-          ),
-          PlatformMenuItemGroup(
-            members: [
-              PlatformMenuItem(
                 label: t.menuFileImport,
                 onSelected: () => _onMenu(MenuAction.fileImport),
               ),
@@ -179,6 +171,23 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
           ),
         ],
       ),
+      PlatformMenu(
+        label: t.menuTools,
+        menus: [
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuToolsEdit,
+                onSelected: () => _onMenu(MenuAction.toolsEdit),
+              ),
+            ],
+          ),
+        ],
+      ),
+      PlatformMenu(
+        label: t.menuHelp,
+        menus: [],
+      ),
     ];
   }
 
@@ -188,7 +197,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
         SettingsWidget.show(context);
         break;
 
-      case MenuAction.fileEdit:
+      case MenuAction.toolsEdit:
         _edit();
         break;
 
