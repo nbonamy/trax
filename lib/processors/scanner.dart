@@ -13,8 +13,11 @@ const String kBootStrapMessage = 'bootstrap';
 const String kStopMessage = 'stop';
 const String kCompleteMessage = 'done';
 
+const int kUpdateEveryMs = 2500;
+
 bool _scanInProgress = false;
 bool _stopRequested = false;
+DateTime? _lastNotification;
 
 bool isScanRunning() {
   return _scanInProgress;
@@ -46,6 +49,7 @@ Future<bool> runScan(
   // a new start
   _stopRequested = false;
   _scanInProgress = true;
+  _lastNotification = null;
 
   // we need a parser
   List<String> queue = [];
@@ -83,18 +87,22 @@ Future<bool> runScan(
       } else if (message == kCompleteMessage) {
         scanCompleted = true;
       } else {
-        bool newArtist = await commandHandler(
+        await commandHandler(
           logger,
           tagLib,
           database,
           message,
           null,
-          null,
+          parser,
           [],
         );
         queue.remove(message['track'].filename);
-        if (newArtist) {
-          logger.d('[SCAN] new artist inserted');
+        DateTime now = DateTime.now();
+        if (_lastNotification == null ||
+            now.difference(_lastNotification!).inMilliseconds >
+                kUpdateEveryMs) {
+          logger.d('[SCAN] onUpdate call');
+          _lastNotification = now;
           onUpdate();
         }
       }
@@ -147,7 +155,7 @@ Future<void> createScanner(
   );
 }
 
-Future<bool> commandHandler(
+Future<void> commandHandler(
   Logger logger,
   TagLib tagLib,
   TraxDatabase database,
@@ -162,18 +170,18 @@ Future<bool> commandHandler(
     mainToScannerPort?.send(kStopMessage);
     parser?.dispose(immediate: true);
     queue.clear();
-    return false;
+    return;
   }
 
   // dummy message
   if (message == '') {
-    return false;
+    return;
   }
 
   // make sure this is a command
   if (message is Map == false || message.containsKey('command') == false) {
     logger.w('[SCAN] Invalid command received');
-    return false;
+    return;
   }
 
   // now run it
@@ -181,47 +189,42 @@ Future<bool> commandHandler(
     case 'info':
       String logMessage = message['message'];
       logger.i('[SCAN] $logMessage');
-      return false;
+      break;
 
     case 'perf':
       String label = message['label'] ?? message['message'];
       logger.perf(label);
-      return false;
+      break;
 
     case 'check':
-      if (_stopRequested) return false;
-      String filename = message['filename'];
-      logger.v('[SCAN] Checking file updated: $filename');
-      if (await checkFile(database, tagLib, filename)) {
-        logger.v('[SCAN] File requires parsing: $filename');
-        queue.add(filename);
-        parser?.sendMessage(filename);
-        return true;
-      } else {
-        return false;
+      if (!_stopRequested) {
+        String filename = message['filename'];
+        logger.v('[SCAN] Checking file updated: $filename');
+        if (await checkFile(database, tagLib, filename)) {
+          logger.v('[SCAN] File requires parsing: $filename');
+          queue.add(filename);
+          parser?.sendMessage(filename);
+        }
       }
+      break;
 
     case 'insert':
-      if (_stopRequested) return false;
-      Track track = message['track'] as Track;
-      if (track.tags != null && track.tags!.valid) {
-        logger.v('[SCAN] Updating track: ${track.filename}');
-        bool newArtist = !(await database.artistExists(track.tags!.artist));
-        database.insert(track, notify: false);
-        return newArtist;
-      } else {
-        return false;
+      if (!_stopRequested) {
+        Track track = message['track'] as Track;
+        if (track.tags != null && track.tags!.valid) {
+          logger.v('[SCAN] Updating track: ${track.filename}');
+          database.insert(track, notify: false);
+        }
       }
+      break;
 
     case 'delete':
-      if (_stopRequested) return false;
-      String filename = message['filename'] as String;
-      logger.v('[SCAN] Deleting track: $filename');
-      database.delete(filename);
-      return false;
-
-    default:
-      return false;
+      if (!_stopRequested) {
+        String filename = message['filename'] as String;
+        logger.v('[SCAN] Deleting track: $filename');
+        database.delete(filename);
+      }
+      break;
   }
 }
 
