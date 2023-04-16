@@ -6,10 +6,10 @@ class AppIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      CupertinoIcons.music_note,
-      color: CupertinoColors.systemPurple,
-      size: size,
+    return Image.asset(
+      'graphics/app_icon.png',
+      width: size,
+      height: size,
     );
   }
 }
