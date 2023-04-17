@@ -41,7 +41,13 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
   void initState() {
     super.initState();
     _tagLib = TagLib();
-    _controller.addListener(() => _action = MetadataAction.updated);
+    _controller.addListener(() {
+      if (_controller.text == widget.track!.lyrics) {
+        _action = MetadataAction.untouched;
+      } else {
+        _action = MetadataAction.updated;
+      }
+    });
   }
 
   @override
@@ -52,9 +58,15 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
 
   Future<bool> loadLyrics() async {
     if (widget.track == null) return Future.value(false);
-    await widget.track!.loadLyrics(_tagLib);
-    _controller.text = widget.track!.lyrics ?? '';
-    _action = MetadataAction.untouched;
+    if (_action == MetadataAction.loading) {
+      String lyrics = await _tagLib.getLyrics(widget.track!.filename);
+      // if still loading
+      if (_action == MetadataAction.loading) {
+        _controller.text = lyrics;
+        widget.track!.lyrics = lyrics;
+        _action = MetadataAction.untouched;
+      }
+    }
     return true;
   }
 

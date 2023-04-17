@@ -68,8 +68,12 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
   Future<bool> loadArtwork() async {
     if (widget.track == null) return Future.value(true);
     if (_action == MetadataAction.loading) {
-      _bytes = await _tagLib.getArtworkBytes(widget.track!.filename);
-      _action = MetadataAction.untouched;
+      Uint8List? bytes = await _tagLib.getArtworkBytes(widget.track!.filename);
+      // if still loading
+      if (_action == MetadataAction.loading) {
+        _bytes = bytes;
+        _action = MetadataAction.untouched;
+      }
     }
     return true;
   }
