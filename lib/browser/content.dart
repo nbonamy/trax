@@ -241,20 +241,11 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     TrackList selection,
     TrackList allTracks,
   ) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          child: TagEditorWidget(
-            editorMode: editorMode,
-            selection: selection,
-            allTracks: allTracks,
-          ),
-        );
-      },
+    TagEditorWidget.show(
+      context,
+      editorMode,
+      selection,
+      allTracks: allTracks,
     );
   }
 }
