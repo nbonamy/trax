@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'audioplayer/audio_player.dart';
 import 'components/theme.dart';
 import 'data/database.dart';
 import 'model/preferences.dart';
 import 'model/selection.dart';
 import 'screens/home.dart';
 import 'utils/artwork_provider.dart';
-import 'audioplayer/audio_player.dart';
 import 'utils/consts.dart';
 import 'utils/logger.dart';
 import 'utils/track_utils.dart';
@@ -28,6 +29,13 @@ void main() async {
   Preferences preferences = Preferences();
   await preferences.init();
   await traxDatabase.init();
+
+  // audio service
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.nabocorp.trax',
+    androidNotificationChannelName: 'Trax Audio Playback',
+    androidNotificationOngoing: true,
+  );
 
   // default options
   WindowOptions windowOptions = const WindowOptions(

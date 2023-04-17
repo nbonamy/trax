@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:just_audio/just_audio.dart' as ja;
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:provider/provider.dart';
 
 import '../model/track.dart';
+import '../utils/track_utils.dart';
 
 class AudioPlayer extends ChangeNotifier {
   static AudioPlayer of(BuildContext context) {
@@ -63,7 +65,22 @@ class AudioPlayer extends ChangeNotifier {
     _playlist = playlist;
     final audioSource = ja.ConcatenatingAudioSource(
       useLazyPreparation: true,
-      children: playlist.map((t) => ja.AudioSource.file(t.filename)).toList(),
+      children: playlist
+          .map(
+            (t) => ja.AudioSource.file(
+              t.filename,
+              tag: MediaItem(
+                id: t.filename,
+                title: t.displayTitle,
+                displayTitle: t.displayTitle,
+                album: t.displayAlbum,
+                artist: t.displayArtist,
+                genre: t.displayGenre,
+                duration: Duration(seconds: t.safeTags.duration),
+              ),
+            ),
+          )
+          .toList(),
     );
     await _player.setAudioSource(
       audioSource,

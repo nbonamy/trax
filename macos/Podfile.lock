@@ -1,4 +1,6 @@
 PODS:
+  - audio_service (0.14.1):
+    - FlutterMacOS
   - audio_session (0.0.1):
     - FlutterMacOS
   - contextual_menu (0.0.1):
@@ -32,6 +34,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - audio_service (from `Flutter/ephemeral/.symlinks/plugins/audio_service/macos`)
   - audio_session (from `Flutter/ephemeral/.symlinks/plugins/audio_session/macos`)
   - contextual_menu (from `Flutter/ephemeral/.symlinks/plugins/contextual_menu/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
@@ -51,6 +54,8 @@ SPEC REPOS:
     - FMDB
 
 EXTERNAL SOURCES:
+  audio_service:
+    :path: Flutter/ephemeral/.symlinks/plugins/audio_service/macos
   audio_session:
     :path: Flutter/ephemeral/.symlinks/plugins/audio_session/macos
   contextual_menu:
@@ -79,6 +84,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
+  audio_service: b88ff778e0e3915efd4cd1a5ad6f0beef0c950a9
   audio_session: dea1f41890dbf1718f04a56f1d6150fd50039b72
   contextual_menu: 6d35fb15942c0d8769f5eae8d3bda653994a6f5a
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
