@@ -22,7 +22,7 @@ class ArtistWidget extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
       decoration: BoxDecoration(
-          color: selected ? Consts.sideBarSelectColor : Colors.transparent,
+          color: selected ? Consts.sideBarSelectBgColor : Colors.transparent,
           borderRadius: BorderRadius.circular(6)),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -32,6 +32,7 @@ class ArtistWidget extends StatelessWidget {
           child: Row(
             children: [
               ArtistProfilePic(
+                selected: selected,
                 iconData: name == Track.kArtistsHome
                     ? CupertinoIcons.home
                     : name == Track.kArtistCompilations
@@ -44,6 +45,11 @@ class ArtistWidget extends StatelessWidget {
                   TrackUtils.getDisplayArtist(name),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: selected
+                        ? Consts.sideBarSelectFgColor
+                        : Consts.sideBarFgColor,
+                  ),
                 ),
               ),
             ],

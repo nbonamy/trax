@@ -74,11 +74,15 @@ class AudioPlayer extends ChangeNotifier {
   }
 
   void pause() {
-    _player.pause();
+    if (isPlaying) {
+      _player.pause();
+    }
   }
 
   void resume() {
-    _player.play();
+    if (!isStopped) {
+      _player.play();
+    }
   }
 
   void playpause() {

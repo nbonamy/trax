@@ -18,24 +18,27 @@ class PlaybackControls extends StatelessWidget {
             child: Icon(
               CupertinoIcons.backward_fill,
               color: audioPlayer.canPrevious ? activeColor : inactiveColor,
+              size: 22,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           GestureDetector(
             onTap: () => audioPlayer.playpause(),
             child: Icon(
               audioPlayer.isPlaying
                   ? CupertinoIcons.pause_fill
                   : CupertinoIcons.play_fill,
-              color: activeColor,
+              color: audioPlayer.isStopped ? inactiveColor : activeColor,
+              size: 28,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           GestureDetector(
             onTap: () => audioPlayer.next(),
             child: Icon(
               CupertinoIcons.forward_fill,
               color: audioPlayer.canNext ? activeColor : inactiveColor,
+              size: 22,
             ),
           ),
         ],

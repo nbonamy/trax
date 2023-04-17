@@ -29,7 +29,7 @@ class BrowserWidget extends StatefulWidget {
 }
 
 class BrowserWidgetState extends State<BrowserWidget> {
-  String? _artist;
+  String _artist = Track.kArtistsHome;
   String? _initialAlbum;
   ActionInProgress? _actionInProgress;
 
@@ -81,27 +81,25 @@ class BrowserWidgetState extends State<BrowserWidget> {
           ContentArea(
             builder: (context, scrollController) => Container(
               color: CupertinoColors.white,
-              child: Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () => SelectionModel.of(context).clear(),
-                  child: Builder(
-                    builder: (context) {
-                      if (_artist == null || _artist == Track.kArtistsHome) {
-                        return DatabaseBuilder<bool>(
-                          future: (database) => database.isEmpty,
-                          builder: (context, database, isEmpty) => isEmpty
-                              ? const WelcomeWidget()
-                              : const StartWidget(),
-                        );
-                      } else {
-                        return BrowserContent(
-                          artist: _artist,
-                          initialAlbum: _initialAlbum,
-                        );
-                      }
-                    },
-                  ),
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => SelectionModel.of(context).clear(),
+                child: Builder(
+                  builder: (context) {
+                    if (_artist == Track.kArtistsHome) {
+                      return DatabaseBuilder<bool>(
+                        future: (database) => database.isEmpty,
+                        builder: (context, database, isEmpty) => isEmpty
+                            ? const WelcomeWidget()
+                            : const StartWidget(),
+                      );
+                    } else {
+                      return BrowserContent(
+                        artist: _artist,
+                        initialAlbum: _initialAlbum,
+                      );
+                    }
+                  },
                 ),
               ),
             ),
@@ -116,7 +114,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
   void onSelectArtist(String? artist, {String? album}) {
     SelectionModel.of(context).clear(notify: false);
     setState(() {
-      _artist = artist;
+      _artist = artist ?? Track.kArtistsHome;
       _initialAlbum = album;
     });
   }
