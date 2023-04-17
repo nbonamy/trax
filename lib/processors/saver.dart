@@ -1,7 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
+import 'package:sanitize_filename/sanitize_filename.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../data/database.dart';
@@ -24,9 +25,9 @@ class TagSaver {
 
   final TagLib tagLib;
   final TraxDatabase database;
-  final String rootFolder;
+  final PreferencesBase preferences;
 
-  TagSaver(this.tagLib, this.database, this.rootFolder);
+  TagSaver(this.tagLib, this.database, this.preferences);
 
   Future<bool> update(
     EditorMode editorMode,
@@ -64,7 +65,7 @@ class TagSaver {
 
         // move?
         if (editorMode != EditorMode.editOnly) {
-          String fullpath = _targetFilename(
+          String fullpath = targetFilename(
             track,
             preferences.keepMediaOrganized,
           );
@@ -167,21 +168,48 @@ class TagSaver {
     return true;
   }
 
-  String _targetFilename(Track track, bool keepMediaOrganized) {
-    String filepath = rootFolder;
+  @visibleForTesting
+  String targetFilename(Track track, bool keepMediaOrganized) {
+    // start with path
+    String filepath = preferences.musicFolder;
     if (keepMediaOrganized) {
       if (track.safeTags.compilation) {
-        filepath = p.join(filepath, Consts.compilationsFolder);
-        filepath = p.join(filepath, track.displayAlbum);
+        filepath =
+            p.join(filepath, sanitizePathComponent(Consts.compilationsFolder));
+        filepath = p.join(filepath, sanitizePathComponent(track.displayAlbum));
       } else {
-        filepath = p.join(filepath, track.displayArtist);
-        filepath = p.join(filepath, track.displayAlbum);
+        filepath = p.join(filepath, sanitizePathComponent(track.displayArtist));
+        filepath = p.join(filepath, sanitizePathComponent(track.displayAlbum));
       }
     }
-    String filename = track.displayTrackIndex;
-    if (filename.isNotEmpty) filename = '$filename. ';
-    filename = '$filename${track.displayTitle}${p.extension(track.filename)}';
+
+    // filename: try to mimick what Apple Music does
+    // start with volumeIndex if relevant followed by -
+    // then trackIndex if relevant followed by space
+    // then track title
+    // then extension
+    String filename = '';
+    if (track.safeTags.volumeIndex != 0) {
+      filename = '$filename${track.safeTags.volumeIndex}-';
+    }
+    if (track.safeTags.trackIndex != 0) {
+      filename =
+          '$filename${track.safeTags.trackIndex.toString().padLeft(2, '0')} ';
+    }
+    {
+      filename = '$filename${sanitizePathComponent(track.displayTitle)}';
+    }
+    {
+      filename = '$filename${p.extension(track.filename)}';
+    }
+
+    // now concat
     String fullpath = p.join(filepath, filename);
     return fullpath;
+  }
+
+  @visibleForTesting
+  String sanitizePathComponent(String pathComponent) {
+    return sanitizeFilename(pathComponent, replacement: '_');
   }
 }

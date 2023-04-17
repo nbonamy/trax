@@ -6,7 +6,11 @@ import '../utils/path_utils.dart';
 
 enum ImportFileOp { copy, move }
 
-class Preferences extends ChangeNotifier {
+abstract class PreferencesBase {
+  String get musicFolder;
+}
+
+class Preferences extends ChangeNotifier implements PreferencesBase {
   static Preferences of(BuildContext context) {
     return Provider.of<Preferences>(context, listen: false);
   }
@@ -23,6 +27,7 @@ class Preferences extends ChangeNotifier {
     super.notifyListeners();
   }
 
+  @override
   String get musicFolder {
     return _prefs.getString('musicfolder') ?? SystemPath.music() ?? '/Music';
   }

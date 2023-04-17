@@ -382,7 +382,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     TagSaver tagSaver = TagSaver(
       _tagLib,
       TraxDatabase.of(context),
-      Preferences.of(context).musicFolder,
+      Preferences.of(context),
     );
     return await tagSaver.update(
       widget.editorMode,
@@ -409,7 +409,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     TagSaver tagSaver = TagSaver(
       _tagLib,
       TraxDatabase.of(context),
-      Preferences.of(context).musicFolder,
+      Preferences.of(context),
     );
 
     // iterate
