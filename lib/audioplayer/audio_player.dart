@@ -49,10 +49,11 @@ class AudioPlayer extends ChangeNotifier {
   }
 
   Stream<double?> get progressStream {
-    return _player.positionStream.map((position) => _player.duration == null
-        ? null
-        : (position.inSeconds.toDouble() /
-            _player.duration!.inSeconds.toDouble()));
+    return _player.positionStream.map(
+      (position) {
+        return _progress(position.inMilliseconds);
+      },
+    );
   }
 
   double get volume {
@@ -129,5 +130,11 @@ class AudioPlayer extends ChangeNotifier {
 
   void _notify(dynamic event) {
     notifyListeners();
+  }
+
+  double? _progress(int positionMs) {
+    return _player.duration == null
+        ? null
+        : (positionMs.toDouble() / _player.duration!.inMilliseconds.toDouble());
   }
 }
