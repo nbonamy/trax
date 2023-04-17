@@ -21,6 +21,7 @@ Track subject(
   int trackIndex = 0,
 }) {
   return Track(
+    id: 0,
     filename: '/Users/trax/Downloads/test.mp3',
     filesize: 0,
     lastModified: 0,

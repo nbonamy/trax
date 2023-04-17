@@ -234,7 +234,7 @@ Future<bool> checkFile(
   String filename,
 ) async {
   // check if cached version is up-to-date
-  Track? cached = await database.getTrack(filename);
+  Track? cached = await database.getTrackByFilename(filename);
   if (cached != null) {
     Track track = Track.parse(filename, null);
     if (track.filesize == cached.filesize &&

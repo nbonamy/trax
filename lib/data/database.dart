@@ -160,7 +160,14 @@ class TraxDatabase extends ChangeNotifier {
     return _dehydrateAlbums(resultSet, AlbumOrdering.none);
   }
 
-  Future<Track?> getTrack(String filename) async {
+  Future<Track?> getTrackById(String id) async {
+    final List<Map> resultSet =
+        await _database!.rawQuery('SELECT * FROM tracks WHERE id=(?)', [id]);
+    if (resultSet.length != 1) return null;
+    return _dehydrateTrack(resultSet.first);
+  }
+
+  Future<Track?> getTrackByFilename(String filename) async {
     final List<Map> resultSet = await _database!
         .rawQuery('SELECT * FROM tracks WHERE filename=(?)', [filename]);
     if (resultSet.length != 1) return null;
@@ -169,7 +176,7 @@ class TraxDatabase extends ChangeNotifier {
 
   void insert(Track track, {bool notify = true}) async {
     // now insert
-    await _database!.execute('''
+    int id = await _database!.rawInsert('''
     INSERT OR REPLACE INTO tracks(filename, filesize, last_modification, format,
       title, album, artist, performer, composer,
       genre, copyright, comment, year, compilation,
@@ -202,6 +209,9 @@ class TraxDatabase extends ChangeNotifier {
       track.safeTags.bitrate,
       DateTime.now().millisecondsSinceEpoch,
     ]);
+
+    // update track
+    track.id = id;
 
     // done
     _invalidateCache();
@@ -350,6 +360,7 @@ class TraxDatabase extends ChangeNotifier {
 
   Track _dehydrateTrack(Map row) {
     return Track(
+      id: row['id'],
       filename: row['filename'],
       filesize: row['filesize'],
       lastModified: row['last_modification'],

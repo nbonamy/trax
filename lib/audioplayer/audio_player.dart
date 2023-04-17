@@ -4,6 +4,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:provider/provider.dart';
 
 import '../model/track.dart';
+import '../processors/http.dart';
 import '../utils/track_utils.dart';
 
 class AudioPlayer extends ChangeNotifier {
@@ -77,6 +78,7 @@ class AudioPlayer extends ChangeNotifier {
                 artist: t.displayArtist,
                 genre: t.displayGenre,
                 duration: Duration(seconds: t.safeTags.duration),
+                artUri: Uri.parse(TraxServer.instance.getArtworkUrl(t)),
               ),
             ),
           )

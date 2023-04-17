@@ -11,6 +11,7 @@ import 'components/theme.dart';
 import 'data/database.dart';
 import 'model/preferences.dart';
 import 'model/selection.dart';
+import 'processors/http.dart';
 import 'screens/home.dart';
 import 'utils/artwork_provider.dart';
 import 'utils/consts.dart';
@@ -29,6 +30,13 @@ void main() async {
   Preferences preferences = Preferences();
   await preferences.init();
   await traxDatabase.init();
+
+  // other stuff
+  ArtworkProvider artworkProvider = ArtworkProvider();
+
+  // and a server
+  TraxServer server = TraxServer(logger, traxDatabase, artworkProvider);
+  server.start();
 
   // audio service
   await JustAudioBackground.init(
@@ -58,6 +66,7 @@ void main() async {
       logger: logger,
       preferences: preferences,
       database: traxDatabase,
+      artworkProvider: artworkProvider,
     ));
   });
 }
@@ -66,11 +75,13 @@ class TraxApp extends StatelessWidget {
   final Logger logger;
   final Preferences preferences;
   final TraxDatabase database;
+  final ArtworkProvider artworkProvider;
   const TraxApp({
     super.key,
     required this.logger,
     required this.preferences,
     required this.database,
+    required this.artworkProvider,
   });
 
   // This widget is the root of your application.
@@ -94,7 +105,7 @@ class TraxApp extends StatelessWidget {
           create: (_) => SelectionModel(),
         ),
         ChangeNotifierProvider(
-          create: (_) => ArtworkProvider(),
+          create: (_) => artworkProvider,
         ),
         ChangeNotifierProvider(
           create: (_) => AudioPlayer(),

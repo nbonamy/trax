@@ -12,7 +12,7 @@ class Logger extends ChangeNotifier {
 
   Logger() {
     _logger = publog.Logger(
-      level: publog.Level.info,
+      level: publog.Level.debug,
       printer: publog.SimplePrinter(),
       output: null,
     );

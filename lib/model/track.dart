@@ -30,6 +30,7 @@ class Track {
   static const String kArtistsHome = '_home_';
   static const String kArtistCompilations = '_compilations_';
 
+  int id;
   String filename;
   Format format = Format.notAudio;
   int lastModified = 0;
@@ -56,6 +57,7 @@ class Track {
     required this.filesize,
     required this.lastModified,
     required this.format,
+    this.id = 0,
     this.tags,
   });
 
