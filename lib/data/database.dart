@@ -222,8 +222,9 @@ class TraxDatabase extends ChangeNotifier {
     }
   }
 
-  void delete(String filename, {bool notify = true}) async {
-    _database!.execute('DELETE FROM tracks WHERE filename=(?)', [filename]);
+  Future<void> delete(String filename, {bool notify = true}) async {
+    await _database!
+        .execute('DELETE FROM tracks WHERE filename=(?)', [filename]);
     _invalidateCache();
     if (notify) notifyListeners();
   }
@@ -262,7 +263,7 @@ class TraxDatabase extends ChangeNotifier {
     await _database!.execute('''
     CREATE TABLE tracks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      filename TEXT, filesize INTEGER, last_modification INTEGER, format TEXT,
+      filename TEXT UNIQUE, filesize INTEGER, last_modification INTEGER, format TEXT,
       title TEXT, album TEXT, artist TEXT, performer TEXT, composer TEXT,
       genre TEXT, copyright TEXT, comment TEXT, year TEXT, compilation INTEGER,
       volume_index INTEGER, volume_count INTEGER, track_index INTEGER, track_count INTEGER,
@@ -273,10 +274,7 @@ class TraxDatabase extends ChangeNotifier {
 
     // indexes
     await _database!.execute('''
-      CREATE UNIQUE INDEX tracks_idx1 ON tracks(filename);
-    ''');
-    await _database!.execute('''
-      CREATE INDEX tracks_idx2 ON tracks(artist, compilation);
+      CREATE INDEX tracks_idx1 ON tracks(artist, compilation);
     ''');
 
     // tracks table
