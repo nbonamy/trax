@@ -87,8 +87,7 @@
   "indexOfCount": "of",
 
   "artworkDelete": "Delete",
-  "artworkAdd": "Add...",
-  "artworkReplace": "Replace...",
+  "artworkUpdate": "Update...",
 
   "lyricsDelete": "Delete lyrics from all tracks",
 

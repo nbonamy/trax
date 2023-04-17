@@ -87,8 +87,7 @@
   "indexOfCount": "sur",
 
   "artworkDelete": "Supprimer",
-  "artworkAdd": "Ajouter...",
-  "artworkReplace": "Remplacer...",
+  "artworkUpdate": "Mettre à jour...",
 
   "lyricsDelete": "Supprimer les paroles de toutes les pistes",
 

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
@@ -39,6 +40,10 @@ class ArtworkProvider extends ChangeNotifier {
   final TagLib _tagLib = TagLib();
   final Map<String, _CacheEntry> _cache = {};
 
+  static ArtworkProvider of(BuildContext context) {
+    return Provider.of<ArtworkProvider>(context, listen: false);
+  }
+
   ArtworkProvider({
     this.maxSize = 1024 * 1024 * 1024 * 16,
   });
@@ -70,8 +75,13 @@ class ArtworkProvider extends ChangeNotifier {
     return artworkBytes;
   }
 
+  void evict(Track track) {
+    _CacheKey cacheKey = _CacheKey.fromTrack(track);
+    _evict(cacheKey);
+  }
+
   void _evict(_CacheKey key) {
-    _cache.remove(key);
+    _cache.remove(key.toString());
   }
 
   void _purge() {

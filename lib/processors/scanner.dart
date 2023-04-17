@@ -79,6 +79,7 @@ Future<bool> runScan(
           parser,
           queue,
           rootFolder,
+          onUpdate,
           () {
             scanCompleted = true;
             checkCompletion();
@@ -86,25 +87,16 @@ Future<bool> runScan(
         );
       } else if (message == kCompleteMessage) {
         scanCompleted = true;
-      } else {
+      } else if (isCommand(message)) {
         await commandHandler(
-          logger,
-          tagLib,
-          database,
-          message,
-          null,
-          parser,
-          [],
+          logger: logger,
+          tagLib: tagLib,
+          database: database,
+          message: message,
+          onUpdate: onUpdate,
+          parser: parser,
         );
         queue.remove(message['track'].filename);
-        DateTime now = DateTime.now();
-        if (_lastNotification == null ||
-            now.difference(_lastNotification!).inMilliseconds >
-                kUpdateEveryMs) {
-          logger.d('[SCAN] onUpdate call');
-          _lastNotification = now;
-          onUpdate();
-        }
       }
       checkCompletion();
     },
@@ -123,6 +115,7 @@ Future<void> createScanner(
   Worker parser,
   List<String> queue,
   String rootFolder,
+  Function onUpdate,
   Function onComplete,
 ) async {
   Worker scanner = Worker();
@@ -137,13 +130,14 @@ Future<void> createScanner(
         onComplete();
       } else {
         commandHandler(
-          logger,
-          tagLib,
-          database,
-          message,
-          mainToScannerPort,
-          parser,
-          queue,
+          logger: logger,
+          tagLib: tagLib,
+          database: database,
+          onUpdate: onUpdate,
+          mainToScannerPort: mainToScannerPort,
+          parser: parser,
+          queue: queue,
+          message: message,
         );
       }
     },
@@ -155,15 +149,24 @@ Future<void> createScanner(
   );
 }
 
-Future<void> commandHandler(
-  Logger logger,
-  TagLib tagLib,
-  TraxDatabase database,
-  dynamic message,
+bool isCommand(dynamic message) {
+  return (message is Map && message.containsKey('command'));
+}
+
+String? getCommand(dynamic message) {
+  return isCommand(message) ? message['command'] : null;
+}
+
+Future<void> commandHandler({
+  required Logger logger,
+  required TagLib tagLib,
+  required TraxDatabase database,
+  required Function onUpdate,
+  required dynamic message,
+  List<String> queue = const [],
   SendPort? mainToScannerPort,
   Worker? parser,
-  List<String> queue,
-) async {
+}) async {
   // handle stop requests
   if (_stopRequested) {
     logger.i('[SCAN] Stop scan requested');
@@ -179,13 +182,14 @@ Future<void> commandHandler(
   }
 
   // make sure this is a command
-  if (message is Map == false || message.containsKey('command') == false) {
+  if (isCommand(message) == false) {
     logger.w('[SCAN] Invalid command received');
     return;
   }
 
   // now run it
-  switch (message['command']) {
+  String command = getCommand(message)!;
+  switch (command) {
     case 'info':
       String logMessage = message['message'];
       logger.i('[SCAN] $logMessage');
@@ -212,7 +216,7 @@ Future<void> commandHandler(
       if (!_stopRequested) {
         Track track = message['track'] as Track;
         if (track.tags != null && track.tags!.valid) {
-          logger.v('[SCAN] Updating track: ${track.filename}');
+          logger.d('[SCAN] Updating track: ${track.filename}');
           database.insert(track, notify: false);
         }
       }
@@ -221,10 +225,19 @@ Future<void> commandHandler(
     case 'delete':
       if (!_stopRequested) {
         String filename = message['filename'] as String;
-        logger.v('[SCAN] Deleting track: $filename');
+        logger.d('[SCAN] Deleting track: $filename');
         database.delete(filename);
       }
       break;
+  }
+
+  // check for notification
+  DateTime now = DateTime.now();
+  if (_lastNotification == null ||
+      now.difference(_lastNotification!).inMilliseconds > kUpdateEveryMs) {
+    logger.d('[SCAN] onUpdate call');
+    _lastNotification = now;
+    onUpdate();
   }
 }
 

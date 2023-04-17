@@ -61,8 +61,8 @@ class Track {
     this.tags,
   });
 
-  void loadLyrics(TagLib tagLib) {
-    lyrics = tagLib.getLyrics(filename);
+  Future<void> loadLyrics(TagLib tagLib) async {
+    lyrics = await tagLib.getLyrics(filename);
   }
 
   String get formatString {

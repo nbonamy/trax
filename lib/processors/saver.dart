@@ -9,13 +9,14 @@ import '../data/database.dart';
 import '../model/editable_tags.dart';
 import '../model/preferences.dart';
 import '../model/track.dart';
+import '../utils/artwork_provider.dart';
 import '../utils/consts.dart';
 import '../utils/path_utils.dart';
 import '../utils/track_utils.dart';
 
 enum EditorMode { edit, import, editOnly }
 
-enum ArtworkAction { untouched, updated, deleted }
+enum MetadataAction { loading, untouched, updated, deleted }
 
 class TagSaver {
   static const String kMixedValueStr = '__mixed__';
@@ -30,13 +31,13 @@ class TagSaver {
   TagSaver(this.tagLib, this.database, this.preferences);
 
   Future<bool> update(
+    Preferences preferences,
+    ArtworkProvider artworkProvider,
     EditorMode editorMode,
     Track track,
     Tags updatedTags,
-    String? updatedLyrics,
-    ArtworkAction artworkAction,
-    Preferences preferences,
-    Uint8List? artworkBytes, {
+    Uint8List? updatedArtwork,
+    String? updatedLyrics, {
     bool notify = true,
   }) async {
     try {
@@ -81,23 +82,16 @@ class TagSaver {
       }
 
       // update artwork
-      if (artworkAction == ArtworkAction.deleted) {
-        tagLib.setArtwork(track.filename, Uint8List(0));
-        updated = true;
-      } else if (artworkAction == ArtworkAction.updated) {
-        tagLib.setArtwork(track.filename, artworkBytes!);
+      if (updatedArtwork != null) {
+        tagLib.setArtwork(track.filename, updatedArtwork);
+        artworkProvider.evict(track);
         updated = true;
       }
 
       // update lyrics
       if (updatedLyrics != null) {
-        if (track.lyrics == null) {
-          track.loadLyrics(tagLib);
-        }
-        if (track.lyrics != updatedLyrics) {
-          tagLib.setLyrics(track.filename, updatedLyrics);
-          updated = true;
-        }
+        tagLib.setLyrics(track.filename, updatedLyrics);
+        updated = true;
       }
 
       // done
