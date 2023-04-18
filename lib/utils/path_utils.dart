@@ -42,6 +42,11 @@ class SystemPath {
     return p.join(appDataDir.path, 'trax.db');
   }
 
+  static Future<String> artistCacheFile() async {
+    Directory appDataDir = await appData();
+    return p.join(appDataDir.path, 'artists.cache');
+  }
+
   static String temporaryFile({String extension = '.tmp'}) {
     Directory tempPath = Directory.systemTemp;
     int randomId = 100000000 + Random().nextInt(9999999);

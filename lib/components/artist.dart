@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../model/track.dart';
 import '../utils/consts.dart';
 import '../utils/track_utils.dart';
 import 'artist_profile_pic.dart';
@@ -32,12 +30,8 @@ class ArtistWidget extends StatelessWidget {
           child: Row(
             children: [
               ArtistProfilePic(
+                name: name,
                 selected: selected,
-                iconData: name == Track.kArtistsHome
-                    ? CupertinoIcons.home
-                    : name == Track.kArtistCompilations
-                        ? CupertinoIcons.smallcircle_circle_fill
-                        : null,
               ),
               const SizedBox(width: 16),
               Expanded(
