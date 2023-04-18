@@ -4,17 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import '../model/track.dart';
-import '../processors/artist_image_provider.dart';
 
 class ArtistProfilePic extends StatelessWidget {
   static const double _kIconSize = 28;
   static const double _kIconPadding = 10;
-  static const double _kImageSize = _kIconSize + 2 * _kIconPadding;
+  static const double _kImageSize = _kIconSize + 2 * _kIconPadding + 2;
 
   final String name;
   final bool selected;
-
-  static final ArtistImageProvider _artistImageProvider = ArtistImageProvider();
 
   const ArtistProfilePic({
     Key? key,
@@ -42,29 +39,21 @@ class ArtistProfilePic extends StatelessWidget {
     }
 
     // try
-    return FutureBuilder(
-      future: _artistImageProvider.getProfilePicUrl(name),
-      builder: (context, snapshot) {
-        if (snapshot.hasData == false || snapshot.data == null) {
-          return _placeholder();
-        }
-        return CachedNetworkImage(
-          imageUrl: snapshot.data!,
-          placeholder: (context, url) => _placeholder(),
-          errorWidget: (context, url, error) => _placeholder(),
-          imageBuilder: (context, imageProvider) => Container(
-            width: _kImageSize,
-            height: _kImageSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
+    return CachedNetworkImage(
+      imageUrl: _getProfilePicUrl(),
+      placeholder: (context, url) => _placeholder(),
+      errorWidget: (context, url, error) => _placeholder(),
+      imageBuilder: (context, imageProvider) => Container(
+        width: _kImageSize,
+        height: _kImageSize,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          image: DecorationImage(
+            image: imageProvider,
+            fit: BoxFit.cover,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -92,5 +81,9 @@ class ArtistProfilePic extends StatelessWidget {
         color: selected ? Colors.white : Colors.black.withOpacity(0.7),
       ),
     );
+  }
+
+  String _getProfilePicUrl() {
+    return 'https://scrapper.bonamy.fr/lastfm.php?artist=${Uri.encodeComponent(name.toLowerCase())}&exact=true&auto=true';
   }
 }
