@@ -17,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Fix flutter SDK folder permission
+      run: git config --global --add safe.directory /tmp/flutter/--
     - uses: subosito/flutter-action@v2
       with:
         flutter-version: 'stable'
