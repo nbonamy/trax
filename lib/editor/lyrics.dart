@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/track.dart';
 import '../processors/saver.dart';
+import 'loading.dart';
 
 class EditorLyricsWidget extends StatefulWidget {
   final Track? track;
@@ -97,10 +97,7 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
                 if (snapshot.connectionState != ConnectionState.done ||
                     snapshot.hasData == false ||
                     snapshot.data == false) {
-                  return LoadingAnimationWidget.prograssiveDots(
-                    size: 64,
-                    color: CupertinoColors.systemGrey,
-                  );
+                  return const LoadingWidget();
                 } else {
                   return MacosTextField(
                     controller: _controller,
