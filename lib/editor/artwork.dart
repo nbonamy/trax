@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pasteboard/pasteboard.dart';
@@ -13,12 +13,15 @@ import '../components/button.dart';
 import '../model/menu_actions.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
+import 'loading.dart';
 
 class EditorArtworkWidget extends StatefulWidget {
   final Track? track;
+  final TrackList selection;
   const EditorArtworkWidget({
     super.key,
-    this.track,
+    required this.track,
+    required this.selection,
   });
 
   @override
@@ -31,6 +34,7 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
 
   late TagLib _tagLib;
   MetadataAction _action = MetadataAction.loading;
+  bool? _checkingMultiple;
   Uint8List? _bytes;
 
   Uint8List? get bytes {
@@ -56,6 +60,7 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
   void didUpdateWidget(EditorArtworkWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     _action = MetadataAction.loading;
+    _checkingMultiple = null;
     _bytes = null;
   }
 
@@ -66,8 +71,15 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
   }
 
   Future<bool> loadArtwork() async {
-    if (widget.track == null) return Future.value(true);
     if (_action == MetadataAction.loading) {
+      if (widget.track == null) {
+        // check in background
+        if (_checkingMultiple == null) {
+          _checkingMultiple = true;
+          _checkIfSameArtwork();
+        }
+        return Future.value(true);
+      }
       Uint8List? bytes = await _tagLib.getArtworkBytes(widget.track!.filename);
       // if still loading
       if (_action == MetadataAction.loading) {
@@ -80,7 +92,6 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations t = AppLocalizations.of(context)!;
     return Center(
       child: FutureBuilder<bool>(
         future: loadArtwork(),
@@ -88,48 +99,21 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
           if (snapshot.connectionState != ConnectionState.done ||
               snapshot.hasData == false ||
               snapshot.data == false) {
-            return LoadingAnimationWidget.prograssiveDots(
-              size: 64,
-              color: CupertinoColors.systemGrey,
-            );
+            return const LoadingWidget();
           } else {
             return Flex(
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 (widget.track == null && _bytes == null)
-                    ? Container(
-                        width: kArtworkSize,
-                        height: kArtworkSize,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: CupertinoColors.lightBackgroundGray,
-                          ),
-                        ),
-                        child: _action == MetadataAction.deleted
-                            ? Container()
-                            : const Icon(
-                                CupertinoIcons.music_albums,
-                                size: kArtworkSize * 0.5,
-                                color: CupertinoColors.lightBackgroundGray,
-                              ),
-                      )
+                    ? _multiplePlaceholder()
                     : ArtworkWidget(
                         bytes: _bytes,
                         size: kArtworkSize,
                         radius: 0.0,
                       ),
                 const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (widget.track == null || _bytes != null) ...[
-                      Button(t.artworkDelete, _delete),
-                      const SizedBox(width: 16),
-                    ],
-                    Button(t.artworkUpdate, _add),
-                  ],
-                )
+                _actionButtons()
               ],
             );
           }
@@ -138,14 +122,59 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
     );
   }
 
-  _delete() {
+  Widget _multiplePlaceholder() {
+    return Container(
+      width: kArtworkSize,
+      height: kArtworkSize,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: CupertinoColors.lightBackgroundGray,
+        ),
+      ),
+      child: _action == MetadataAction.deleted
+          ? Container()
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  CupertinoIcons.music_albums,
+                  size: kArtworkSize * 0.5,
+                  color: CupertinoColors.lightBackgroundGray,
+                ),
+                if (_checkingMultiple != null && _checkingMultiple!) ...[
+                  const SizedBox(height: 8),
+                  LoadingAnimationWidget.prograssiveDots(
+                    size: 32,
+                    color: CupertinoColors.lightBackgroundGray,
+                  ),
+                ]
+              ],
+            ),
+    );
+  }
+
+  Widget _actionButtons() {
+    AppLocalizations t = AppLocalizations.of(context)!;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (widget.track == null || _bytes != null) ...[
+          Button(t.artworkDelete, _delete),
+          const SizedBox(width: 16),
+        ],
+        Button(t.artworkUpdate, _add),
+      ],
+    );
+  }
+
+  void _delete() {
     setState(() {
       _bytes = null;
       _action = MetadataAction.deleted;
     });
   }
 
-  _add() async {
+  void _add() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png'],
@@ -156,6 +185,29 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
       setState(() {
         _bytes = fileBytes;
         _action = MetadataAction.updated;
+      });
+    }
+  }
+
+  void _checkIfSameArtwork() async {
+    Uint8List? refBytes =
+        await _tagLib.getArtworkBytes(widget.selection.first.filename);
+    for (int i = 1; i < widget.selection.length; i++) {
+      Uint8List? bytes =
+          await _tagLib.getArtworkBytes(widget.selection[i].filename);
+      if (_action != MetadataAction.loading ||
+          listEquals(bytes?.toList(), refBytes?.toList()) == false) {
+        setState(() => _checkingMultiple = false);
+        return;
+      }
+    }
+
+    // we are here so all same: but do a last check
+    if (_action == MetadataAction.loading) {
+      setState(() {
+        _bytes = refBytes;
+        _action = MetadataAction.untouched;
+        _checkingMultiple = false;
       });
     }
   }

@@ -282,6 +282,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           EditorArtworkWidget(
             key: _artworkKey,
             track: currentTrack,
+            selection: widget.selection,
           ),
           EditorLyricsWidget(
             key: _lyricsKey,
