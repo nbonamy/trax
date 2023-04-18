@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +10,7 @@ class SelectionModel extends ChangeNotifier {
     return _selection.isEmpty;
   }
 
-  UnmodifiableListView<Track> get get => UnmodifiableListView(_selection);
+  List<Track> get get => List.from(_selection);
 
   static SelectionModel of(BuildContext context) {
     return Provider.of<SelectionModel>(context, listen: false);

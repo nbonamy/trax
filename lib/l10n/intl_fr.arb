@@ -17,7 +17,8 @@
   "menuFileReveal": "Révéler dans Finder",
 
   "menuEdit": "Edition",
-  "menuEditSelectAll": "Tout sélectionner",
+  "menuEditSelectAllAlbum": "Sélectionner toutes les pistes de l'album",
+  "menuEditSelectAllArtist": "Sélectionner toutes les pistes de l'artist",
   "menuEditPaste": "Coller",
   "menuEditDelete": "Déplacer dans la Corbeille",
 

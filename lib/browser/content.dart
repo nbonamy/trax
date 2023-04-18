@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:trax/audioplayer/audio_player.dart';
+import 'package:trax/utils/track_utils.dart';
 
 import '../components/album.dart';
 import '../components/database_builder.dart';
@@ -199,8 +200,11 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       case MenuAction.fileReveal:
         _revealInFinder();
         break;
-      case MenuAction.editSelectAll:
-        selectionModel.set(_albums.allTracks);
+      case MenuAction.editSelectAllAlbum:
+        _selectAllAlbum();
+        break;
+      case MenuAction.editSelectAllArtist:
+        _selectAllArtist();
         break;
       case MenuAction.editDelete:
         _deleteFiles(
@@ -214,6 +218,31 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       default:
         break;
     }
+  }
+
+  void _selectAllAlbum() {
+    SelectionModel selectionModel = SelectionModel.of(context);
+    List<Track> selection = selectionModel.get;
+    if (selection.isEmpty) {
+      _selectAllArtist();
+      return;
+    }
+    String album = selection.first.displayAlbum;
+    for (int i = 1; i < selection.length; i++) {
+      if (selection[i].displayAlbum != album) {
+        //_selectAllArtist();
+        return;
+      }
+    }
+
+    // ok all tracks are from same album so let's select them all
+    selectionModel
+        .set(_albums.allTracks.where((t) => t.displayAlbum == album).toList());
+  }
+
+  void _selectAllArtist() {
+    SelectionModel selectionModel = SelectionModel.of(context);
+    selectionModel.set(_albums.allTracks);
   }
 
   _revealInFinder() {

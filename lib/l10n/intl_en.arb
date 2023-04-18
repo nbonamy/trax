@@ -17,7 +17,8 @@
   "menuFileReveal": "Show in Finder",
   
   "menuEdit": "Edit",
-  "menuEditSelectAll": "Select All",
+  "menuEditSelectAllAlbum": "Select All Album Tracks",
+  "menuEditSelectAllArtist": "Select All Artist Tracks",
   "menuEditPaste": "Paste",
   "menuEditDelete": "Move to Trash",
 

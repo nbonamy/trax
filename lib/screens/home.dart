@@ -127,9 +127,15 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
-                label: t.menuEditSelectAll,
+                label: t.menuEditSelectAllAlbum,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyA),
-                onSelected: () => _onMenu(MenuAction.editSelectAll),
+                onSelected: () => _onMenu(MenuAction.editSelectAllAlbum),
+              ),
+              PlatformMenuItem(
+                label: t.menuEditSelectAllArtist,
+                shortcut:
+                    MenuUtils.cmdShortcut(LogicalKeyboardKey.keyA, shift: true),
+                onSelected: () => _onMenu(MenuAction.editSelectAllArtist),
               ),
             ],
           ),
