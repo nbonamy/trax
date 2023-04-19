@@ -25,12 +25,20 @@ class TraxHomePage extends StatefulWidget {
   State<TraxHomePage> createState() => _TraxHomePageState();
 }
 
-class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
+class _TraxHomePageState extends State<TraxHomePage>
+    with WindowListener, MenuHandler {
   final GlobalKey<BrowserWidgetState> _keyBrowser = GlobalKey();
   @override
   void initState() {
     super.initState();
+    initMenuSubscription();
     windowManager.addListener(this);
+  }
+
+  @override
+  void dispose() {
+    cancelMenuSubscription();
+    super.dispose();
   }
 
   @override
@@ -61,7 +69,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               PlatformMenuItem(
                 label: t.menuAppSettings,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.comma),
-                onSelected: () => _onMenu(MenuAction.appSettings),
+                onSelected: () => onMenuAction(MenuAction.appSettings),
               ),
             ],
           ),
@@ -81,7 +89,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
             members: [
               PlatformMenuItem(
                 label: t.menuFileImport,
-                onSelected: () => _onMenu(MenuAction.fileImport),
+                onSelected: () => onMenuAction(MenuAction.fileImport),
               ),
             ],
           ),
@@ -90,11 +98,11 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               PlatformMenuItem(
                 label: t.menuFileRefresh,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR),
-                onSelected: () => _onMenu(MenuAction.fileRefresh),
+                onSelected: () => onMenuAction(MenuAction.fileRefresh),
               ),
               PlatformMenuItem(
                 label: t.menuFileRebuild,
-                onSelected: () => _onMenu(
+                onSelected: () => onMenuAction(
                   MenuAction.fileRebuild,
                 ),
               ),
@@ -106,7 +114,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
                 label: t.menuFileReveal,
                 shortcut:
                     MenuUtils.cmdShortcut(LogicalKeyboardKey.keyR, shift: true),
-                onSelected: () => _onMenu(MenuAction.fileReveal),
+                onSelected: () => onMenuAction(MenuAction.fileReveal),
               ),
             ],
           ),
@@ -120,7 +128,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               PlatformMenuItem(
                 label: t.menuEditPaste,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyV),
-                onSelected: () => _onMenu(MenuAction.editPaste),
+                onSelected: () => onMenuAction(MenuAction.editPaste),
               ),
             ],
           ),
@@ -129,13 +137,13 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               PlatformMenuItem(
                 label: t.menuEditSelectAllAlbum,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyA),
-                onSelected: () => _onMenu(MenuAction.editSelectAllAlbum),
+                onSelected: () => onMenuAction(MenuAction.editSelectAllAlbum),
               ),
               PlatformMenuItem(
                 label: t.menuEditSelectAllArtist,
                 shortcut:
                     MenuUtils.cmdShortcut(LogicalKeyboardKey.keyA, shift: true),
-                onSelected: () => _onMenu(MenuAction.editSelectAllArtist),
+                onSelected: () => onMenuAction(MenuAction.editSelectAllArtist),
               ),
             ],
           ),
@@ -149,7 +157,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               PlatformMenuItem(
                 label: t.menuTrackInfo,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyI),
-                onSelected: () => _onMenu(MenuAction.trackInfo),
+                onSelected: () => onMenuAction(MenuAction.trackInfo),
               ),
             ],
           ),
@@ -166,7 +174,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               PlatformMenuItem(
                 label: t.menuEditDelete,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.backspace),
-                onSelected: () => _onMenu(MenuAction.editDelete),
+                onSelected: () => onMenuAction(MenuAction.editDelete),
               ),
             ],
           ),
@@ -180,12 +188,12 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
               PlatformMenuItem(
                 label: t.menuTrackPrev,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyP),
-                onSelected: () => _onMenu(MenuAction.trackPrevious),
+                onSelected: () => onMenuAction(MenuAction.trackPrevious),
               ),
               PlatformMenuItem(
                 label: t.menuTrackNext,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyN),
-                onSelected: () => _onMenu(MenuAction.trackNext),
+                onSelected: () => onMenuAction(MenuAction.trackNext),
               ),
             ],
           ),
@@ -198,7 +206,7 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
             members: [
               PlatformMenuItem(
                 label: t.menuToolsEdit,
-                onSelected: () => _onMenu(MenuAction.toolsEdit),
+                onSelected: () => onMenuAction(MenuAction.toolsEdit),
               ),
             ],
           ),
@@ -211,7 +219,8 @@ class _TraxHomePageState extends State<TraxHomePage> with WindowListener {
     ];
   }
 
-  void _onMenu(MenuAction action) async {
+  @override
+  void onMenuAction(MenuAction action) async {
     switch (action) {
       case MenuAction.appSettings:
         SettingsWidget.show(context);

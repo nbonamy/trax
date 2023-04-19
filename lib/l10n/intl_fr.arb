@@ -55,7 +55,14 @@
   "home": "Accueil",
   "compilations": "Compilations",
 
-  "welcome": "Bienvenue",
+  "welcomeTitle": "Bienvenue !",
+  "welcomeLibraryLocation": "Votre répertoire Musique est : ",
+  "welcomeActionsIntro": "Vous pouvez ",
+  "welcomeActionChange": "le modifier",
+  "welcomeActionsOr": " ou ",
+  "welcomeActionScan": "lancer une analyse",
+  "welcomeActionsEnd": ".",
+
   "startLibrary": "Votre collection",
   "addedRecently": "Ajoutés récemment",
 

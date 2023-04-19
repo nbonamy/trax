@@ -55,7 +55,14 @@
   "home": "Home",
   "compilations": "Compilations",
 
-  "welcome": "Welcome",
+  "welcomeTitle": "Welcome!",
+  "welcomeLibraryLocation": "You Music folder is currently set to: ",
+  "welcomeActionsIntro": "You can ",
+  "welcomeActionChange": "change it",
+  "welcomeActionsOr": " or ",
+  "welcomeActionScan": "run a scan",
+  "welcomeActionsEnd": ".",
+
   "startLibrary": "Your Library",
   "addedRecently": "Added recently",
 
