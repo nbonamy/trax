@@ -28,8 +28,10 @@ PODS:
   - sqflite (0.0.2):
     - FlutterMacOS
     - FMDB (>= 2.7.5)
+  - taglib-framework (1.13-1)
   - taglib_ffi (1.0.0):
     - FlutterMacOS
+    - taglib-framework (= 1.13-1)
   - window_manager (0.2.0):
     - FlutterMacOS
 
@@ -52,6 +54,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - FMDB
+    - taglib-framework
 
 EXTERNAL SOURCES:
   audio_service:
@@ -97,9 +100,10 @@ SPEC CHECKSUMS:
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
   shared_preferences_foundation: 986fc17f3d3251412d18b0265f9c64113a8c2472
   sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
-  taglib_ffi: aeb37e4b99ae1c39fcdfb4e0e42f7f22242fe5ed
+  taglib-framework: 66b9b6eed87597adb846fcd87669f6122a3a8d0f
+  taglib_ffi: a0f65635de6b53d49fa0d59d5ec3d532747e9f62
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
 
 PODFILE CHECKSUM: ec3a267b951cf4ed1540d33015451fed0e200941
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1

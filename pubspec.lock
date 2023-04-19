@@ -664,10 +664,11 @@ packages:
   taglib_ffi:
     dependency: "direct main"
     description:
-      path: "../taglib_ffi"
-      relative: true
-    source: path
-    version: "0.0.9"
+      name: taglib_ffi
+      sha256: "404c587f50095774a311b014c31630fd127b661a5bc420596739bb0ec4b813fa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   term_glyph:
     dependency: transitive
     description:

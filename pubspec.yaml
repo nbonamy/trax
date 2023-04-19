@@ -26,8 +26,7 @@ dependencies:
   path_provider: ^2.0.14
   provider: ^6.0.2
   shared_preferences: ^2.0.15
-  taglib_ffi:
-    path: ../taglib_ffi
+  taglib_ffi: ^0.1.0
   window_manager: ^0.3.2
   loading_animation_widget: ^1.2.0+4
   event_bus: ^2.0.0
