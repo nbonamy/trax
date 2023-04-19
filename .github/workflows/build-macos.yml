@@ -1,0 +1,29 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: build-macos
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    env:
+      RUNNER_OS: macos
+    steps:
+    - uses: actions/checkout@v3
+    - name: Fix flutter SDK folder permission
+      run: git config --global --add safe.directory /tmp/flutter/--
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.7.11'
+        architecture: x64
+    - run: flutter pub get
+    - run: flutter test
+    - run: flutter build macos
