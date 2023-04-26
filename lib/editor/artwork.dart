@@ -15,13 +15,17 @@ import '../model/track.dart';
 import '../processors/saver.dart';
 import 'loading.dart';
 
+typedef ArtworkCalculatedCallback = void Function(Uint8List bytes);
+
 class EditorArtworkWidget extends StatefulWidget {
   final Track? track;
   final TrackList selection;
+  final ArtworkCalculatedCallback artworkCallback;
   const EditorArtworkWidget({
     super.key,
     required this.track,
     required this.selection,
+    required this.artworkCallback,
   });
 
   @override
@@ -209,6 +213,9 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
         _action = MetadataAction.untouched;
         _checkingMultiple = false;
       });
+      if (_bytes != null) {
+        widget.artworkCallback(_bytes!);
+      }
     }
   }
 

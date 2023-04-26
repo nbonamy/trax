@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../components/artwork.dart';
 import '../components/artwork_async.dart';
 import '../components/button.dart';
 import '../components/dialog.dart';
@@ -91,6 +92,8 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   late EditableTags tags;
 
   int _activeIndex = -1;
+
+  Uint8List? _artworkBytes;
 
   bool get singleTrackMode =>
       widget.editorMode == EditorMode.edit && widget.selection.length == 1;
@@ -229,12 +232,18 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       preferenceKey: 'editor.alignment',
       header: Row(
         children: [
-          AsyncArtwork(
-            track: currentTrack,
-            size: kArtworkSize,
-            radius: 4.0,
-            defaultPlaceholderBorderColor: CupertinoColors.systemGrey3,
-          ),
+          _artworkBytes == null
+              ? AsyncArtwork(
+                  track: currentTrack,
+                  size: kArtworkSize,
+                  radius: 4.0,
+                  defaultPlaceholderBorderColor: CupertinoColors.systemGrey3,
+                )
+              : ArtworkWidget(
+                  bytes: _artworkBytes,
+                  size: kArtworkSize,
+                  radius: 0.0,
+                ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -283,6 +292,11 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
             key: _artworkKey,
             track: currentTrack,
             selection: widget.selection,
+            artworkCallback: (bytes) {
+              if (_artworkBytes == null) {
+                setState(() => _artworkBytes = bytes);
+              }
+            },
           ),
           EditorLyricsWidget(
             key: _lyricsKey,
