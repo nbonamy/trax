@@ -1,8 +1,12 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../model/preferences.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
 import 'loading.dart';
@@ -59,7 +63,21 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
   Future<bool> loadLyrics() async {
     if (widget.track == null) return Future.value(false);
     if (_action == MetadataAction.loading) {
-      String lyrics = await _tagLib.getLyrics(widget.track!.filename);
+      // get dependent of prefs
+      String lyrics = '';
+      Preferences prefs = Preferences.of(context);
+      switch (prefs.lyricsSaveMode) {
+        case LyricsSaveMode.tag:
+          lyrics = await _tagLib.getLyrics(widget.track!.filename);
+          break;
+        case LyricsSaveMode.lrc:
+          File f = File(widget.track!.companionLrcFilepath);
+          if (f.existsSync()) {
+            lyrics = await f.readAsString();
+          }
+          break;
+      }
+
       // if still loading
       if (_action == MetadataAction.loading) {
         _controller.text = lyrics;
@@ -108,6 +126,11 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
                         color: const Color.fromRGBO(192, 192, 192, 1.0),
                         width: 0.8,
                       ),
+                    ),
+                    style: const TextStyle(
+                      fontFeatures: [
+                        FontFeature.tabularFigures(),
+                      ],
                     ),
                   );
                 }

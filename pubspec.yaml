@@ -1,7 +1,7 @@
 name: trax
-description: A new Flutter project.
+description: Music management for all!
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 1.1.0+1
 
 environment:
   sdk: '>=2.19.6 <3.0.0'

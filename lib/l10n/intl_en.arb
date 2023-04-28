@@ -106,6 +106,10 @@
   "settingsImportOptions": "Import Options",
   "settingsImportFileOpDesc": "files to Music folder when adding to Library",
   "settingsKeepOrganizedDesc": "Keep Music Media folder organized",
+  "settingsLyrics": "Lyrics Options",
+  "settingsLyricsSaveMode": "Save lyrics in",
+  "settingsLyricsSaveModeTags": "Audio file tags",
+  "settingsLyricsSaveModeLrc": "Companion LRC file",
 
   "appName": "Trax"
 

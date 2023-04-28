@@ -36,6 +36,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
   late String _musicFolder;
   late ImportFileOp _importFileOp;
   late bool _keepMediaOrganized;
+  late LyricsSaveMode _lyricsSaveMode;
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     _musicFolder = _preferences.musicFolder;
     _importFileOp = _preferences.importFileOp;
     _keepMediaOrganized = _preferences.keepMediaOrganized;
+    _lyricsSaveMode = _preferences.lyricsSaveMode;
   }
 
   @override
@@ -53,7 +55,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
 
     return DraggableDialog(
       width: 550,
-      height: 320,
+      height: 350,
       headerBgColor: const Color.fromRGBO(240, 234, 230, 1.0),
       //: const Color.fromRGBO(240, 234, 230, 1.0),
       // contentsBgColor: const Color.fromRGBO(246, 240, 236, 1.0),
@@ -125,6 +127,28 @@ class _SettingsWidgetState extends State<SettingsWidget> {
             const SizedBox(width: 8),
             Text(t.settingsKeepOrganizedDesc),
           ]),
+          _row(t.settingsLyrics, 1, [
+            Text(t.settingsLyricsSaveMode),
+            const SizedBox(width: 8),
+            MacosPopupButton(
+              value: _lyricsSaveMode,
+              items: [
+                MacosPopupMenuItem(
+                  value: LyricsSaveMode.tag,
+                  child: Text(t.settingsLyricsSaveModeTags),
+                ),
+                MacosPopupMenuItem(
+                  value: LyricsSaveMode.lrc,
+                  child: Text(t.settingsLyricsSaveModeLrc),
+                ),
+              ],
+              onChanged: (v) {
+                setState(() {
+                  _lyricsSaveMode = v ?? _lyricsSaveMode;
+                });
+              },
+            ),
+          ]),
         ],
       ),
       footer: Row(
@@ -152,6 +176,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     _preferences.musicFolder = _musicFolder;
     _preferences.importFileOp = _importFileOp;
     _preferences.keepMediaOrganized = _keepMediaOrganized;
+    _preferences.lyricsSaveMode = _lyricsSaveMode;
     return true;
   }
 

@@ -90,7 +90,21 @@ class TagSaver {
 
       // update lyrics
       if (updatedLyrics != null) {
-        tagLib.setLyrics(track.filename, updatedLyrics);
+        switch (preferences.lyricsSaveMode) {
+          case LyricsSaveMode.tag:
+            tagLib.setLyrics(track.filename, updatedLyrics);
+            break;
+          case LyricsSaveMode.lrc:
+            File f = File(track.companionLrcFilepath);
+            if (updatedLyrics.isEmpty) {
+              if (await f.exists()) {
+                await f.delete();
+              }
+            } else {
+              await f.writeAsString(updatedLyrics);
+            }
+            break;
+        }
         updated = true;
       }
 

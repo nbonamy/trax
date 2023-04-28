@@ -99,6 +99,10 @@ class Track {
     return tags == null ? EditableTags() : EditableTags.fromTags(tags!);
   }
 
+  String get companionLrcFilepath {
+    return p.setExtension(filename, '.lrc');
+  }
+
   static bool isTrack(String filename) {
     // skip ._ files
     if (p.basename(filename).startsWith('._')) return false;

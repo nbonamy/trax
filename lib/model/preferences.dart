@@ -6,6 +6,8 @@ import '../utils/path_utils.dart';
 
 enum ImportFileOp { copy, move }
 
+enum LyricsSaveMode { tag, lrc }
+
 abstract class PreferencesBase {
   String get musicFolder;
 }
@@ -50,6 +52,15 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
 
   set keepMediaOrganized(bool keepOrganized) {
     _prefs.setBool('keeporganized', keepOrganized);
+  }
+
+  LyricsSaveMode get lyricsSaveMode {
+    return LyricsSaveMode.values
+        .elementAt(_prefs.getInt('lyricssavemode') ?? 0);
+  }
+
+  set lyricsSaveMode(LyricsSaveMode lyricsSaveMode) {
+    _prefs.setInt('lyricssavemode', lyricsSaveMode.index);
   }
 
   Rect get windowBounds {
