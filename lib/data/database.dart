@@ -48,8 +48,12 @@ class TraxDatabase extends ChangeNotifier {
   Future<void> init() async {
     String dbFile = databaseFile ?? await SystemPath.dbFile();
     logger.i('[DB] File: $dbFile');
-    _database = await openDatabase(dbFile);
-    _checkSchemaVersion();
+    _database = await openDatabase(
+      dbFile,
+      version: _latestSchemaVersion,
+      onCreate: _createSchema,
+      onUpgrade: _updateSchema,
+    );
     //clear();
   }
 
@@ -247,27 +251,7 @@ class TraxDatabase extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _checkSchemaVersion() async {
-    try {
-      final List<Map> resultSet =
-          await _database!.rawQuery('SELECT * FROM info');
-      final Map row = resultSet.first;
-      final int version = int.parse(row['version'].toString());
-      if (version != _latestSchemaVersion) {
-        _updateSchema(version);
-      }
-    } on DatabaseException catch (e) {
-      if (e.isNoSuchTableError('info')) {
-        await _createSchema();
-      } else {
-        rethrow;
-      }
-    } catch (e) {
-      _database = null;
-    }
-  }
-
-  Future<void> _createSchema() async {
+  Future<void> _createSchema(Database db, int version) async {
     // tracks table
     await _database!.execute('''
     CREATE TABLE tracks (
@@ -285,28 +269,12 @@ class TraxDatabase extends ChangeNotifier {
     await _database!.execute('''
       CREATE INDEX tracks_idx1 ON tracks(artist, compilation);
     ''');
-
-    // tracks table
-    await _database!.execute('''
-    CREATE TABLE info (
-      version INTEGER
-    );
-    ''');
-
-    // insert
-    await _database!.execute(
-        'INSERT INTO info(version) VALUES((?))', [_latestSchemaVersion]);
   }
 
-  void _updateSchema(int currentVersion) {
-    if (currentVersion == _latestSchemaVersion) return;
+  void _updateSchema(Database db, int oldVersion, int newVersion) {
+    if (oldVersion == newVersion) return;
     // no update yet
-    _updateVersion(currentVersion + 1);
-    _updateSchema(currentVersion + 1);
-  }
-
-  void _updateVersion(int version) {
-    _database!.execute('UPDATE info SET version=(?)', [version]);
+    _updateSchema(db, oldVersion + 1, newVersion);
   }
 
   AlbumList _dehydrateAlbums(
