@@ -165,12 +165,27 @@ class TagSaver {
     String fullpath, {
     notify = false,
   }) async {
-    if (fullpath == track.filename) return false;
+    // different?
+    if (fullpath == track.filename) {
+      return false;
+    }
+
+    // prepare
     String currpath = track.filename;
     database.delete(currpath, notify: false);
+    File lyrics = File(track.companionLrcFilepath);
+
+    // now rename
     await Directory(p.dirname(fullpath)).create(recursive: true);
     await File(currpath).rename(fullpath);
     track.filename = fullpath;
+
+    // handle lyrics
+    if (await lyrics.exists()) {
+      await lyrics.rename(track.companionLrcFilepath);
+    }
+
+    // done
     database.insert(track, notify: notify);
     return true;
   }
