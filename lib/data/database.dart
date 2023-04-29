@@ -36,6 +36,10 @@ class TraxDatabase extends ChangeNotifier {
     return Provider.of<TraxDatabase>(context, listen: false);
   }
 
+  bool get isOpen {
+    return _database != null;
+  }
+
   TraxDatabase({
     required this.logger,
     this.databaseFile,

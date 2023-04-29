@@ -115,7 +115,11 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   }
 
   void loadCache() async {
+    // check database
     TraxDatabase database = TraxDatabase.of(context);
+    if (!database.isOpen) return;
+
+    // get
     _allAlbums = await database.allAlbums();
     _allArtists = await database.allArtists();
     _allPerformers = await database.allPerformers();
@@ -186,35 +190,41 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       builder: (context) => Column(
         children: [
           _textFieldRow(
+            const Key('title'),
             t.tagTitle,
             _titleController,
             placeholder: mixedTextPlaceholder,
           ),
           _textFieldRow(
+            const Key('album'),
             t.tagAlbum,
             _albumController,
             placeholder: mixedTextPlaceholder,
             results: _allAlbums,
           ),
           _textFieldRow(
+            const Key('artist'),
             t.tagArtist,
             _artistController,
             placeholder: mixedTextPlaceholder,
             results: _allArtists,
           ),
           _textFieldRow(
+            const Key('performer'),
             t.tagPerformer,
             _performerController,
             placeholder: mixedTextPlaceholder,
             results: _allPerformers,
           ),
           _textFieldRow(
+            const Key('composer'),
             t.tagComposer,
             _composerController,
             placeholder: mixedTextPlaceholder,
             results: _allComposers,
           ),
           _textFieldRow(
+            const Key('genre'),
             t.tagGenre,
             _genreController,
             placeholder: mixedTextPlaceholder,
@@ -222,6 +232,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
             showResultsWhenEmpty: true,
           ),
           _textFieldRow(
+            const Key('year'),
             t.tagYear,
             _yearController,
             placeholder: mixedNumPlaceholder,
@@ -230,6 +241,8 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
             width: 60,
           ),
           _textFieldsRow(
+            const Key('volume_index'),
+            const Key('volume_count'),
             t.tagVolumeIndex,
             indexSeparator,
             40,
@@ -239,6 +252,8 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
             keyboardType: TextInputType.number,
           ),
           _textFieldsRow(
+            const Key('track_index'),
+            const Key('track_count'),
             t.tagTrackIndex,
             indexSeparator,
             40,
@@ -248,6 +263,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
             keyboardType: TextInputType.number,
           ),
           _checkBoxRow(
+            const Key('compilation'),
             t.tagCompilation,
             description: 'Album is a compilation of songs by various artists',
             value: tags.editedCompilation,
@@ -256,11 +272,13 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
             }),
           ),
           _textFieldRow(
+            const Key('copyright'),
             t.tagCopyright,
             _copyrightController,
             placeholder: mixedTextPlaceholder,
           ),
           _textFieldRow(
+            const Key('comment'),
             t.tagComment,
             _commentController,
             placeholder: mixedTextPlaceholder,
@@ -272,6 +290,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   }
 
   Widget _textFieldRow(
+    Key key,
     String label,
     TextEditingController controller, {
     String? placeholder,
@@ -283,6 +302,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     double? width,
   }) {
     Widget textField = _textField(
+      key,
       keyboardType,
       maxLength,
       controller,
@@ -299,6 +319,8 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   }
 
   Widget _textFieldsRow(
+    Key key1,
+    Key key2,
     String label,
     String separator,
     double width,
@@ -313,6 +335,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       SizedBox(
         width: width,
         child: _textField(
+          key1,
           keyboardType,
           maxLength,
           controller1,
@@ -330,6 +353,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       SizedBox(
         width: width,
         child: _textField(
+          key2,
           keyboardType,
           maxLength,
           controller2,
@@ -352,12 +376,13 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   // }
 
   Widget _checkBoxRow(
+    Key key,
     String label, {
     required bool? value,
     required ValueChanged? onChanged,
     String? description,
   }) {
-    Widget checkbox = _checkbox(value, onChanged);
+    Widget checkbox = _checkbox(key, value, onChanged);
     return _row(
       label,
       4,
@@ -402,6 +427,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   }
 
   Widget _textField(
+    Key key,
     TextInputType? keyboardType,
     int? maxLength,
     TextEditingController controller,
@@ -443,6 +469,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       return KeyEventResult.ignored;
     };
     return MacosAutoCompleteField(
+      key: key,
       focusNode: focusNode,
       autofocus: controller == _focusedController,
       padding: const EdgeInsets.symmetric(
@@ -498,12 +525,14 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   // }
 
   Widget _checkbox(
+    Key key,
     bool? value,
     ValueChanged<bool>? onChanged,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: MacosCheckbox(
+        key: key,
         value: value,
         onChanged: onChanged,
       ),
