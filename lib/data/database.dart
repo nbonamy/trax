@@ -175,6 +175,11 @@ class TraxDatabase extends ChangeNotifier {
   }
 
   void insert(Track track, {bool notify = true}) async {
+    // update importedAt if needed
+    if (track.importedAt == 0) {
+      track.importedAt = DateTime.now().millisecondsSinceEpoch;
+    }
+
     // now insert
     int id = await _database!.rawInsert('''
     INSERT OR REPLACE INTO tracks(filename, filesize, last_modification, format,
@@ -207,7 +212,7 @@ class TraxDatabase extends ChangeNotifier {
       track.safeTags.sampleRate,
       track.safeTags.bitsPerSample,
       track.safeTags.bitrate,
-      DateTime.now().millisecondsSinceEpoch,
+      track.importedAt,
     ]);
 
     // update track
@@ -361,6 +366,7 @@ class TraxDatabase extends ChangeNotifier {
       id: row['id'],
       filename: row['filename'],
       filesize: row['filesize'],
+      importedAt: row['imported_at'],
       lastModified: row['last_modification'],
       format: row['format'].toString().toFormat(),
       tags: Tags(

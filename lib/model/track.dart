@@ -33,6 +33,7 @@ class Track {
   int id;
   String filename;
   Format format = Format.notAudio;
+  int importedAt = 0;
   int lastModified = 0;
   int filesize = 0;
 
@@ -58,6 +59,7 @@ class Track {
     required this.lastModified,
     required this.format,
     this.id = 0,
+    this.importedAt = 0,
     this.tags,
   });
 

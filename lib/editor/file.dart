@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../model/track.dart';
@@ -30,10 +32,19 @@ class EditorFileWidget extends StatelessWidget {
           _row('channels', track.channelsString),
           _row('', ''),
           _row(
-              'date modified',
-              DateTime.fromMillisecondsSinceEpoch(track.lastModified)
-                  .toString()
-                  .substring(0, 19)),
+            'date imported',
+            DateTime.fromMillisecondsSinceEpoch(track.importedAt)
+                .toString()
+                .substring(0, 19),
+            tabularFigures: true,
+          ),
+          _row(
+            'date modified',
+            DateTime.fromMillisecondsSinceEpoch(track.lastModified)
+                .toString()
+                .substring(0, 19),
+            tabularFigures: true,
+          ),
           _row('', ''),
           _row('location', track.filename),
         ],
@@ -41,7 +52,11 @@ class EditorFileWidget extends StatelessWidget {
     );
   }
 
-  Widget _row(String label, String value) {
+  Widget _row(
+    String label,
+    String value, {
+    bool tabularFigures = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Flex(
@@ -53,6 +68,11 @@ class EditorFileWidget extends StatelessWidget {
             child: Text(
               value,
               softWrap: true,
+              style: TextStyle(
+                fontFeatures: [
+                  if (tabularFigures) const FontFeature.tabularFigures(),
+                ],
+              ),
             ),
           ),
         ],
@@ -70,6 +90,7 @@ class EditorFileWidget extends StatelessWidget {
           textAlign: TextAlign.right,
           style: const TextStyle(
             color: Color.fromRGBO(125, 125, 125, 1.0),
+            //fontWeight: FontWeight.w500,
           ),
         ),
       ),
