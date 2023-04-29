@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
-import 'package:sanitize_filename/sanitize_filename.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../data/database.dart';
@@ -218,6 +217,6 @@ class TagSaver {
 
   @visibleForTesting
   String sanitizePathComponent(String pathComponent) {
-    return sanitizeFilename(pathComponent, replacement: '_');
+    return PathUtils.sanitizeFilename(pathComponent, replacement: '_');
   }
 }
