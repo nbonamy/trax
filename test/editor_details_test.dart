@@ -222,7 +222,7 @@ Future<GlobalKey<EditorDetailsWidgetState>> runTest(
     singleTrackMode: singleTrackMode,
     onComplete: () {},
   );
-  await tester.pumpWidget(await bootstrapWidget(widget));
+  await tester.pumpWidget(await bootstrapWidget(tester, widget));
 
   // check screen structure
   expect(tester.allWidgets.whereType<MacosTextField>().length, 13);
