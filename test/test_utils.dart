@@ -72,13 +72,17 @@ Future<AppLocalizations> getLocalizations(WidgetTester t) async {
   return result;
 }
 
-Future<Widget> bootstrapWidget(WidgetTester tester, Widget widget) async {
+Future<Widget> bootstrapWidget(
+  WidgetTester tester,
+  Widget widget, {
+  Map<String, Object> mockPreferences = const {},
+}) async {
   // logger
   Logger logger = Logger();
 
   // dummy preferences
   // https://stackoverflow.com/questions/44357053/flutter-test-missingpluginexception
-  SharedPreferences.setMockInitialValues({});
+  SharedPreferences.setMockInitialValues(mockPreferences);
   Preferences preferences = Preferences();
 
   // dummy path_provider
