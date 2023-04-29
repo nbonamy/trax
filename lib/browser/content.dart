@@ -43,6 +43,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   final ItemScrollController _itemScrollController = ItemScrollController();
   AlbumList _albums = LinkedHashMap();
   late TraxDatabase database;
+  Track? _extendSelectionBase;
 
   @override
   void initState() {
@@ -56,6 +57,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
   void didUpdateWidget(covariant BrowserContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     _itemScrollController.jumpTo(index: 0);
+    _extendSelectionBase = null;
     _albums = AlbumList();
   }
 
@@ -139,26 +141,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     );
   }
 
-  void _select(Track track, TrackList siblings) {
-    // extended selection
-    if (PlatformKeyboard.selectionExtendActive) {
-      _extendSelect(track);
-      return;
-    }
-
-    SelectionModel selectionModel = SelectionModel.of(context);
-    bool selected = selectionModel.contains(track);
-    if (PlatformKeyboard.selectionToggleActive) {
-      if (selected) {
-        selectionModel.remove(track);
-      } else {
-        selectionModel.add(track);
-      }
-    } else {
-      selectionModel.set([track]);
-    }
-  }
-
   void _execute(Track track, TrackList siblings) {
     AudioPlayer audioPlayer = AudioPlayer.of(context);
     audioPlayer.play(
@@ -167,30 +149,48 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     );
   }
 
-  void _extendSelect(Track track) {
-    SelectionModel selectionModel = SelectionModel.of(context);
-    Track? lastSelected = selectionModel.lastSelected;
-    if (lastSelected == null) {
-      selectionModel.set([track]);
+  void _select(Track track, TrackList siblings) {
+    if (PlatformKeyboard.selectionExtendActive) {
+      _extendSelect(track);
     } else {
-      if (!PlatformKeyboard.selectionToggleActive) {
-        selectionModel.set([lastSelected], notify: false);
-      }
-      bool inBetween = false;
-      for (TrackList tracks in _albums.values) {
-        for (Track t in tracks) {
-          if (inBetween) {
-            selectionModel.add(t);
-          }
-          if (t == track || t == lastSelected) {
-            if (inBetween) {
-              return;
-            }
-            inBetween = true;
-          }
-        }
-      }
+      _normalSelect(track);
+      _extendSelectionBase = track;
     }
+  }
+
+  void _normalSelect(Track track) {
+    SelectionModel selectionModel = SelectionModel.of(context);
+    if (PlatformKeyboard.selectionToggleActive) {
+      selectionModel.toggle(track);
+    } else {
+      selectionModel.set([track]);
+    }
+  }
+
+  void _extendSelect(Track track) {
+    // if we have no base then normal select
+    if (_extendSelectionBase == null) {
+      _normalSelect(track);
+      return;
+    }
+
+    // reset if not toggle
+    SelectionModel selectionModel = SelectionModel.of(context);
+    if (!PlatformKeyboard.selectionToggleActive) {
+      selectionModel.clear(notify: false);
+    }
+
+    // we need base and track indexes
+    int baseIndex = _albums.allTracks.indexOf(_extendSelectionBase!);
+    int trackIndex = _albums.allTracks.indexOf(track);
+    int rangeStart = min(baseIndex, trackIndex);
+    int rangeEnd = max(baseIndex, trackIndex) + 1;
+
+    // now add all
+    _albums.allTracks
+        .getRange(rangeStart, rangeEnd)
+        .forEach((t) => selectionModel.add(t, notify: false));
+    selectionModel.notify();
   }
 
   @override

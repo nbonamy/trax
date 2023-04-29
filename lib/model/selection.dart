@@ -16,10 +16,6 @@ class SelectionModel extends ChangeNotifier {
     return Provider.of<SelectionModel>(context, listen: false);
   }
 
-  Track? get lastSelected {
-    return _selection.isEmpty ? null : _selection.last;
-  }
-
   bool contains(Track item) {
     return _selection.contains(item);
   }
@@ -51,11 +47,23 @@ class SelectionModel extends ChangeNotifier {
     }
   }
 
+  void toggle(Track item, {bool notify = true}) {
+    if (_selection.contains(item)) {
+      remove(item, notify: notify);
+    } else {
+      add(item, notify: notify);
+    }
+  }
+
   void set(TrackList items, {bool notify = true}) {
     _selection.clear();
     _selection.addAll(items);
     if (notify) {
       notifyListeners();
     }
+  }
+
+  void notify() {
+    notifyListeners();
   }
 }
