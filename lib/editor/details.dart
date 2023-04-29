@@ -182,90 +182,92 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     String indexSeparator = t.indexOfCount;
 
     // return
-    return Column(
-      children: [
-        _textFieldRow(
-          t.tagTitle,
-          _titleController,
-          placeholder: mixedTextPlaceholder,
-        ),
-        _textFieldRow(
-          t.tagAlbum,
-          _albumController,
-          placeholder: mixedTextPlaceholder,
-          results: _allAlbums,
-        ),
-        _textFieldRow(
-          t.tagArtist,
-          _artistController,
-          placeholder: mixedTextPlaceholder,
-          results: _allArtists,
-        ),
-        _textFieldRow(
-          t.tagPerformer,
-          _performerController,
-          placeholder: mixedTextPlaceholder,
-          results: _allPerformers,
-        ),
-        _textFieldRow(
-          t.tagComposer,
-          _composerController,
-          placeholder: mixedTextPlaceholder,
-          results: _allComposers,
-        ),
-        _textFieldRow(
-          t.tagGenre,
-          _genreController,
-          placeholder: mixedTextPlaceholder,
-          results: _allGenres,
-          showResultsWhenEmpty: true,
-        ),
-        _textFieldRow(
-          t.tagYear,
-          _yearController,
-          placeholder: mixedNumPlaceholder,
-          keyboardType: TextInputType.number,
-          maxLength: 4,
-          width: 60,
-        ),
-        _textFieldsRow(
-          t.tagVolumeIndex,
-          indexSeparator,
-          40,
-          _volumeIndexController,
-          _volumeCountController,
-          placeholder: mixedNumPlaceholder,
-          keyboardType: TextInputType.number,
-        ),
-        _textFieldsRow(
-          t.tagTrackIndex,
-          indexSeparator,
-          40,
-          _trackIndexController,
-          _trackCountController,
-          placeholder: mixedNumPlaceholder,
-          keyboardType: TextInputType.number,
-        ),
-        _checkBoxRow(
-          t.tagCompilation,
-          description: 'Album is a compilation of songs by various artists',
-          value: tags.editedCompilation,
-          onChanged: (b) => setState(() {
-            tags.editedCompilation = b;
-          }),
-        ),
-        _textFieldRow(
-          t.tagCopyright,
-          _copyrightController,
-          placeholder: mixedTextPlaceholder,
-        ),
-        _textFieldRow(
-          t.tagComment,
-          _commentController,
-          placeholder: mixedTextPlaceholder,
-          minLines: 3,
-        ),
-      ],
+    return Builder(
+      builder: (context) => Column(
+        children: [
+          _textFieldRow(
+            t.tagTitle,
+            _titleController,
+            placeholder: mixedTextPlaceholder,
+          ),
+          _textFieldRow(
+            t.tagAlbum,
+            _albumController,
+            placeholder: mixedTextPlaceholder,
+            results: _allAlbums,
+          ),
+          _textFieldRow(
+            t.tagArtist,
+            _artistController,
+            placeholder: mixedTextPlaceholder,
+            results: _allArtists,
+          ),
+          _textFieldRow(
+            t.tagPerformer,
+            _performerController,
+            placeholder: mixedTextPlaceholder,
+            results: _allPerformers,
+          ),
+          _textFieldRow(
+            t.tagComposer,
+            _composerController,
+            placeholder: mixedTextPlaceholder,
+            results: _allComposers,
+          ),
+          _textFieldRow(
+            t.tagGenre,
+            _genreController,
+            placeholder: mixedTextPlaceholder,
+            results: _allGenres,
+            showResultsWhenEmpty: true,
+          ),
+          _textFieldRow(
+            t.tagYear,
+            _yearController,
+            placeholder: mixedNumPlaceholder,
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            width: 60,
+          ),
+          _textFieldsRow(
+            t.tagVolumeIndex,
+            indexSeparator,
+            40,
+            _volumeIndexController,
+            _volumeCountController,
+            placeholder: mixedNumPlaceholder,
+            keyboardType: TextInputType.number,
+          ),
+          _textFieldsRow(
+            t.tagTrackIndex,
+            indexSeparator,
+            40,
+            _trackIndexController,
+            _trackCountController,
+            placeholder: mixedNumPlaceholder,
+            keyboardType: TextInputType.number,
+          ),
+          _checkBoxRow(
+            t.tagCompilation,
+            description: 'Album is a compilation of songs by various artists',
+            value: tags.editedCompilation,
+            onChanged: (b) => setState(() {
+              tags.editedCompilation = b;
+            }),
+          ),
+          _textFieldRow(
+            t.tagCopyright,
+            _copyrightController,
+            placeholder: mixedTextPlaceholder,
+          ),
+          _textFieldRow(
+            t.tagComment,
+            _commentController,
+            placeholder: mixedTextPlaceholder,
+            minLines: 3,
+          ),
+        ],
+      ),
     );
   }
 
@@ -436,6 +438,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           _mixedValue.contains(controller)) {
         _userCleared.add(controller);
         _mixedValue.remove(controller);
+        setState(() {});
       }
       return KeyEventResult.ignored;
     };
