@@ -1,16 +1,14 @@
-import 'dart:typed_data';
-
 import 'package:audiotranscode_ffi/audiotranscode_ffi.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:path/path.dart' as p;
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../components/app_icon.dart';
 import '../components/button.dart';
 import '../components/draggable_dialog.dart';
+import '../data/database.dart';
 import '../model/preferences.dart';
 import '../model/track.dart';
 import '../processors/transcoder.dart';
@@ -51,8 +49,9 @@ class TranscoderWidget extends StatefulWidget {
 }
 
 class _TranscoderWidgetState extends State<TranscoderWidget> {
-  final AudioTranscoder _audioTranscoder = AudioTranscoder();
+  late AudioTranscoder _audioTranscoder;
   final TagLib tagLib = TagLib();
+  late TraxDatabase _database;
   String? _destinationFolder;
   late Preferences _preferences;
   bool _deleteSourceFiles = false;
@@ -62,10 +61,16 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   late int _bitrate;
   bool _stopTranscode = false;
 
+  bool get isConvertingLibraryTracks => widget.trackList != null;
+  bool get isConvertingFiles =>
+      !isConvertingLibraryTracks && widget.files != null;
+
   @override
   void initState() {
     super.initState();
+    _database = TraxDatabase.of(context);
     _preferences = Preferences.of(context);
+    _audioTranscoder = AudioTranscoder(database: _database);
     _transcodeFormat = _preferences.convertFormat;
     _bitsPerSample = _preferences.convertBitsPerSample;
     _sampleRate = _preferences.convertSamplerate;
@@ -84,7 +89,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     AppLocalizations t = AppLocalizations.of(context)!;
 
     // tracks
-    if (widget.trackList != null) {
+    if (isConvertingLibraryTracks) {
       // init
       format = widget.trackList!.first.format;
       bitrate = widget.trackList!.first.safeTags.bitrate;
@@ -98,7 +103,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
         if (track.safeTags.sampleRate != sampleRate) sampleRate = null;
         if (track.safeTags.bitsPerSample != bitsPerSample) bitsPerSample = null;
       }
-    } else if (widget.files != null) {
+    } else if (isConvertingFiles) {
       // init
       Tags tags = tagLib.getAudioTags(widget.files!.first);
       format = Track.getFormat(widget.files!.first);
@@ -304,15 +309,11 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   }
 
   void _transcode() {
-    if (widget.trackList != null) {
-      _transcodeSelection(widget.trackList!);
-    } else if (widget.files != null) {
+    if (isConvertingLibraryTracks) {
+      _transcodeFiles(widget.trackList!.map((t) => t.filename).toList());
+    } else if (isConvertingFiles) {
       _transcodeFiles(widget.files!);
     }
-  }
-
-  void _transcodeSelection(TrackList trackList) async {
-    _transcodeFiles(trackList.map((t) => t.filename).toList());
   }
 
   void _transcodeFiles(List<String> files) async {
@@ -332,40 +333,17 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     eventBus.fire(BackgroundActionEndEvent(BackgroundAction.transcode));
   }
 
-  Future<bool> _runTranscode(String src) async {
-    // init
-    bool rc = false;
-    String dst = p.join(_destinationFolder ?? p.dirname(src), p.basename(src));
-
-    // now transcode
-    if (_transcodeFormat == TranscodeFormat.mp3) {
-      dst = _replaceExtension(dst, '.mp3');
-      rc = await _audioTranscoder.transcodeMp3(src, dst, _bitrate);
-    } else if (_transcodeFormat == TranscodeFormat.flac) {
-      dst = _replaceExtension(dst, '.flac');
-      rc = await _audioTranscoder.transcodeFlac(
-          src, dst, _sampleRate, _bitsPerSample);
-    }
-
-    // if successful copy metadata
-    if (rc) {
-      // get it from src
-      Tags tags = tagLib.getAudioTags(src);
-      Uint8List? artwork = await tagLib.getArtworkBytes(src);
-      String? lyrics = await tagLib.getLyrics(src);
-
-      // save it to dst
-      tagLib.setAudioTags(dst, tags);
-      tagLib.setArtwork(dst, artwork ?? Uint8List(0));
-      tagLib.setLyrics(dst, lyrics);
-    }
-
-    // done
-    return rc;
-  }
-
-  String _replaceExtension(String filepath, String ext) {
-    return p.setExtension(filepath, ext);
+  Future<bool> _runTranscode(String src) {
+    return _audioTranscoder.transcode(
+      src,
+      _destinationFolder,
+      _transcodeFormat,
+      _bitrate,
+      _sampleRate,
+      _bitsPerSample,
+      _deleteSourceFiles,
+      isConvertingLibraryTracks && _destinationFolder == null,
+    );
   }
 
   Widget _row(String label, double paddingTop, List<Widget> widgets) {
