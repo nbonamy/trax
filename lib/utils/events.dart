@@ -40,3 +40,5 @@ class SelectArtistAlbumEvent {
   final String? album;
   SelectArtistAlbumEvent(this.artist, this.album);
 }
+
+class StopTranscodeEvent {}

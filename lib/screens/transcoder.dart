@@ -60,6 +60,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   late int _bitsPerSample;
   late int _sampleRate;
   late int _bitrate;
+  bool _stopTranscode = false;
 
   @override
   void initState() {
@@ -69,6 +70,9 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     _bitsPerSample = _preferences.convertBitsPerSample;
     _sampleRate = _preferences.convertSamplerate;
     _bitrate = _preferences.convertBitrate;
+    eventBus.on<StopTranscodeEvent>().listen(
+          (event) => _stopTranscode = true,
+        );
   }
 
   Future<String> _getSourceFileDescription() async {
@@ -312,6 +316,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   }
 
   void _transcodeFiles(List<String> files) async {
+    _stopTranscode = false;
     for (int i = 0; i < files.length; i++) {
       eventBus
           .fire(BackgroundActionStartEvent(BackgroundAction.transcode, data: {
@@ -320,6 +325,9 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
       }));
       String src = files[i];
       await _runTranscode(src);
+      if (_stopTranscode) {
+        break;
+      }
     }
     eventBus.fire(BackgroundActionEndEvent(BackgroundAction.transcode));
   }

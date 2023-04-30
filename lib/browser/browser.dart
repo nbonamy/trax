@@ -141,10 +141,13 @@ class BrowserWidgetState extends State<BrowserWidget> {
       }
       if (event.action == BackgroundAction.transcode) {
         setState(
-          () => _actionInProgress = ActionInProgress(t.transcodeInProgress(
-            event.data['count'],
-            event.data['index'],
-          )),
+          () => _actionInProgress = ActionInProgress(
+            t.transcodeInProgress(
+              event.data['count'],
+              event.data['index'],
+            ),
+            cancel: () => eventBus.fire(StopTranscodeEvent()),
+          ),
         );
       }
     } else if (event is BackgroundActionEndEvent) {
