@@ -12,7 +12,7 @@ class Button extends StatelessWidget {
     this.label,
     this.onPressed, {
     super.key,
-    this.verticalPadding = 2,
+    this.verticalPadding = 3,
     this.horizontalPadding,
     this.defaultButton = false,
     this.noBorder = false,
@@ -22,9 +22,11 @@ class Button extends StatelessWidget {
   Widget build(BuildContext context) {
     PushButton button = PushButton(
       buttonSize: ButtonSize.large,
-      padding: EdgeInsets.symmetric(
-        vertical: verticalPadding,
-        horizontal: horizontalPadding ?? (noBorder ? 0 : 24),
+      padding: EdgeInsets.only(
+        top: verticalPadding,
+        bottom: verticalPadding + 2,
+        left: horizontalPadding ?? (noBorder ? 0 : 24),
+        right: horizontalPadding ?? (noBorder ? 0 : 24),
       ),
       color: defaultButton ? null : CupertinoColors.white,
       disabledColor: CupertinoColors.white,
