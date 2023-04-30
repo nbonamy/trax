@@ -139,6 +139,14 @@ class BrowserWidgetState extends State<BrowserWidget> {
           ),
         );
       }
+      if (event.action == BackgroundAction.transcode) {
+        setState(
+          () => _actionInProgress = ActionInProgress(t.transcodeInProgress(
+            event.data['count'],
+            event.data['index'],
+          )),
+        );
+      }
     } else if (event is BackgroundActionEndEvent) {
       setState(() => _actionInProgress = null);
     } else if (event is SelectArtistEvent) {

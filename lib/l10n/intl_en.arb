@@ -5,15 +5,15 @@
   "cancel": "Cancel",
   "save": "Save",
   "clear": "Clear",
-  "browse": "Browse...",
+  "browse": "Browse…",
 
   "saveError": "An error occured while updating metadata.",
   "scanRunningError": "A scan is already in progress.",
 
-  "menuAppSettings": "Settings...",
+  "menuAppSettings": "Settings…",
   
   "menuFile": "File",
-  "menuFileImport": "Add to Library...",
+  "menuFileImport": "Add to Library…",
   "menuFileRefresh": "Refresh",
   "menuFileRebuild": "Rebuild",
   "menuFileReveal": "Show in Finder",
@@ -25,15 +25,15 @@
   "menuEditDelete": "Move to Trash",
 
   "menuTrack": "Track",
-  "menuTrackInfo": "Info...",
-  "menuTrackConvert": "Convert...",
+  "menuTrackInfo": "Info…",
+  "menuTrackConvert": "Convert…",
   "menuTrackPlay": "Play",
   "menuTrackPrev": "Previous track",
   "menuTrackNext": "Next track",
 
   "menuTools": "Tools",
-  "menuToolsEdit": "Edit tags in files...",
-  "menuToolsConvert": "Convert audio format...",
+  "menuToolsEdit": "Edit tags in files…",
+  "menuToolsConvert": "Convert audio format…",
 
   "menuView": "View",
   
@@ -53,6 +53,7 @@
 
   "scanInProgress": "Scanning audio files",
   "importInProgress": "Parsing imported files",
+  "transcodeInProgress": "Converting audio files ({index} of {count})",
 
   "unknownTitle": "Unknown title",
   "unknownAlbum": "Unknown album",
@@ -114,7 +115,7 @@
   "fileInfoFilePath": "location",
 
   "artworkDelete": "Delete",
-  "artworkUpdate": "Update...",
+  "artworkUpdate": "Update…",
 
   "lyricsDelete": "Delete lyrics from all tracks",
 

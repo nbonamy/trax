@@ -16,7 +16,8 @@ enum BackgroundAction { scan, import, transcode }
 
 class BackgroundActionStartEvent {
   final BackgroundAction action;
-  BackgroundActionStartEvent(this.action);
+  final Map<String, dynamic> data;
+  BackgroundActionStartEvent(this.action, {this.data = const {}});
 }
 
 class BackgroundActionEndEvent {

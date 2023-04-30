@@ -5,15 +5,15 @@
   "cancel": "Annuler",
   "save": "Sauvegarder",
   "clear": "Effacer",
-  "browse": "Parcourir...",
+  "browse": "Parcourir…",
 
   "saveError": "Une erreur est survenue lors de la sauvegarde.",
   "scanRunningError": "Une analyse est déjà en cours.",
 
-  "menuAppSettings": "Configuration...",
+  "menuAppSettings": "Configuration…",
   
   "menuFile": "Fichier",
-  "menuFileImport": "Ajouter à la librairie...",
+  "menuFileImport": "Ajouter à la librairie…",
   "menuFileRefresh": "Rafraîchir",
   "menuFileRebuild": "Reconstruire",
   "menuFileReveal": "Révéler dans Finder",
@@ -25,15 +25,15 @@
   "menuEditDelete": "Déplacer dans la Corbeille",
 
   "menuTrack": "Piste",
-  "menuTrackInfo": "Info...",
-  "menuTrackConvert": "Convertir...",
+  "menuTrackInfo": "Info…",
+  "menuTrackConvert": "Convertir…",
   "menuTrackPlay": "Jouer",
   "menuTrackPrev": "Piste précédente",
   "menuTrackNext": "Piste suivante",
 
   "menuTools": "Outils",
-  "menuToolsEdit": "Editer les tags de fichiers...",
-  "menuToolsConvert": "Conversion de format audio...",
+  "menuToolsEdit": "Editer les tags de fichiers…",
+  "menuToolsConvert": "Conversion de format audio…",
 
   "menuView": "Affichage",
 
@@ -53,6 +53,7 @@
 
   "scanInProgress": "Analyse en cours",
   "importInProgress": "Analyse en cours",
+  "transcodeInProgress": "Conversion en cours ({index} de {count})",
 
   "unknownTitle": "Titre inconnu",
   "unknownAlbum": "Album inconnu",
@@ -114,7 +115,7 @@
   "fileInfoFilePath": "fichier",
 
   "artworkDelete": "Supprimer",
-  "artworkUpdate": "Mettre à jour...",
+  "artworkUpdate": "Mettre à jour…",
 
   "lyricsDelete": "Supprimer les paroles de toutes les pistes",
 

@@ -14,6 +14,7 @@ import '../components/draggable_dialog.dart';
 import '../model/preferences.dart';
 import '../model/track.dart';
 import '../processors/transcoder.dart';
+import '../utils/events.dart';
 
 class TranscoderWidget extends StatefulWidget {
   final List<String>? files;
@@ -311,10 +312,16 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   }
 
   void _transcodeFiles(List<String> files) async {
-    for (String file in files) {
-      String src = file;
+    for (int i = 0; i < files.length; i++) {
+      eventBus
+          .fire(BackgroundActionStartEvent(BackgroundAction.transcode, data: {
+        'index': i + 1,
+        'count': files.length,
+      }));
+      String src = files[i];
       await _runTranscode(src);
     }
+    eventBus.fire(BackgroundActionEndEvent(BackgroundAction.transcode));
   }
 
   Future<bool> _runTranscode(String src) async {
