@@ -333,8 +333,12 @@ class _TraxHomePageState extends State<TraxHomePage>
     if (result?.paths == null) return;
 
     // we need to parse them
+    List<String> files = [];
+    for (String? path in result!.paths) {
+      if (path != null) files.add(path);
+    }
     // ignore: use_build_context_synchronously
-    TranscoderWidget.show(context, files: result!.paths);
+    TranscoderWidget.show(context, files: files);
   }
 
   void _runScan() async {

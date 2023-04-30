@@ -68,18 +68,7 @@ class Track {
   }
 
   String get formatString {
-    switch (format) {
-      case Format.notAudio:
-        return 'Unknown';
-      case Format.mp3:
-        return 'MPEG-1, Layer 3';
-      case Format.flac:
-        return 'Free Lossless Audio Codec';
-      case Format.mp4:
-        return 'Apple Lossless Audio Codec';
-      case Format.vorbis:
-        return 'Ogg Vorbis';
-    }
+    return getFormatString(format);
   }
 
   String get channelsString {
@@ -124,6 +113,24 @@ class Track {
         return Format.vorbis;
       default:
         return Format.notAudio;
+    }
+  }
+
+  static String getFormatString(
+    Format format, {
+    bool shortDescription = false,
+  }) {
+    switch (format) {
+      case Format.notAudio:
+        return 'Unknown';
+      case Format.mp3:
+        return shortDescription ? 'MP3' : 'MPEG-1, Layer 3';
+      case Format.flac:
+        return shortDescription ? 'FLAC' : 'Free Lossless Audio Codec';
+      case Format.mp4:
+        return shortDescription ? 'ALAC' : 'Apple Lossless Audio Codec';
+      case Format.vorbis:
+        return shortDescription ? 'Vorbis' : 'Ogg Vorbis';
     }
   }
 }

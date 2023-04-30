@@ -16,7 +16,7 @@ import '../model/track.dart';
 import '../processors/transcoder.dart';
 
 class TranscoderWidget extends StatefulWidget {
-  final List<String?>? files;
+  final List<String>? files;
   final TrackList? trackList;
   const TranscoderWidget({
     super.key,
@@ -30,7 +30,7 @@ class TranscoderWidget extends StatefulWidget {
   static void show(
     BuildContext context, {
     TrackList? selection,
-    List<String?>? files,
+    List<String>? files,
   }) {
     showDialog(
       context: context,
@@ -39,7 +39,10 @@ class TranscoderWidget extends StatefulWidget {
         return Dialog(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          child: TranscoderWidget(trackList: selection, files: files),
+          child: TranscoderWidget(
+            trackList: selection,
+            files: files,
+          ),
         );
       },
     );
@@ -51,6 +54,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   final TagLib tagLib = TagLib();
   String? _destinationFolder;
   late Preferences _preferences;
+  bool _deleteSourceFiles = false;
   late TranscodeFormat _transcodeFormat;
   late int _bitsPerSample;
   late int _sampleRate;
@@ -66,6 +70,71 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     _bitrate = _preferences.convertBitrate;
   }
 
+  Future<String> _getSourceFileDescription() async {
+    Format? format;
+    int? bitrate;
+    int? sampleRate;
+    int? bitsPerSample;
+    // needed
+    AppLocalizations t = AppLocalizations.of(context)!;
+
+    // tracks
+    if (widget.trackList != null) {
+      // init
+      format = widget.trackList!.first.format;
+      bitrate = widget.trackList!.first.safeTags.bitrate;
+      sampleRate = widget.trackList!.first.safeTags.sampleRate;
+      bitsPerSample = widget.trackList!.first.safeTags.bitsPerSample;
+
+      // parse all
+      for (Track track in widget.trackList!.skip(1)) {
+        if (track.format != format) format = null;
+        if (track.safeTags.bitrate != bitrate) bitrate = null;
+        if (track.safeTags.sampleRate != sampleRate) sampleRate = null;
+        if (track.safeTags.bitsPerSample != bitsPerSample) bitsPerSample = null;
+      }
+    } else if (widget.files != null) {
+      // init
+      Tags tags = tagLib.getAudioTags(widget.files!.first);
+      format = Track.getFormat(widget.files!.first);
+      bitrate = tags.bitrate;
+      sampleRate = tags.sampleRate;
+      bitsPerSample = tags.bitsPerSample;
+
+      // parse all
+      for (String file in widget.files!.skip(1)) {
+        Tags tags = tagLib.getAudioTags(file);
+        if (Track.getFormat(file) != format) format = null;
+        if (tags.bitrate != bitrate) bitrate = null;
+        if (tags.sampleRate != sampleRate) sampleRate = null;
+        if (tags.bitsPerSample != bitsPerSample) bitsPerSample = null;
+      }
+    }
+
+    // decide
+    if (format != null) {
+      if (format == Format.mp3 || format == Format.vorbis) {
+        String desc = Track.getFormatString(format, shortDescription: true);
+        desc += bitrate == null
+            ? ', ${t.convertInfoVariousBitrates}'
+            : ', $bitrate bps';
+        return desc;
+      } else if (format == Format.flac || format == Format.mp4) {
+        String desc = Track.getFormatString(format, shortDescription: true);
+        desc += bitsPerSample == null
+            ? ', ${t.convertInfoVariousBitsPerSample}'
+            : ', $bitsPerSample bits';
+        desc += sampleRate == null
+            ? ', ${t.convertInfoVariousSampleRates}'
+            : ', $sampleRate Hz';
+        return desc;
+      }
+    }
+
+    // too bad
+    return t.convertInfoVariousFormats;
+  }
+
   @override
   Widget build(BuildContext context) {
     // needed
@@ -73,7 +142,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
 
     return DraggableDialog(
       width: 550,
-      height: 370,
+      height: 435,
       headerBgColor: const Color.fromRGBO(240, 234, 230, 1.0),
       //: const Color.fromRGBO(240, 234, 230, 1.0),
       // contentsBgColor: const Color.fromRGBO(246, 240, 236, 1.0),
@@ -93,36 +162,13 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
       body: Flex(
         direction: Axis.vertical,
         children: [
-          _row(t.convertDestination, 1, [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(_destinationFolder ?? t.convertDestinationSame),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    if (_destinationFolder != null) ...[
-                      Button(
-                        'Clear',
-                        () => setState(() => _destinationFolder = null),
-                        horizontalPadding: 8,
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    Button(
-                      'Browse...',
-                      () async {
-                        String? folder =
-                            await FilePicker.platform.getDirectoryPath();
-                        setState(() => _destinationFolder = folder);
-                      },
-                      horizontalPadding: 8,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ]),
+          FutureBuilder(
+              future: _getSourceFileDescription(),
+              builder: (context, snapshot) {
+                String text =
+                    snapshot.hasData ? snapshot.data! : 'calculating...';
+                return _row(t.convertInfoTitle, 1, [Text(text)]);
+              }),
           _row(t.convertFormat, 1, [
             MacosPopupButton(
                 value: _transcodeFormat,
@@ -184,6 +230,44 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
               ),
             ]),
           ],
+          _row(t.convertDestination, 1, [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_destinationFolder ?? t.convertDestinationSame),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (_destinationFolder != null) ...[
+                      Button(
+                        t.clear,
+                        () => setState(() => _destinationFolder = null),
+                        horizontalPadding: 8,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Button(
+                      t.browse,
+                      () async {
+                        String? folder =
+                            await FilePicker.platform.getDirectoryPath();
+                        setState(() => _destinationFolder = folder);
+                      },
+                      horizontalPadding: 8,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ]),
+          _row('', 1, [
+            MacosCheckbox(
+              value: _deleteSourceFiles,
+              onChanged: (b) => setState(() => _deleteSourceFiles = b),
+            ),
+            const SizedBox(width: 8),
+            Text(t.convertDeleteSrc),
+          ]),
         ],
       ),
       footer: Row(
@@ -226,9 +310,8 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     _transcodeFiles(trackList.map((t) => t.filename).toList());
   }
 
-  void _transcodeFiles(List<String?> files) async {
-    for (String? file in files) {
-      if (file == null) continue;
+  void _transcodeFiles(List<String> files) async {
+    for (String file in files) {
       String src = file;
       await _runTranscode(src);
     }
