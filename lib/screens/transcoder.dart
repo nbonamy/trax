@@ -141,70 +141,47 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
           if (_transcodeFormat == TranscodeFormat.mp3) ...[
             _row(t.convertBitrate, 1, [
               MacosPopupButton(
-                  value: _bitrate,
-                  items: const [
-                    MacosPopupMenuItem(
-                      value: 128000,
-                      child: Text('128 kbps'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 160000,
-                      child: Text('160 kbps'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 192000,
-                      child: Text('192 kbps'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 320000,
-                      child: Text('320 kbps'),
-                    ),
-                  ],
-                  onChanged: (b) => setState(() => _bitrate = b!)),
+                value: _bitrate,
+                items: AudioTranscoder.kSettingsBitrate
+                    .map(
+                      (s) => MacosPopupMenuItem(
+                        value: s.bitrate,
+                        child: Text(s.name),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (b) => setState(() => _bitrate = b!),
+              ),
             ]),
           ],
           if (_transcodeFormat == TranscodeFormat.flac) ...[
             _row(t.convertBitsPerSample, 1, [
               MacosPopupButton(
-                  value: _bitsPerSample,
-                  items: const [
-                    MacosPopupMenuItem(
-                      value: 16,
-                      child: Text('16 bits'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 24,
-                      child: Text('24 bits'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 32,
-                      child: Text('32 bits'),
-                    ),
-                  ],
-                  onChanged: (b) => setState(() => _bitsPerSample = b!)),
+                value: _bitsPerSample,
+                items: AudioTranscoder.kSettingsBitsPerSample
+                    .map(
+                      (s) => MacosPopupMenuItem(
+                        value: s.bitsPerSample,
+                        child: Text(s.name),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (b) => setState(() => _bitsPerSample = b!),
+              ),
             ]),
             _row(t.convertSampleRate, 1, [
               MacosPopupButton(
-                  value: _sampleRate,
-                  items: const [
-                    MacosPopupMenuItem(
-                      value: 44100,
-                      child: Text('44.1 kHz'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 48000,
-                      child: Text('48 kHz'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 88200,
-                      child: Text('88.2 kHz'),
-                    ),
-                    MacosPopupMenuItem(
-                      value: 96000,
-                      child: Text('96 kHz'),
-                    ),
-                  ],
-                  onChanged: (s) => setState(() => _sampleRate = s!)),
+                value: _sampleRate,
+                items: AudioTranscoder.kSettingsSampleRate
+                    .map(
+                      (s) => MacosPopupMenuItem(
+                        value: s.sampleRate,
+                        child: Text(s.name),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (s) => setState(() => _sampleRate = s!),
+              ),
             ]),
           ],
         ],

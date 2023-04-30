@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../processors/transcoder.dart';
 import '../utils/path_utils.dart';
 
 enum ImportFileOp { copy, move }
@@ -65,8 +66,8 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
   }
 
   TranscodeFormat get convertFormat {
-    return TranscodeFormat.values
-        .elementAt(_prefs.getInt('convertformat') ?? 0);
+    return TranscodeFormat.values.elementAt(
+        _prefs.getInt('convertformat') ?? TranscodeFormat.flac.index);
   }
 
   set convertFormat(TranscodeFormat convertFormat) {
@@ -74,7 +75,8 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
   }
 
   int get convertBitrate {
-    return _prefs.getInt('convertbitrate') ?? 320000;
+    return _prefs.getInt('convertbitrate') ??
+        AudioTranscoder.kSettingsBitrate.last.bitrate;
   }
 
   set convertBitrate(int bitrate) {
@@ -82,7 +84,8 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
   }
 
   int get convertSamplerate {
-    return _prefs.getInt('convertsamplerate') ?? 44100;
+    return _prefs.getInt('convertsamplerate') ??
+        AudioTranscoder.kSettingsSampleRate.first.sampleRate;
   }
 
   set convertSamplerate(int samplerate) {
@@ -90,7 +93,8 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
   }
 
   int get convertBitsPerSample {
-    return _prefs.getInt('convertbitspersample') ?? 16;
+    return _prefs.getInt('convertbitspersample') ??
+        AudioTranscoder.kSettingsBitsPerSample.first.bitsPerSample;
   }
 
   set convertBitsPerSample(int bitsPerSample) {
