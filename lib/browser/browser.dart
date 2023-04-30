@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import '../audioplayer/toolbar.dart';
@@ -120,18 +121,22 @@ class BrowserWidgetState extends State<BrowserWidget> {
   }
 
   void onEvent(event) {
+    // needed
+    AppLocalizations t = AppLocalizations.of(context)!;
     if (event is BackgroundActionStartEvent) {
       if (event.action == BackgroundAction.scan) {
         setState(
           () => _actionInProgress = ActionInProgress(
-            'Scanning audio files',
+            t.scanInProgress,
             cancel: stopScan,
           ),
         );
       }
       if (event.action == BackgroundAction.import) {
         setState(
-          () => _actionInProgress = ActionInProgress('Parsing imported files'),
+          () => _actionInProgress = ActionInProgress(
+            t.importInProgress,
+          ),
         );
       }
     } else if (event is BackgroundActionEndEvent) {

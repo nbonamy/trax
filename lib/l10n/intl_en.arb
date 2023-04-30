@@ -4,6 +4,8 @@
   "no": "No",
   "cancel": "Cancel",
   "save": "Save",
+  "clear": "Clear",
+  "browse": "Browse...",
 
   "saveError": "An error occured while updating metadata.",
   "scanRunningError": "A scan is already in progress.",
@@ -49,6 +51,9 @@
   "rebuildConfirm": "Are you sure you want to rebuild your entire library?",
   "overwriteConfirm": "Destination file(s) already exists. Do you want to overwrite them?",
 
+  "scanInProgress": "Scanning audio files",
+  "importInProgress": "Parsing imported files",
+
   "unknownTitle": "Unknown title",
   "unknownAlbum": "Unknown album",
   "unknownArtist": "Unknown artist",
@@ -89,12 +94,24 @@
   "tagVolumeIndex": "Disc number",
   "tagTrackIndex": "Track",
   "tagCompilation": "Compilation",
+  "tagCompilationDesc": "Album is a compilation of songs by various artists",
   "tagCopyright": "Copyright",
   "tagComment": "Comment",
 
   "tagsMixed": "Mixed",
   
   "indexOfCount": "of",
+
+  "fileInfoKind": "kind",
+  "fileInfoDuration": "duration",
+  "fileInfoFileSize": "size",
+  "fileInfoBitsPerSample": "bits per sample",
+  "fileInfoSampleRate": "sample rate",
+  "fileInfoBitrate": "bitrate",
+  "fileInfoChannels": "channels",
+  "fileInfoImported": "date imported",
+  "fileInfoModified": "date modified",
+  "fileInfoFilePath": "location",
 
   "artworkDelete": "Delete",
   "artworkUpdate": "Update...",
@@ -104,6 +121,7 @@
   "importFileOpCopy": "Copy",
   "importFileOpMove": "Move",
 
+  "settingsTitle": "Settings",
   "settingsMusicFolder": "Music Folder",
   "settingsImportOptions": "Import Options",
   "settingsImportFileOpDesc": "files to Music folder when adding to Library",
@@ -116,10 +134,17 @@
   "convertTitle": "Audio Conversion",
   "convertDestination": "Target Folder",
   "convertDestinationSame": "Same as source file",
+  "convertDeleteSrc": "Delete source files",
   "convertFormat": "Target Format",
   "convertBitrate": "Bitrate",
   "convertSampleRate": "Sample Rate",
   "convertBitsPerSample": "Bits Per Sample",
+
+  "convertInfoTitle": "Source Info",
+  "convertInfoVariousFormats": "various formats",
+  "convertInfoVariousBitrates": "various bitrates",
+  "convertInfoVariousSampleRates": "various sample rates",
+  "convertInfoVariousBitsPerSample": "various bits per sample",
 
   "appName": "Trax"
 

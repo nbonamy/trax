@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../model/track.dart';
 import '../utils/num_utils.dart';
@@ -14,39 +15,64 @@ class EditorFileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // needed
+    AppLocalizations t = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 16),
       child: Flex(
         direction: Axis.vertical,
         children: [
-          _row('kind', track.formatString),
-          _row('duration',
-              track.safeTags.duration.formatDuration(skipHours: true)),
-          _row('size', track.filesize.formatFilesize()),
+          _row(
+            t.fileInfoKind,
+            track.formatString,
+          ),
+          _row(
+            t.fileInfoDuration,
+            track.safeTags.duration.formatDuration(skipHours: true),
+          ),
+          _row(
+            t.fileInfoFileSize,
+            track.filesize.formatFilesize(),
+          ),
           if (track.safeTags.bitsPerSample != 0)
-            _row('bits per sample', '${track.safeTags.bitsPerSample} bits'),
+            _row(
+              t.fileInfoBitsPerSample,
+              '${track.safeTags.bitsPerSample} bits',
+            ),
           if (track.safeTags.sampleRate != 0)
-            _row('sample rate', '${track.safeTags.sampleRate} Hz'),
+            _row(
+              t.fileInfoSampleRate,
+              '${track.safeTags.sampleRate} Hz',
+            ),
           if (track.safeTags.bitrate != 0)
-            _row('bitate', '${track.safeTags.bitrate} kbps'),
-          _row('channels', track.channelsString),
+            _row(
+              t.fileInfoBitrate,
+              '${track.safeTags.bitrate} kbps',
+            ),
+          _row(
+            t.fileInfoChannels,
+            track.channelsString,
+          ),
           _row('', ''),
           _row(
-            'date imported',
+            t.fileInfoImported,
             DateTime.fromMillisecondsSinceEpoch(track.importedAt)
                 .toString()
                 .substring(0, 19),
             tabularFigures: true,
           ),
           _row(
-            'date modified',
+            t.fileInfoModified,
             DateTime.fromMillisecondsSinceEpoch(track.lastModified)
                 .toString()
                 .substring(0, 19),
             tabularFigures: true,
           ),
           _row('', ''),
-          _row('location', track.filename),
+          _row(
+            t.fileInfoFilePath,
+            track.filename,
+          ),
         ],
       ),
     );

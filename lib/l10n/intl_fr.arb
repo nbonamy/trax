@@ -4,7 +4,9 @@
   "no": "Non",
   "cancel": "Annuler",
   "save": "Sauvegarder",
-  
+  "clear": "Effacer",
+  "browse": "Parcourir...",
+
   "saveError": "Une erreur est survenue lors de la sauvegarde.",
   "scanRunningError": "Une analyse est déjà en cours.",
 
@@ -49,6 +51,9 @@
   "rebuildConfirm": "Etes-vous sûr de vouloir reconstruite votre collection ?",
   "overwriteConfirm": "Les fichiers existent déjà. Voulez-vous les remplacer ?",
 
+  "scanInProgress": "Analyse en cours",
+  "importInProgress": "Analyse en cours",
+
   "unknownTitle": "Titre inconnu",
   "unknownAlbum": "Album inconnu",
   "unknownArtist": "Artiste inconnu",
@@ -89,12 +94,24 @@
   "tagVolumeIndex": "Disque",
   "tagTrackIndex": "Piste",
   "tagCompilation": "Compilation",
+  "tagCompilationDesc": "Album de compilation de divers artistes",
   "tagCopyright": "Copyright",
   "tagComment": "Commentaire",
 
   "tagsMixed": "Multiple",
 
   "indexOfCount": "sur",
+
+  "fileInfoKind": "type",
+  "fileInfoDuration": "durée",
+  "fileInfoFileSize": "taille",
+  "fileInfoBitsPerSample": "taille d'échantillions",
+  "fileInfoSampleRate": "fréquence d'échantillionnage",
+  "fileInfoBitrate": "bitrate",
+  "fileInfoChannels": "nb de canaux",
+  "fileInfoImported": "importé le",
+  "fileInfoModified": "modifié le",
+  "fileInfoFilePath": "fichier",
 
   "artworkDelete": "Supprimer",
   "artworkUpdate": "Mettre à jour...",
@@ -104,6 +121,7 @@
   "importFileOpCopy": "Copier",
   "importFileOpMove": "Déplacer",
 
+  "settingsTitle": "Configuration",
   "settingsMusicFolder": "Dossier Musique",
   "settingsImportOptions": "Options d'import",
   "settingsImportFileOpDesc": "les fichiers lors de l'ajout dans la Collection",
@@ -116,10 +134,17 @@
   "convertTitle": "Conversion Audio",
   "convertDestination": "Destination",
   "convertDestinationSame": "Identique à la source",
+  "convertDeleteSrc": "Effacer les fichiers originaux",
   "convertFormat": "Format",
   "convertBitrate": "Bitrate",
   "convertSampleRate": "Sample Rate",
   "convertBitsPerSample": "Bits Per Sample",
+
+  "convertInfoTitle": "Info sources",
+  "convertInfoVariousFormats": "formats mélangés",
+  "convertInfoVariousBitrates": "bitrates variables",
+  "convertInfoVariousSampleRates": "fréquences variables",
+  "convertInfoVariousBitsPerSample": "tailles variables",
 
   "appName": "Trax"
 

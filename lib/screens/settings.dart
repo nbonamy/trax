@@ -60,12 +60,12 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       //: const Color.fromRGBO(240, 234, 230, 1.0),
       // contentsBgColor: const Color.fromRGBO(246, 240, 236, 1.0),
       header: Row(
-        children: const [
-          AppIcon(size: 80),
-          SizedBox(width: 16),
+        children: [
+          const AppIcon(size: 80),
+          const SizedBox(width: 16),
           Text(
-            'Settings',
-            style: TextStyle(
+            t.settingsTitle,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
             ),
@@ -79,7 +79,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
             Text(_musicFolder),
             const SizedBox(width: 16),
             Button(
-              'Browse...',
+              t.browse,
               () async {
                 String? folder = await FilePicker.platform.getDirectoryPath(
                   initialDirectory: Directory(_musicFolder).existsSync()

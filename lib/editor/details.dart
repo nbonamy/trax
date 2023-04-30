@@ -265,7 +265,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
           _checkBoxRow(
             const Key('compilation'),
             t.tagCompilation,
-            description: 'Album is a compilation of songs by various artists',
+            description: t.tagCompilationDesc,
             value: tags.editedCompilation,
             onChanged: (b) => setState(() {
               tags.editedCompilation = b;
