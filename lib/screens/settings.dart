@@ -55,7 +55,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
 
     return DraggableDialog(
       width: 550,
-      height: 350,
+      height: 340,
       headerBgColor: const Color.fromRGBO(240, 234, 230, 1.0),
       //: const Color.fromRGBO(240, 234, 230, 1.0),
       // contentsBgColor: const Color.fromRGBO(246, 240, 236, 1.0),
@@ -167,17 +167,15 @@ class _SettingsWidgetState extends State<SettingsWidget> {
   }
 
   void _onSave() async {
-    if (await _save()) {
-      _onClose();
-    }
+    _save();
+    _onClose();
   }
 
-  Future<bool> _save() async {
+  void _save() {
     _preferences.musicFolder = _musicFolder;
     _preferences.importFileOp = _importFileOp;
     _preferences.keepMediaOrganized = _keepMediaOrganized;
     _preferences.lyricsSaveMode = _lyricsSaveMode;
-    return true;
   }
 
   Widget _row(String label, double paddingTop, List<Widget> widgets) {

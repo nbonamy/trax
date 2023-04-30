@@ -20,6 +20,7 @@ import '../model/preferences.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
+import '../screens/transcoder.dart';
 import '../utils/file_utils.dart';
 import '../utils/path_utils.dart';
 import '../utils/platform_keyboard.dart';
@@ -154,7 +155,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       _extendSelect(track);
     } else {
       _normalSelect(track);
-      _extendSelectionBase = track;
     }
   }
 
@@ -165,6 +165,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     } else {
       selectionModel.set([track]);
     }
+    _extendSelectionBase = track;
   }
 
   void _extendSelect(Track track) {
@@ -214,6 +215,9 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
         break;
       case MenuAction.trackInfo:
         _showEditor(EditorMode.edit, selectionModel.get, _albums.allTracks);
+        break;
+      case MenuAction.trackConvert:
+        _showTranscoder(selectionModel.get);
         break;
       default:
         break;
@@ -275,6 +279,15 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       editorMode,
       selection,
       allTracks: allTracks,
+    );
+  }
+
+  void _showTranscoder(
+    TrackList selection,
+  ) {
+    TranscoderWidget.show(
+      context,
+      selection: selection,
     );
   }
 }

@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.13"
+  audiotranscode_ffi:
+    dependency: "direct main"
+    description:
+      name: audiotranscode_ffi
+      sha256: "11c3ccd9bb31b0c2da98213551490754a06bfb0b41f78717fa821108020b0841"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   boolean_selector:
     dependency: transitive
     description:

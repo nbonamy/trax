@@ -1,3 +1,4 @@
+import 'package:audiotranscode_ffi/audiotranscode_ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,6 +62,39 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
 
   set lyricsSaveMode(LyricsSaveMode lyricsSaveMode) {
     _prefs.setInt('lyricssavemode', lyricsSaveMode.index);
+  }
+
+  TranscodeFormat get convertFormat {
+    return TranscodeFormat.values
+        .elementAt(_prefs.getInt('convertformat') ?? 0);
+  }
+
+  set convertFormat(TranscodeFormat convertFormat) {
+    _prefs.setInt('convertformat', convertFormat.index);
+  }
+
+  int get convertBitrate {
+    return _prefs.getInt('convertbitrate') ?? 320000;
+  }
+
+  set convertBitrate(int bitrate) {
+    _prefs.setInt('convertbitrate', bitrate);
+  }
+
+  int get convertSamplerate {
+    return _prefs.getInt('convertsamplerate') ?? 44100;
+  }
+
+  set convertSamplerate(int samplerate) {
+    _prefs.setInt('convertsamplerate', samplerate);
+  }
+
+  int get convertBitsPerSample {
+    return _prefs.getInt('convertbitspersample') ?? 16;
+  }
+
+  set convertBitsPerSample(int bitsPerSample) {
+    _prefs.setInt('convertbitspersample', bitsPerSample);
   }
 
   Rect get windowBounds {

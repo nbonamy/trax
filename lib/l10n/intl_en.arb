@@ -24,12 +24,14 @@
 
   "menuTrack": "Track",
   "menuTrackInfo": "Info...",
+  "menuTrackConvert": "Convert...",
   "menuTrackPlay": "Play",
   "menuTrackPrev": "Previous track",
   "menuTrackNext": "Next track",
 
   "menuTools": "Tools",
   "menuToolsEdit": "Edit tags in files...",
+  "menuToolsConvert": "Convert audio format...",
 
   "menuView": "View",
   
@@ -110,6 +112,14 @@
   "settingsLyricsSaveMode": "Save lyrics in",
   "settingsLyricsSaveModeTags": "Audio file tags",
   "settingsLyricsSaveModeLrc": "Companion LRC file",
+
+  "convertTitle": "Audio Conversion",
+  "convertDestination": "Target Folder",
+  "convertDestinationSame": "Same as source file",
+  "convertFormat": "Target Format",
+  "convertBitrate": "Bitrate",
+  "convertSampleRate": "Sample Rate",
+  "convertBitsPerSample": "Bits Per Sample",
 
   "appName": "Trax"
 

@@ -17,6 +17,7 @@ import '../processors/scanner.dart';
 import '../utils/events.dart';
 import '../utils/logger.dart';
 import 'settings.dart';
+import 'transcoder.dart';
 
 class TraxHomePage extends StatefulWidget {
   const TraxHomePage({super.key});
@@ -160,14 +161,16 @@ class _TraxHomePageState extends State<TraxHomePage>
               ),
             ],
           ),
-          // PlatformMenuItemGroup(
-          //   members: [
-          //     PlatformMenuItem(
-          //       label: t.menuTrackPlay,
-          //       onSelected: () => _onMenu(MenuAction.trackPlay),
-          //     ),
-          //   ],
-          // ),
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuTrackConvert,
+                shortcut:
+                    MenuUtils.cmdShortcut(LogicalKeyboardKey.keyC, shift: true),
+                onSelected: () => onMenuSelected(MenuAction.trackConvert),
+              ),
+            ],
+          ),
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
@@ -209,6 +212,14 @@ class _TraxHomePageState extends State<TraxHomePage>
               ),
             ],
           ),
+          PlatformMenuItemGroup(
+            members: [
+              PlatformMenuItem(
+                label: t.menuToolsConvert,
+                onSelected: () => onMenuSelected(MenuAction.toolsConvert),
+              ),
+            ],
+          ),
         ],
       ),
       PlatformMenu(
@@ -228,10 +239,6 @@ class _TraxHomePageState extends State<TraxHomePage>
     switch (action) {
       case MenuAction.appSettings:
         SettingsWidget.show(context);
-        break;
-
-      case MenuAction.toolsEdit:
-        _edit();
         break;
 
       case MenuAction.fileImport:
@@ -255,6 +262,14 @@ class _TraxHomePageState extends State<TraxHomePage>
             });
         break;
 
+      case MenuAction.toolsEdit:
+        _edit();
+        break;
+
+      case MenuAction.toolsConvert:
+        _transcode();
+        break;
+
       default:
         break;
     }
@@ -262,6 +277,10 @@ class _TraxHomePageState extends State<TraxHomePage>
 
   void _edit() async {
     _pickAndEdit(EditorMode.editOnly);
+  }
+
+  void _transcode() async {
+    _pickAndTranscode();
   }
 
   void _import() {
@@ -302,6 +321,20 @@ class _TraxHomePageState extends State<TraxHomePage>
         ));
       },
     );
+  }
+
+  void _pickAndTranscode() async {
+    // get some files
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowMultiple: true,
+      allowedExtensions: ['mp3', 'm4a', 'flac'],
+    );
+    if (result?.paths == null) return;
+
+    // we need to parse them
+    // ignore: use_build_context_synchronously
+    TranscoderWidget.show(context, files: result!.paths);
   }
 
   void _runScan() async {

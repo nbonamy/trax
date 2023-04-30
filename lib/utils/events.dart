@@ -12,7 +12,7 @@ extension MenuBus on EventBus {
 
 final EventBus eventBus = EventBus();
 
-enum BackgroundAction { scan, import }
+enum BackgroundAction { scan, import, transcode }
 
 class BackgroundActionStartEvent {
   final BackgroundAction action;
