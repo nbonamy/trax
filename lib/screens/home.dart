@@ -357,13 +357,9 @@ class _TraxHomePageState extends State<TraxHomePage>
       Logger.of(context),
       Preferences.of(context).musicFolder,
       TraxDatabase.of(context),
-      () {
-        TraxDatabase.of(context).notify();
-      },
-      () {
-        TraxDatabase.of(context).notify();
-        eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
-      },
+      onUpdate: () => TraxDatabase.of(context).notify(),
+      onComplete: () =>
+          eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan)),
     );
     if (!started) {
       eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));

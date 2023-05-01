@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -32,7 +34,7 @@ class BrowserWidget extends StatefulWidget {
 class BrowserWidgetState extends State<BrowserWidget> {
   String _artist = Track.kArtistsHome;
   String? _initialAlbum;
-  ActionInProgress? _actionInProgress;
+  final StreamController<ActionInProgress?> _actionStream = StreamController();
 
   @override
   void initState() {
@@ -66,11 +68,19 @@ class BrowserWidgetState extends State<BrowserWidget> {
                     artist: _artist,
                   ),
                 ),
-                if (_actionInProgress != null)
-                  StatusBarWidget(
-                    message: _actionInProgress!.statusMessage,
-                    onStop: _actionInProgress!.cancel,
-                  )
+                StreamBuilder(
+                  stream: _actionStream.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.data != null) {
+                      return StatusBarWidget(
+                        message: snapshot.data!.statusMessage,
+                        onStop: snapshot.data!.cancel,
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
               ],
             ),
           );
@@ -125,33 +135,27 @@ class BrowserWidgetState extends State<BrowserWidget> {
     AppLocalizations t = AppLocalizations.of(context)!;
     if (event is BackgroundActionStartEvent) {
       if (event.action == BackgroundAction.scan) {
-        setState(
-          () => _actionInProgress = ActionInProgress(
-            t.scanInProgress,
-            cancel: stopScan,
-          ),
-        );
+        _actionStream.sink.add(ActionInProgress(
+          t.scanInProgress,
+          cancel: stopScan,
+        ));
       }
       if (event.action == BackgroundAction.import) {
-        setState(
-          () => _actionInProgress = ActionInProgress(
-            t.importInProgress,
-          ),
-        );
+        _actionStream.sink.add(ActionInProgress(
+          t.importInProgress,
+        ));
       }
       if (event.action == BackgroundAction.transcode) {
-        setState(
-          () => _actionInProgress = ActionInProgress(
-            t.transcodeInProgress(
-              event.data['count'],
-              event.data['index'],
-            ),
-            cancel: () => eventBus.fire(StopTranscodeEvent()),
+        _actionStream.sink.add(ActionInProgress(
+          t.transcodeInProgress(
+            event.data['count'],
+            event.data['index'],
           ),
-        );
+          cancel: () => eventBus.fire(StopTranscodeEvent()),
+        ));
       }
     } else if (event is BackgroundActionEndEvent) {
-      setState(() => _actionInProgress = null);
+      _actionStream.sink.add(null);
     } else if (event is SelectArtistEvent) {
       onSelectArtist(event.artist);
     } else if (event is SelectArtistAlbumEvent) {

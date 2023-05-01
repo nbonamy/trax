@@ -17,6 +17,7 @@ const int kUpdateEveryMs = 2500;
 
 bool _scanInProgress = false;
 bool _stopRequested = false;
+bool _updateHappened = false;
 DateTime? _lastNotification;
 
 bool isScanRunning() {
@@ -30,10 +31,10 @@ void stopScan() {
 Future<bool> runScan(
   Logger logger,
   String rootFolder,
-  TraxDatabase database,
-  Function onUpdate,
-  Function onComplete,
-) async {
+  TraxDatabase database, {
+  required Function onUpdate,
+  required Function onComplete,
+}) async {
   // no double
   if (_scanInProgress) {
     logger.w('[SCAN] Scan already in progress');
@@ -49,6 +50,7 @@ Future<bool> runScan(
   // a new start
   _stopRequested = false;
   _scanInProgress = true;
+  _updateHappened = false;
   _lastNotification = null;
 
   // we need a parser
@@ -66,6 +68,7 @@ Future<bool> runScan(
         if (_stopRequested || (scanCompleted && queue.isEmpty)) {
           logger.i('[SCAN] Scan completion detected');
           _scanInProgress = false;
+          if (_updateHappened) onUpdate(); // if update not notified
           onComplete();
         }
       }
@@ -218,6 +221,7 @@ Future<void> commandHandler({
         if (track.tags != null && track.tags!.valid) {
           logger.d('[SCAN] Updating track: ${track.filename}');
           database.insert(track, notify: false);
+          _updateHappened = true;
         }
       }
       break;
@@ -227,6 +231,7 @@ Future<void> commandHandler({
         String filename = message['filename'] as String;
         logger.d('[SCAN] Deleting track: $filename');
         database.delete(filename);
+        _updateHappened = true;
       }
       break;
   }
@@ -235,9 +240,12 @@ Future<void> commandHandler({
   DateTime now = DateTime.now();
   if (_lastNotification == null ||
       now.difference(_lastNotification!).inMilliseconds > kUpdateEveryMs) {
-    logger.d('[SCAN] onUpdate call');
-    _lastNotification = now;
-    onUpdate();
+    if (_updateHappened) {
+      logger.d('[SCAN] onUpdate call');
+      _lastNotification = now;
+      _updateHappened = false;
+      onUpdate();
+    }
   }
 }
 

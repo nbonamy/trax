@@ -77,6 +77,11 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
     super.dispose();
   }
 
+  // @override
+  // void setState(VoidCallback fn) {
+  //   super.setState(fn);
+  // }
+
   void _refresh() async {
     setState(() {
       _albums = AlbumList();
