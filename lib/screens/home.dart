@@ -164,10 +164,10 @@ class _TraxHomePageState extends State<TraxHomePage>
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
-                label: t.menuTrackConvert,
+                label: t.menuTrackTranscode,
                 shortcut:
                     MenuUtils.cmdShortcut(LogicalKeyboardKey.keyC, shift: true),
-                onSelected: () => onMenuSelected(MenuAction.trackConvert),
+                onSelected: () => onMenuSelected(MenuAction.trackTranscode),
               ),
             ],
           ),
@@ -215,8 +215,8 @@ class _TraxHomePageState extends State<TraxHomePage>
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
-                label: t.menuToolsConvert,
-                onSelected: () => onMenuSelected(MenuAction.toolsConvert),
+                label: t.menuToolsTranscode,
+                onSelected: () => onMenuSelected(MenuAction.toolsTranscode),
               ),
             ],
           ),
@@ -266,7 +266,7 @@ class _TraxHomePageState extends State<TraxHomePage>
         _edit();
         break;
 
-      case MenuAction.toolsConvert:
+      case MenuAction.toolsYTranscode:
         _transcode();
         break;
 

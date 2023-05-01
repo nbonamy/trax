@@ -41,69 +41,69 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
   }
 
   ImportFileOp get importFileOp {
-    return ImportFileOp.values.elementAt(_prefs.getInt('importfileop') ?? 0);
+    return ImportFileOp.values.elementAt(_prefs.getInt('import.fileop') ?? 0);
   }
 
   set importFileOp(ImportFileOp importFileOp) {
-    _prefs.setInt('importfileop', importFileOp.index);
+    _prefs.setInt('import.fileop', importFileOp.index);
   }
 
   bool get keepMediaOrganized {
-    return _prefs.getBool('keeporganized') ?? true;
+    return _prefs.getBool('import.keeporganized') ?? true;
   }
 
   set keepMediaOrganized(bool keepOrganized) {
-    _prefs.setBool('keeporganized', keepOrganized);
+    _prefs.setBool('import.keeporganized', keepOrganized);
   }
 
   LyricsSaveMode get lyricsSaveMode {
     return LyricsSaveMode.values
-        .elementAt(_prefs.getInt('lyricssavemode') ?? 0);
+        .elementAt(_prefs.getInt('lyrics.savemode') ?? 0);
   }
 
   set lyricsSaveMode(LyricsSaveMode lyricsSaveMode) {
-    _prefs.setInt('lyricssavemode', lyricsSaveMode.index);
+    _prefs.setInt('lyrics.savemode', lyricsSaveMode.index);
   }
 
-  TranscodeFormat get convertFormat {
+  TranscodeFormat get transcodeFormat {
     return TranscodeFormat.values.elementAt(
-        _prefs.getInt('convertformat') ?? TranscodeFormat.flac.index);
+        _prefs.getInt('transcode.format') ?? TranscodeFormat.flac.index);
   }
 
-  set convertFormat(TranscodeFormat convertFormat) {
-    _prefs.setInt('convertformat', convertFormat.index);
+  set transcodeFormat(TranscodeFormat transcodeFormat) {
+    _prefs.setInt('transcode.format', transcodeFormat.index);
   }
 
-  int get convertBitrate {
-    return _prefs.getInt('convertbitrate') ??
-        AudioTranscoder.kSettingsBitrate.last.bitrate;
+  int get transcodeBitrate {
+    return _prefs.getInt('transcode.bitrate') ??
+        AudioTranscoder.kSettingsMp3Bitrate.last.bitrate;
   }
 
-  set convertBitrate(int bitrate) {
-    _prefs.setInt('convertbitrate', bitrate);
+  set transcodeBitrate(int bitrate) {
+    _prefs.setInt('transcode.bitrate', bitrate);
   }
 
-  int get convertSamplerate {
-    return _prefs.getInt('convertsamplerate') ??
+  int get transcodeSamplerate {
+    return _prefs.getInt('transcode.samplerate') ??
         AudioTranscoder.kSettingsSampleRate.first.sampleRate;
   }
 
-  set convertSamplerate(int samplerate) {
-    _prefs.setInt('convertsamplerate', samplerate);
+  set transcodeSamplerate(int samplerate) {
+    _prefs.setInt('transcode.samplerate', samplerate);
   }
 
-  int get convertBitsPerSample {
-    return _prefs.getInt('convertbitspersample') ??
+  int get transcodeBitsPerSample {
+    return _prefs.getInt('transcode.bitspersample') ??
         AudioTranscoder.kSettingsBitsPerSample.first.bitsPerSample;
   }
 
-  set convertBitsPerSample(int bitsPerSample) {
-    _prefs.setInt('convertbitspersample', bitsPerSample);
+  set transcodeBitsPerSample(int bitsPerSample) {
+    _prefs.setInt('transcode.bitspersample', bitsPerSample);
   }
 
   Rect get windowBounds {
     try {
-      var bounds = _prefs.getString('bounds');
+      var bounds = _prefs.getString('window.bounds');
       var parts = bounds?.split(',');
       var left = double.parse(parts![0]);
       var top = double.parse(parts[1]);
@@ -116,7 +116,7 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
   }
 
   set windowBounds(Rect rc) {
-    _prefs.setString('bounds',
+    _prefs.setString('window.bounds',
         '${rc.left.toStringAsFixed(1)},${rc.top.toStringAsFixed(1)},${rc.right.toStringAsFixed(1)},${rc.bottom.toStringAsFixed(1)}');
   }
 

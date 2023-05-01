@@ -61,9 +61,9 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   late int _bitrate;
   bool _stopTranscode = false;
 
-  bool get isConvertingLibraryTracks => widget.trackList != null;
-  bool get isConvertingFiles =>
-      !isConvertingLibraryTracks && widget.files != null;
+  bool get isTranscodingLibraryTracks => widget.trackList != null;
+  bool get isTranscodingFiles =>
+      !isTranscodingLibraryTracks && widget.files != null;
 
   @override
   void initState() {
@@ -71,10 +71,10 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     _database = TraxDatabase.of(context);
     _preferences = Preferences.of(context);
     _audioTranscoder = AudioTranscoder(database: _database);
-    _transcodeFormat = _preferences.convertFormat;
-    _bitsPerSample = _preferences.convertBitsPerSample;
-    _sampleRate = _preferences.convertSamplerate;
-    _bitrate = _preferences.convertBitrate;
+    _transcodeFormat = _preferences.transcodeFormat;
+    _bitsPerSample = _preferences.transcodeBitsPerSample;
+    _sampleRate = _preferences.transcodeSamplerate;
+    _bitrate = _preferences.transcodeBitrate;
     eventBus.on<StopTranscodeEvent>().listen(
           (event) => _stopTranscode = true,
         );
@@ -89,7 +89,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     AppLocalizations t = AppLocalizations.of(context)!;
 
     // tracks
-    if (isConvertingLibraryTracks) {
+    if (isTranscodingLibraryTracks) {
       // init
       format = widget.trackList!.first.format;
       bitrate = widget.trackList!.first.safeTags.bitrate;
@@ -103,7 +103,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
         if (track.safeTags.sampleRate != sampleRate) sampleRate = null;
         if (track.safeTags.bitsPerSample != bitsPerSample) bitsPerSample = null;
       }
-    } else if (isConvertingFiles) {
+    } else if (isTranscodingFiles) {
       // init
       Tags tags = tagLib.getAudioTags(widget.files!.first);
       format = Track.getFormat(widget.files!.first);
@@ -123,26 +123,28 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
 
     // decide
     if (format != null) {
-      if (format == Format.mp3 || format == Format.vorbis) {
+      if (AudioTranscoder.isBitrateFormat(format)) {
         String desc = Track.getFormatString(format, shortDescription: true);
         desc += bitrate == null
-            ? ', ${t.convertInfoVariousBitrates}'
+            ? ', ${t.transcodeInfoVariousBitrates}'
             : ', $bitrate bps';
         return desc;
-      } else if (format == Format.flac || format == Format.mp4) {
+      } else if (AudioTranscoder.isSampleFormat(format)) {
         String desc = Track.getFormatString(format, shortDescription: true);
         desc += bitsPerSample == null
-            ? ', ${t.convertInfoVariousBitsPerSample}'
+            ? ', ${t.transcodeInfoVariousBitsPerSample}'
             : ', $bitsPerSample bits';
         desc += sampleRate == null
-            ? ', ${t.convertInfoVariousSampleRates}'
+            ? ', ${t.transcodeInfoVariousSampleRates}'
             : ', $sampleRate Hz';
         return desc;
+      } else {
+        return 'Unknown format';
       }
     }
 
     // too bad
-    return t.convertInfoVariousFormats;
+    return t.transcodeInfoVariousFormats;
   }
 
   @override
@@ -161,7 +163,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
           const AppIcon(size: 80),
           const SizedBox(width: 16),
           Text(
-            t.convertTitle,
+            t.transcodeTitle,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
@@ -177,9 +179,9 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
               builder: (context, snapshot) {
                 String text =
                     snapshot.hasData ? snapshot.data! : 'calculating...';
-                return _row(t.convertInfoTitle, 1, [Text(text)]);
+                return _row(t.transcodeInfoTitle, 1, [Text(text)]);
               }),
-          _row(t.convertFormat, 1, [
+          _row(t.transcodeFormat, 1, [
             MacosPopupButton(
                 value: _transcodeFormat,
                 items: const [
@@ -191,14 +193,18 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
                     value: TranscodeFormat.flac,
                     child: Text('FLAC'),
                   ),
+                  // MacosPopupMenuItem(
+                  //   value: TranscodeFormat.aac,
+                  //   child: Text('AAC'),
+                  // ),
                 ],
                 onChanged: (f) => setState(() => _transcodeFormat = f!)),
           ]),
-          if (_transcodeFormat == TranscodeFormat.mp3) ...[
-            _row(t.convertBitrate, 1, [
+          if (AudioTranscoder.isBitrateTranscode(_transcodeFormat)) ...[
+            _row(t.transcodeBitrate, 1, [
               MacosPopupButton(
                 value: _bitrate,
-                items: AudioTranscoder.kSettingsBitrate
+                items: AudioTranscoder.kSettingsMp3Bitrate
                     .map(
                       (s) => MacosPopupMenuItem(
                         value: s.bitrate,
@@ -210,8 +216,8 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
               ),
             ]),
           ],
-          if (_transcodeFormat == TranscodeFormat.flac) ...[
-            _row(t.convertBitsPerSample, 1, [
+          if (AudioTranscoder.isSampleTranscode(_transcodeFormat)) ...[
+            _row(t.transcodeBitsPerSample, 1, [
               MacosPopupButton(
                 value: _bitsPerSample,
                 items: AudioTranscoder.kSettingsBitsPerSample
@@ -225,7 +231,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
                 onChanged: (b) => setState(() => _bitsPerSample = b!),
               ),
             ]),
-            _row(t.convertSampleRate, 1, [
+            _row(t.transcodeSampleRate, 1, [
               MacosPopupButton(
                 value: _sampleRate,
                 items: AudioTranscoder.kSettingsSampleRate
@@ -240,11 +246,11 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
               ),
             ]),
           ],
-          _row(t.convertDestination, 1, [
+          _row(t.transcodeDestination, 1, [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_destinationFolder ?? t.convertDestinationSame),
+                Text(_destinationFolder ?? t.transcodeDestinationSame),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -276,7 +282,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
               onChanged: (b) => setState(() => _deleteSourceFiles = b),
             ),
             const SizedBox(width: 8),
-            Text(t.convertDeleteSrc),
+            Text(t.transcodeDeleteSrc),
           ]),
         ],
       ),
@@ -285,7 +291,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
         children: [
           Button(t.cancel, _onClose),
           const SizedBox(width: 8),
-          Button(t.save, _onConvert, defaultButton: true),
+          Button(t.save, _onTranscode, defaultButton: true),
         ],
       ),
     );
@@ -295,23 +301,23 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     Navigator.of(context).pop();
   }
 
-  void _onConvert() async {
+  void _onTranscode() async {
     _save();
     _transcode();
     _onClose();
   }
 
   void _save() {
-    _preferences.convertFormat = _transcodeFormat;
-    _preferences.convertBitsPerSample = _bitsPerSample;
-    _preferences.convertSamplerate = _sampleRate;
-    _preferences.convertBitrate = _bitrate;
+    _preferences.transcodeFormat = _transcodeFormat;
+    _preferences.transcodeBitsPerSample = _bitsPerSample;
+    _preferences.transcodeSamplerate = _sampleRate;
+    _preferences.transcodeBitrate = _bitrate;
   }
 
   void _transcode() {
-    if (isConvertingLibraryTracks) {
+    if (isTranscodingLibraryTracks) {
       _transcodeFiles(widget.trackList!.map((t) => t.filename).toList());
-    } else if (isConvertingFiles) {
+    } else if (isTranscodingFiles) {
       _transcodeFiles(widget.files!);
     }
   }
@@ -342,7 +348,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
       _sampleRate,
       _bitsPerSample,
       _deleteSourceFiles,
-      isConvertingLibraryTracks && _destinationFolder == null,
+      isTranscodingLibraryTracks && _destinationFolder == null,
     );
   }
 

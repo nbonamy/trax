@@ -221,7 +221,7 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       case MenuAction.trackInfo:
         _showEditor(EditorMode.edit, selectionModel.get, _albums.allTracks);
         break;
-      case MenuAction.trackConvert:
+      case MenuAction.trackTranscode:
         _showTranscoder(selectionModel.get);
         break;
       default:

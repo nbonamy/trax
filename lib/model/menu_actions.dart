@@ -17,12 +17,12 @@ enum MenuAction {
   editPaste,
   editDelete,
   trackInfo,
-  trackConvert,
+  trackTranscode,
   // trackPlay,
   trackPrevious,
   trackNext,
   toolsEdit,
-  toolsConvert,
+  toolsTranscode,
 }
 
 class MenuUtils {

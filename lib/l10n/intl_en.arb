@@ -26,14 +26,14 @@
 
   "menuTrack": "Track",
   "menuTrackInfo": "Info…",
-  "menuTrackConvert": "Convert…",
+  "menuTrackTranscode": "Convert…",
   "menuTrackPlay": "Play",
   "menuTrackPrev": "Previous track",
   "menuTrackNext": "Next track",
 
   "menuTools": "Tools",
   "menuToolsEdit": "Edit tags in files…",
-  "menuToolsConvert": "Convert audio format…",
+  "menuToolsTranscode": "Convert audio format…",
 
   "menuView": "View",
   
@@ -132,20 +132,20 @@
   "settingsLyricsSaveModeTags": "Audio file tags",
   "settingsLyricsSaveModeLrc": "Companion LRC file",
 
-  "convertTitle": "Audio Conversion",
-  "convertDestination": "Target Folder",
-  "convertDestinationSame": "Same as source file",
-  "convertDeleteSrc": "Delete source files",
-  "convertFormat": "Target Format",
-  "convertBitrate": "Bitrate",
-  "convertSampleRate": "Sample Rate",
-  "convertBitsPerSample": "Bits Per Sample",
+  "transcodeTitle": "Audio Conversion",
+  "transcodeDestination": "Target Folder",
+  "transcodeDestinationSame": "Same as source file",
+  "transcodeDeleteSrc": "Delete source files",
+  "transcodeFormat": "Target Format",
+  "transcodeBitrate": "Bitrate",
+  "transcodeSampleRate": "Sample Rate",
+  "transcodeBitsPerSample": "Bits Per Sample",
 
-  "convertInfoTitle": "Source Info",
-  "convertInfoVariousFormats": "various formats",
-  "convertInfoVariousBitrates": "various bitrates",
-  "convertInfoVariousSampleRates": "various sample rates",
-  "convertInfoVariousBitsPerSample": "various bits per sample",
+  "transcodeInfoTitle": "Source Info",
+  "transcodeInfoVariousFormats": "various formats",
+  "transcodeInfoVariousBitrates": "various bitrates",
+  "transcodeInfoVariousSampleRates": "various sample rates",
+  "transcodeInfoVariousBitsPerSample": "various bits per sample",
 
   "appName": "Trax"
 

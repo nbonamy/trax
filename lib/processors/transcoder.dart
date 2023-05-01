@@ -28,11 +28,17 @@ class AudioSettingSampleRate {
 }
 
 class AudioTranscoder {
-  static final List<AudioSettingBitrate> kSettingsBitrate = [
+  static final List<AudioSettingBitrate> kSettingsMp3Bitrate = [
     AudioSettingBitrate('128 kbps', 128000),
     AudioSettingBitrate('160 kbps', 160000),
     AudioSettingBitrate('192 kbps', 192000),
     AudioSettingBitrate('320 kbps', 320000),
+  ];
+
+  static final List<AudioSettingBitrate> kSettingsAacBitrate = [
+    AudioSettingBitrate('128 kbps', 128000),
+    AudioSettingBitrate('192 kbps', 192000),
+    AudioSettingBitrate('256 kbps', 256000),
   ];
 
   static final List<AudioSettingBitsPerSample> kSettingsBitsPerSample = [
@@ -154,6 +160,10 @@ class AudioTranscoder {
     return at_ffi.transcodeMp3(src, dst, bitrate);
   }
 
+  // Future<bool> transcodeAAc(String src, String dst, int bitrate) {
+  //   return at_ffi.transcodeAac(src, dst, bitrate);
+  // }
+
   Future<bool> transcodeFlac(
       String src, String dst, int sampleRate, int bitsPerSample) {
     return at_ffi.transcodeFlac(src, dst, sampleRate, bitsPerSample);
@@ -165,6 +175,26 @@ class AudioTranscoder {
         return '.mp3';
       case TranscodeFormat.flac:
         return '.flac';
+      // case TranscodeFormat.aac:
+      //   return '.aac';
+      // case TranscodeFormat.alac:
+      //   return '.m4a';
     }
+  }
+
+  static bool isBitrateFormat(Format format) {
+    return [Format.mp3, Format.aac, Format.vorbis].contains(format);
+  }
+
+  static bool isBitrateTranscode(TranscodeFormat format) {
+    return [TranscodeFormat.mp3 /*, TranscodeFormat.aac*/].contains(format);
+  }
+
+  static bool isSampleFormat(Format format) {
+    return [Format.flac, Format.mp4].contains(format);
+  }
+
+  static bool isSampleTranscode(TranscodeFormat format) {
+    return [TranscodeFormat.flac /*, TranscodeFormat.alac*/].contains(format);
   }
 }
