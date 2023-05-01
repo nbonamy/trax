@@ -358,8 +358,9 @@ class _TraxHomePageState extends State<TraxHomePage>
       Preferences.of(context).musicFolder,
       TraxDatabase.of(context),
       onUpdate: () => TraxDatabase.of(context).notify(),
-      onComplete: () =>
-          eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan)),
+      onComplete: () => eventBus.fire(
+        BackgroundActionEndEvent(BackgroundAction.scan),
+      ),
     );
     if (!started) {
       eventBus.fire(BackgroundActionEndEvent(BackgroundAction.scan));
