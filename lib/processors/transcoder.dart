@@ -26,6 +26,13 @@ class AudioSettingSampleRate {
   AudioSettingSampleRate(this.name, this.sampleRate);
 }
 
+class TranscodingSettings {
+  int bitrate;
+  int bitsPerSample;
+  int sampleRate;
+  TranscodingSettings(this.bitrate, this.bitsPerSample, this.sampleRate);
+}
+
 class AudioTranscoder {
   static final List<AudioSettingBitrate> kSettingsMp3Bitrate = [
     AudioSettingBitrate('128 kbps', 128000),
