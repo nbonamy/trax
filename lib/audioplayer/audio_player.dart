@@ -18,7 +18,7 @@ class AudioPlayer extends ChangeNotifier {
   AudioPlayer() {
     _player.playerStateStream.listen(_notify);
     //_player.positionStream.listen(_notify);
-    _player.currentIndexStream.listen(_notify);
+    //_player.currentIndexStream.listen(_notify);
     _player.playingStream.listen(_notify);
     _player.playbackEventStream.listen(_notify);
   }
@@ -39,13 +39,14 @@ class AudioPlayer extends ChangeNotifier {
     return _player.hasPrevious;
   }
 
-  Track? get current {
-    if (_player.currentIndex == null ||
-        _player.currentIndex! > _playlist.length - 1) {
-      return null;
-    } else {
-      return _playlist[_player.currentIndex!];
-    }
+  Stream<Track?> get currentTrackStream {
+    return _player.currentIndexStream.map((index) {
+      if (index == null || index > _playlist.length - 1) {
+        return null;
+      } else {
+        return _playlist[index];
+      }
+    });
   }
 
   Stream<double?> get progressStream {

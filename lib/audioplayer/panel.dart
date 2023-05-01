@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 
 import '../components/artwork_async.dart';
 import '../utils/track_utils.dart';
@@ -22,11 +21,12 @@ class AudioPanel extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-      child: Consumer<AudioPlayer>(
-        builder: (context, audioPlayer, child) => Row(
+      child: StreamBuilder(
+        stream: AudioPlayer.of(context).currentTrackStream,
+        builder: (context, snapshot) => Row(
           children: [
             AsyncArtwork(
-              track: audioPlayer.current,
+              track: snapshot.data,
               size: 50,
               radius: borderRadius,
               placeholder: Container(
@@ -46,7 +46,7 @@ class AudioPanel extends StatelessWidget {
                 children: [
                   const SizedBox(height: 4),
                   Text(
-                    audioPlayer.current?.displayTitle ?? '',
+                    snapshot.data?.displayTitle ?? '',
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
@@ -54,7 +54,7 @@ class AudioPanel extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${audioPlayer.current?.displayPerformer ?? ''} - ${audioPlayer.current?.displayAlbum ?? ''}',
+                    '${snapshot.data?.displayPerformer ?? ''} - ${snapshot.data?.displayAlbum ?? ''}',
                     style: const TextStyle(
                       fontWeight: FontWeight.w300,
                       fontSize: 12,
