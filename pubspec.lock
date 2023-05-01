@@ -60,10 +60,11 @@ packages:
   audiotranscode_ffi:
     dependency: "direct main"
     description:
-      path: "../audiotranscode_ffi"
-      relative: true
-    source: path
-    version: "1.0.0"
+      name: audiotranscode_ffi
+      sha256: fa59553e61eaa0b01e3951d32031c0990f64a82f673b6b6532d7c1d514313ae4
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   boolean_selector:
     dependency: transitive
     description:
