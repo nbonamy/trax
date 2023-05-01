@@ -266,7 +266,7 @@ class _TraxHomePageState extends State<TraxHomePage>
         _edit();
         break;
 
-      case MenuAction.toolsYTranscode:
+      case MenuAction.toolsTranscode:
         _transcode();
         break;
 
