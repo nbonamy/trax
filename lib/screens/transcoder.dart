@@ -56,14 +56,63 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
   late Preferences _preferences;
   bool _deleteSourceFiles = false;
   late TranscodeFormat _transcodeFormat;
-  late int _bitsPerSample;
-  late int _sampleRate;
-  late int _bitrate;
+  late int _bitsPerSampleFlac;
+  late int _bitsPerSampleAlac;
+  late int _sampleRateFlac;
+  late int _sampleRateAlac;
+  late int _bitrateMp3;
+  late int _bitrateAac;
   bool _stopTranscode = false;
 
+  // info
   bool get isTranscodingLibraryTracks => widget.trackList != null;
   bool get isTranscodingFiles =>
       !isTranscodingLibraryTracks && widget.files != null;
+
+  // bitrate adapters
+  List<AudioSettingBitrate> get bitrateValues =>
+      _transcodeFormat == TranscodeFormat.aac
+          ? AudioTranscoder.kSettingsAacBitrate
+          : AudioTranscoder.kSettingsMp3Bitrate;
+  int get bitrate =>
+      _transcodeFormat == TranscodeFormat.aac ? _bitrateAac : _bitrateMp3;
+  set bitrate(int bitrate) {
+    if (_transcodeFormat == TranscodeFormat.aac) {
+      _bitrateAac = bitrate;
+    } else {
+      _bitrateMp3 = bitrate;
+    }
+  }
+
+  // bits per sample adapters
+  List<AudioSettingBitsPerSample> get bitsPerSampleValues =>
+      _transcodeFormat == TranscodeFormat.alac
+          ? AudioTranscoder.kSettingsAlacBitsPerSample
+          : AudioTranscoder.kSettingsFlacBitsPerSample;
+  int get bitsPerSample => _transcodeFormat == TranscodeFormat.alac
+      ? _bitsPerSampleAlac
+      : _bitsPerSampleFlac;
+  set bitsPerSample(int bitsPerSample) {
+    if (_transcodeFormat == TranscodeFormat.alac) {
+      _bitsPerSampleAlac = bitsPerSample;
+    } else {
+      _bitsPerSampleFlac = bitsPerSample;
+    }
+  }
+
+  // sample rate adapter
+  List<AudioSettingSampleRate> get sampleRateValues =>
+      AudioTranscoder.kSettingsSampleRate;
+  int get sampleRate => _transcodeFormat == TranscodeFormat.alac
+      ? _sampleRateAlac
+      : _sampleRateFlac;
+  set sampleRate(int sampleRate) {
+    if (_transcodeFormat == TranscodeFormat.alac) {
+      _sampleRateAlac = sampleRate;
+    } else {
+      _sampleRateFlac = sampleRate;
+    }
+  }
 
   @override
   void initState() {
@@ -72,9 +121,12 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
     _preferences = Preferences.of(context);
     _audioTranscoder = AudioTranscoder(database: _database);
     _transcodeFormat = _preferences.transcodeFormat;
-    _bitsPerSample = _preferences.transcodeBitsPerSample;
-    _sampleRate = _preferences.transcodeSamplerate;
-    _bitrate = _preferences.transcodeBitrate;
+    _bitrateMp3 = _preferences.transcodeBitrateMp3;
+    _bitrateAac = _preferences.transcodeBitrateAac;
+    _bitsPerSampleFlac = _preferences.transcodeBitsPerSampleFlac;
+    _bitsPerSampleAlac = _preferences.transcodeBitsPerSampleAlac;
+    _sampleRateFlac = _preferences.transcodeSampleRateFlac;
+    _sampleRateAlac = _preferences.transcodeSampleRateAlac;
     eventBus.on<StopTranscodeEvent>().listen(
           (event) => _stopTranscode = true,
         );
@@ -193,18 +245,22 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
                     value: TranscodeFormat.flac,
                     child: Text('FLAC'),
                   ),
-                  // MacosPopupMenuItem(
-                  //   value: TranscodeFormat.aac,
-                  //   child: Text('AAC'),
-                  // ),
+                  MacosPopupMenuItem(
+                    value: TranscodeFormat.aac,
+                    child: Text('AAC'),
+                  ),
+                  MacosPopupMenuItem(
+                    value: TranscodeFormat.alac,
+                    child: Text('ALAC'),
+                  ),
                 ],
                 onChanged: (f) => setState(() => _transcodeFormat = f!)),
           ]),
           if (AudioTranscoder.isBitrateTranscode(_transcodeFormat)) ...[
             _row(t.transcodeBitrate, 1, [
               MacosPopupButton(
-                value: _bitrate,
-                items: AudioTranscoder.kSettingsMp3Bitrate
+                value: bitrate,
+                items: bitrateValues
                     .map(
                       (s) => MacosPopupMenuItem(
                         value: s.bitrate,
@@ -212,15 +268,15 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
                       ),
                     )
                     .toList(),
-                onChanged: (b) => setState(() => _bitrate = b!),
+                onChanged: (b) => setState(() => bitrate = b!),
               ),
             ]),
           ],
           if (AudioTranscoder.isSampleTranscode(_transcodeFormat)) ...[
             _row(t.transcodeBitsPerSample, 1, [
               MacosPopupButton(
-                value: _bitsPerSample,
-                items: AudioTranscoder.kSettingsBitsPerSample
+                value: bitsPerSample,
+                items: bitsPerSampleValues
                     .map(
                       (s) => MacosPopupMenuItem(
                         value: s.bitsPerSample,
@@ -228,13 +284,13 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
                       ),
                     )
                     .toList(),
-                onChanged: (b) => setState(() => _bitsPerSample = b!),
+                onChanged: (b) => setState(() => bitsPerSample = b!),
               ),
             ]),
             _row(t.transcodeSampleRate, 1, [
               MacosPopupButton(
-                value: _sampleRate,
-                items: AudioTranscoder.kSettingsSampleRate
+                value: sampleRate,
+                items: sampleRateValues
                     .map(
                       (s) => MacosPopupMenuItem(
                         value: s.sampleRate,
@@ -242,7 +298,7 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
                       ),
                     )
                     .toList(),
-                onChanged: (s) => setState(() => _sampleRate = s!),
+                onChanged: (s) => setState(() => sampleRate = s!),
               ),
             ]),
           ],
@@ -309,9 +365,12 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
 
   void _save() {
     _preferences.transcodeFormat = _transcodeFormat;
-    _preferences.transcodeBitsPerSample = _bitsPerSample;
-    _preferences.transcodeSamplerate = _sampleRate;
-    _preferences.transcodeBitrate = _bitrate;
+    _preferences.transcodeBitrateMp3 = _bitrateMp3;
+    _preferences.transcodeBitrateAac = _bitrateAac;
+    _preferences.transcodeBitsPerSampleFlac = _bitsPerSampleFlac;
+    _preferences.transcodeBitsPerSampleAlac = _bitsPerSampleAlac;
+    _preferences.transcodeSampleRateFlac = _sampleRateFlac;
+    _preferences.transcodeSampleRateAlac = _sampleRateAlac;
   }
 
   void _transcode() {
@@ -344,9 +403,9 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
       src,
       _destinationFolder,
       _transcodeFormat,
-      _bitrate,
-      _sampleRate,
-      _bitsPerSample,
+      bitrate,
+      bitsPerSample,
+      sampleRate,
       _deleteSourceFiles,
       isTranscodingLibraryTracks && _destinationFolder == null,
     );

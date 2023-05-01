@@ -7,7 +7,7 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 
 import 'editable_tags.dart';
 
-enum Format { notAudio, mp3, flac, mp4, vorbis, aac }
+enum Format { notAudio, mp3, flac, alac, vorbis, aac }
 
 extension FormatEx on String {
   Format toFormat() => Format.values.firstWhere((d) => d.toString() == this);
@@ -106,7 +106,7 @@ class Track {
       case '.mp3':
         return Format.mp3;
       case '.m4a':
-        return Format.mp4;
+        return Format.alac;
       case '.flac':
         return Format.flac;
       case '.ogg':
@@ -126,12 +126,12 @@ class Track {
       case Format.mp3:
         return shortDescription ? 'MP3' : 'MPEG-1, Layer 3';
       case Format.aac:
-        return shortDescription ? 'AAC' : 'Apple Audio Codec';
+        return shortDescription ? 'AAC' : 'Advanced Audio Codec';
       case Format.vorbis:
         return shortDescription ? 'Vorbis' : 'Ogg Vorbis';
       case Format.flac:
         return shortDescription ? 'FLAC' : 'Free Lossless Audio Codec';
-      case Format.mp4:
+      case Format.alac:
         return shortDescription ? 'ALAC' : 'Apple Lossless Audio Codec';
     }
   }

@@ -74,31 +74,58 @@ class Preferences extends ChangeNotifier implements PreferencesBase {
     _prefs.setInt('transcode.format', transcodeFormat.index);
   }
 
-  int get transcodeBitrate {
-    return _prefs.getInt('transcode.bitrate') ??
+  int get transcodeBitrateMp3 {
+    return _prefs.getInt('transcode.bitrate.mp3') ??
         AudioTranscoder.kSettingsMp3Bitrate.last.bitrate;
   }
 
-  set transcodeBitrate(int bitrate) {
-    _prefs.setInt('transcode.bitrate', bitrate);
+  set transcodeBitrateMp3(int bitrate) {
+    _prefs.setInt('transcode.bitrate.mp3', bitrate);
   }
 
-  int get transcodeSamplerate {
-    return _prefs.getInt('transcode.samplerate') ??
+  int get transcodeBitrateAac {
+    return _prefs.getInt('transcode.bitrate.aac') ??
+        AudioTranscoder.kSettingsAacBitrate.last.bitrate;
+  }
+
+  set transcodeBitrateAac(int bitrate) {
+    _prefs.setInt('transcode.bitrate.aac', bitrate);
+  }
+
+  int get transcodeBitsPerSampleFlac {
+    return _prefs.getInt('transcode.bitspersample.flac') ??
+        AudioTranscoder.kSettingsFlacBitsPerSample.first.bitsPerSample;
+  }
+
+  set transcodeBitsPerSampleFlac(int bitsPerSample) {
+    _prefs.setInt('transcode.bitspersample.flac', bitsPerSample);
+  }
+
+  int get transcodeBitsPerSampleAlac {
+    return _prefs.getInt('transcode.bitspersample.alac') ??
+        AudioTranscoder.kSettingsAlacBitsPerSample.first.bitsPerSample;
+  }
+
+  set transcodeBitsPerSampleAlac(int bitsPerSample) {
+    _prefs.setInt('transcode.bitspersample.alac', bitsPerSample);
+  }
+
+  int get transcodeSampleRateFlac {
+    return _prefs.getInt('transcode.samplerate.flac') ??
         AudioTranscoder.kSettingsSampleRate.first.sampleRate;
   }
 
-  set transcodeSamplerate(int samplerate) {
-    _prefs.setInt('transcode.samplerate', samplerate);
+  set transcodeSampleRateFlac(int samplerate) {
+    _prefs.setInt('transcode.samplerate.flac', samplerate);
   }
 
-  int get transcodeBitsPerSample {
-    return _prefs.getInt('transcode.bitspersample') ??
-        AudioTranscoder.kSettingsBitsPerSample.first.bitsPerSample;
+  int get transcodeSampleRateAlac {
+    return _prefs.getInt('transcode.samplerate.alac') ??
+        AudioTranscoder.kSettingsSampleRate.first.sampleRate;
   }
 
-  set transcodeBitsPerSample(int bitsPerSample) {
-    _prefs.setInt('transcode.bitspersample', bitsPerSample);
+  set transcodeSampleRateAlac(int samplerate) {
+    _prefs.setInt('transcode.samplerate.alac', samplerate);
   }
 
   Rect get windowBounds {

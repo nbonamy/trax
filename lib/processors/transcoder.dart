@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:audiotranscode_ffi/audiotranscode_ffi.dart' as at_ffi;
 import 'package:audiotranscode_ffi/audiotranscode_ffi.dart';
 import 'package:path/path.dart' as p;
 import 'package:taglib_ffi/taglib_ffi.dart';
@@ -36,15 +35,19 @@ class AudioTranscoder {
   ];
 
   static final List<AudioSettingBitrate> kSettingsAacBitrate = [
-    AudioSettingBitrate('128 kbps', 128000),
-    AudioSettingBitrate('192 kbps', 192000),
-    AudioSettingBitrate('256 kbps', 256000),
+    AudioSettingBitrate('128 kbps (VBR)', 128000),
+    AudioSettingBitrate('192 kbps (VBR)', 192000),
+    AudioSettingBitrate('256 kbps (VBR)', 256000),
   ];
 
-  static final List<AudioSettingBitsPerSample> kSettingsBitsPerSample = [
+  static final List<AudioSettingBitsPerSample> kSettingsFlacBitsPerSample = [
     AudioSettingBitsPerSample('16 bits', 16),
     AudioSettingBitsPerSample('24 bits', 24),
-    AudioSettingBitsPerSample('32 bits', 32),
+  ];
+
+  static final List<AudioSettingBitsPerSample> kSettingsAlacBitsPerSample = [
+    AudioSettingBitsPerSample('16 bits', 16),
+    AudioSettingBitsPerSample('24 bits', 24),
   ];
 
   static final List<AudioSettingSampleRate> kSettingsSampleRate = [
@@ -52,6 +55,8 @@ class AudioTranscoder {
     AudioSettingSampleRate('48 kHz', 48000),
     AudioSettingSampleRate('88.2 kHz', 88200),
     AudioSettingSampleRate('96 kHz', 96000),
+    AudioSettingSampleRate('176.4 kHz', 176400),
+    AudioSettingSampleRate('192 kHz', 192000),
   ];
 
   final TagLib tagLib = TagLib();
@@ -66,8 +71,8 @@ class AudioTranscoder {
     String? destinationFolder,
     TranscodeFormat transcodeFormat,
     int bitrate,
-    int sampleRate,
     int bitsPerSample,
+    int sampleRate,
     bool deleteSourceFile,
     bool addToLibrary,
   ) async {
@@ -100,8 +105,21 @@ class AudioTranscoder {
       rc = await transcodeFlac(
         src,
         dst,
-        sampleRate,
         bitsPerSample,
+        sampleRate,
+      );
+    } else if (transcodeFormat == TranscodeFormat.aac) {
+      rc = await transcodeAac(
+        src,
+        dst,
+        bitrate,
+      );
+    } else if (transcodeFormat == TranscodeFormat.alac) {
+      rc = await transcodeAlac(
+        src,
+        dst,
+        bitsPerSample,
+        sampleRate,
       );
     }
 
@@ -156,29 +174,16 @@ class AudioTranscoder {
     return true;
   }
 
-  Future<bool> transcodeMp3(String src, String dst, int bitrate) {
-    return at_ffi.transcodeMp3(src, dst, bitrate);
-  }
-
-  // Future<bool> transcodeAAc(String src, String dst, int bitrate) {
-  //   return at_ffi.transcodeAac(src, dst, bitrate);
-  // }
-
-  Future<bool> transcodeFlac(
-      String src, String dst, int sampleRate, int bitsPerSample) {
-    return at_ffi.transcodeFlac(src, dst, sampleRate, bitsPerSample);
-  }
-
   String _targetExtension(TranscodeFormat transcodeFormat) {
     switch (transcodeFormat) {
       case TranscodeFormat.mp3:
         return '.mp3';
       case TranscodeFormat.flac:
         return '.flac';
-      // case TranscodeFormat.aac:
-      //   return '.aac';
-      // case TranscodeFormat.alac:
-      //   return '.m4a';
+      case TranscodeFormat.aac:
+        return '.aac';
+      case TranscodeFormat.alac:
+        return '.m4a';
     }
   }
 
@@ -187,14 +192,14 @@ class AudioTranscoder {
   }
 
   static bool isBitrateTranscode(TranscodeFormat format) {
-    return [TranscodeFormat.mp3 /*, TranscodeFormat.aac*/].contains(format);
+    return [TranscodeFormat.mp3, TranscodeFormat.aac].contains(format);
   }
 
   static bool isSampleFormat(Format format) {
-    return [Format.flac, Format.mp4].contains(format);
+    return [Format.flac, Format.alac].contains(format);
   }
 
   static bool isSampleTranscode(TranscodeFormat format) {
-    return [TranscodeFormat.flac /*, TranscodeFormat.alac*/].contains(format);
+    return [TranscodeFormat.flac, TranscodeFormat.alac].contains(format);
   }
 }

@@ -41,7 +41,7 @@ dependencies:
   mutex: ^3.0.1
   just_audio: ^0.9.32
   just_audio_background: ^0.0.1-beta.9
-  audiotranscode_ffi: ^1.0.1
+  audiotranscode_ffi: ^1.1.0
 
 dev_dependencies:
   flutter_test:

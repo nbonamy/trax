@@ -8,7 +8,7 @@ void main() {
   test('isTrack', () {
     expect(Track.getFormat('test.mp3'), Format.mp3);
     expect(Track.getFormat('test.ogg'), Format.vorbis);
-    expect(Track.getFormat('test.m4a'), Format.mp4);
+    expect(Track.getFormat('test.m4a'), Format.alac);
     expect(Track.getFormat('test.flac'), Format.flac);
     expect(Track.getFormat('test'), Format.notAudio);
     expect(Track.getFormat('test.docx'), Format.notAudio);
