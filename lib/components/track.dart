@@ -107,7 +107,7 @@ class TrackWidget extends StatelessWidget {
           ],
           ctxm.MenuItem.separator(),
           ctxm.MenuItem(
-            label: t.menuEditDelete,
+            label: t.menuEditDeleteSoft,
             onClick: (_) => eventBus.fire(
               MenuActionEvent(MenuAction.editDelete),
             ),

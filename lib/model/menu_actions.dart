@@ -17,6 +17,7 @@ enum MenuAction {
   editPaste,
   editDelete,
   trackInfo,
+  trackCleanupTitles,
   trackTranscode,
   // trackPlay,
   trackPrevious,

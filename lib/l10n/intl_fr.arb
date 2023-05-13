@@ -9,6 +9,7 @@
 
   "saveError": "Une erreur est survenue lors de la sauvegarde.",
   "scanRunningError": "Une analyse est déjà en cours.",
+  "cleanupTitleError": "Pas de suffixe commun trouvé dans les pistes sélectionnées.",
 
   "menuAppSettings": "Configuration…",
   
@@ -21,11 +22,14 @@
   "menuEdit": "Edition",
   "menuEditSelectAllAlbum": "Sélectionner toutes les pistes de l'album",
   "menuEditSelectAllArtist": "Sélectionner toutes les pistes de l'artist",
+  "menuEditCopy": "Copier",
   "menuEditPaste": "Coller",
-  "menuEditDelete": "Déplacer dans la Corbeille",
+  "menuEditDelete": "Supprimer",
+  "menuEditDeleteSoft": "Déplacer dans la Corbeille",
 
   "menuTrack": "Piste",
   "menuTrackInfo": "Info…",
+  "menuTrackCleanupTitles": "Nettoyer les Titres",
   "menuTrackTranscode": "Convertir…",
   "menuTrackPlay": "Jouer",
   "menuTrackPrev": "Piste précédente",
@@ -146,6 +150,9 @@
   "transcodeInfoVariousBitrates": "bitrates variables",
   "transcodeInfoVariousSampleRates": "fréquences variables",
   "transcodeInfoVariousBitsPerSample": "tailles variables",
+
+  "cleanupTitleWithCopyToComment": "Suffixe commun trouvé dans les titres des pistes sélectionnées. Voulez-vous le déplacer vers les commentaires ?",
+  "cleanupTitleWithoutCopyToComment": "Suffixe commun trouvé dans les titres des pistes sélectionnées. Voulez-vous le supprimer ?",
 
   "appName": "Trax"
 

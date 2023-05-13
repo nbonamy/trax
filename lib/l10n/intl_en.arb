@@ -9,6 +9,7 @@
 
   "saveError": "An error occured while updating metadata.",
   "scanRunningError": "A scan is already in progress.",
+  "cleanupTitleError": "No common suffix in selected tracks titles",
 
   "menuAppSettings": "Settings…",
   
@@ -21,11 +22,14 @@
   "menuEdit": "Edit",
   "menuEditSelectAllAlbum": "Select All Album Tracks",
   "menuEditSelectAllArtist": "Select All Artist Tracks",
+  "menuEditCopy": "Copy",
   "menuEditPaste": "Paste",
-  "menuEditDelete": "Move to Trash",
+  "menuEditDelete": "Delete",
+  "menuEditDeleteSoft": "Move to Trash",
 
   "menuTrack": "Track",
   "menuTrackInfo": "Info…",
+  "menuTrackCleanupTitles": "Cleanup Titles",
   "menuTrackTranscode": "Convert…",
   "menuTrackPlay": "Play",
   "menuTrackPrev": "Previous track",
@@ -146,6 +150,9 @@
   "transcodeInfoVariousBitrates": "various bitrates",
   "transcodeInfoVariousSampleRates": "various sample rates",
   "transcodeInfoVariousBitsPerSample": "various bits per sample",
+
+  "cleanupTitleWithCopyToComment": "Common suffix found in selected tracks titles. Do you want to move it to the comments?",
+  "cleanupTitleWithoutCopyToComment": "Common suffix found in selected tracks titles. Do you want to remove it?",
 
   "appName": "Trax"
 

@@ -20,6 +20,7 @@ import '../model/preferences.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
+import '../processors/tagger.dart';
 import '../screens/transcoder.dart';
 import '../utils/file_utils.dart';
 import '../utils/path_utils.dart';
@@ -221,6 +222,9 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       case MenuAction.trackInfo:
         _showEditor(EditorMode.edit, selectionModel.get, _albums.allTracks);
         break;
+      case MenuAction.trackCleanupTitles:
+        _cleanupTitles(selectionModel.get);
+        break;
       case MenuAction.trackTranscode:
         _showTranscoder(selectionModel.get);
         break;
@@ -285,6 +289,11 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
       selection,
       allTracks: allTracks,
     );
+  }
+
+  void _cleanupTitles(TrackList selection) {
+    Tagger tagger = Tagger(context, database);
+    tagger.cleanupTitles(selection);
   }
 
   void _showTranscoder(

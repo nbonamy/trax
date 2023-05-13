@@ -159,6 +159,11 @@ class _TraxHomePageState extends State<TraxHomePage>
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyI),
                 onSelected: () => onMenuSelected(MenuAction.trackInfo),
               ),
+              PlatformMenuItem(
+                label: t.menuTrackCleanupTitles,
+                //shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.keyI),
+                onSelected: () => onMenuSelected(MenuAction.trackCleanupTitles),
+              ),
             ],
           ),
           PlatformMenuItemGroup(
@@ -174,7 +179,7 @@ class _TraxHomePageState extends State<TraxHomePage>
           PlatformMenuItemGroup(
             members: [
               PlatformMenuItem(
-                label: t.menuEditDelete,
+                label: t.menuEditDeleteSoft,
                 shortcut: MenuUtils.cmdShortcut(LogicalKeyboardKey.backspace),
                 onSelected: () => onMenuSelected(MenuAction.editDelete),
               ),

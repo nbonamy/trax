@@ -8,6 +8,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../components/context_menu.dart' as ctxm;
 import '../components/artwork.dart';
 import '../components/button.dart';
 import '../model/menu_actions.dart';
@@ -96,6 +97,7 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations t = AppLocalizations.of(context)!;
     return Center(
       child: FutureBuilder<bool>(
         future: loadArtwork(),
@@ -111,10 +113,30 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
               children: [
                 (widget.track == null && _bytes == null)
                     ? _multiplePlaceholder()
-                    : ArtworkWidget(
-                        bytes: _bytes,
-                        size: kArtworkSize,
-                        radius: 0.0,
+                    : ctxm.ContextMenu(
+                        menu: ctxm.Menu(
+                          items: [
+                            if (_bytes != null)
+                              ctxm.MenuItem(
+                                label: t.menuEditCopy,
+                                onClick: (_) => _copy(bytes!),
+                              ),
+                            ctxm.MenuItem(
+                              label: t.menuEditPaste,
+                              onClick: (_) => _paste(),
+                            ),
+                            ctxm.MenuItem.separator(),
+                            ctxm.MenuItem(
+                              label: t.menuEditDelete,
+                              onClick: (_) => _delete(),
+                            ),
+                          ],
+                        ),
+                        child: ArtworkWidget(
+                          bytes: _bytes,
+                          size: kArtworkSize,
+                          radius: 0.0,
+                        ),
                       ),
                 const SizedBox(height: 8),
                 _actionButtons()
@@ -193,6 +215,20 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
     }
   }
 
+  Future<void> _paste() async {
+    final imageBytes = await Pasteboard.image;
+    if (imageBytes != null) {
+      setState(() {
+        _bytes = imageBytes;
+        _action = MetadataAction.updated;
+      });
+    }
+  }
+
+  void _copy(Uint8List bytes) {
+    Pasteboard.writeImage(bytes);
+  }
+
   void _checkIfSameArtwork() async {
     Uint8List? refBytes =
         await _tagLib.getArtworkBytes(widget.selection.first.filename);
@@ -222,13 +258,7 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
   @override
   void onMenuAction(MenuAction action) async {
     if (action == MenuAction.editPaste) {
-      final imageBytes = await Pasteboard.image;
-      if (imageBytes != null) {
-        setState(() {
-          _bytes = imageBytes;
-          _action = MetadataAction.updated;
-        });
-      }
+      await _paste();
     }
   }
 }
