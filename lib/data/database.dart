@@ -164,7 +164,7 @@ class TraxDatabase extends ChangeNotifier {
 
   Future<AlbumList> recents() async {
     final List<Map> resultSet = await _database!.rawQuery(
-        'SELECT * FROM tracks WHERE imported_at>(UNIXEPOCH()-30*24*60*60)*1000 ORDER BY imported_at DESC');
+        'SELECT * FROM tracks WHERE imported_at>(UNIXEPOCH()-30*24*60*60)*1000 ORDER BY imported_at DESC, id DESC');
     return _dehydrateAlbums(resultSet, AlbumOrdering.none);
   }
 

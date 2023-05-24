@@ -61,10 +61,10 @@ packages:
     dependency: "direct main"
     description:
       name: audiotranscode_ffi
-      sha256: "209bf923aabf2adb9de4fe5100c776e7cb51df50e2cdecff9e73b192fe50929b"
+      sha256: "68387ed4491ea4e13a27eabcd49879f76324fe6637accac2308a1774ef34545d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   boolean_selector:
     dependency: transitive
     description:

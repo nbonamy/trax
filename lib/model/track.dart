@@ -46,7 +46,7 @@ class Track {
     return Track(
       filename: filename,
       filesize: fs.size,
-      lastModified: max(fs.changed.millisecondsSinceEpoch,
+      lastModified: max(0 /*fs.changed.millisecondsSinceEpoch*/,
           fs.modified.millisecondsSinceEpoch),
       format: getFormat(filename),
       tags: tagLib?.getAudioTags(filename),
