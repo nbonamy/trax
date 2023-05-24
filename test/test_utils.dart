@@ -7,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart' hide Tags;
 import 'package:macos_ui/macos_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/audioplayer/audio_player.dart';
@@ -90,7 +89,8 @@ Future<Widget> bootstrapWidget(
   const MethodChannel channel = MethodChannel(
     'plugins.flutter.io/path_provider',
   );
-  channel.setMockMethodCallHandler((MethodCall methodCall) async {
+  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+      (MethodCall methodCall) async {
     if (methodCall.method == 'getApplicationSupportDirectory') {
       if (Platform.operatingSystem == 'macos') {
         return '${SystemPath.home()}/Library/Application Support/com.nabocorp.trax';

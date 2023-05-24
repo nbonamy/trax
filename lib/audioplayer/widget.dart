@@ -19,10 +19,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<AudioPlayer>(
-      builder: (context, audioPlayer, child) => Flex(
+      builder: (context, audioPlayer, child) => const Flex(
         direction: Axis.horizontal,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
+        children: [
           PlaybackControls(),
           AudioPanel(),
           VolumeControls(),

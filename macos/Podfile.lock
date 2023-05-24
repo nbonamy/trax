@@ -3,12 +3,14 @@ PODS:
     - FlutterMacOS
   - audio_session (0.0.1):
     - FlutterMacOS
-  - audiotranscode_ffi (1.0.0):
+  - audiotranscode_ffi (1.1.0):
     - ffmpeg-kit-macos-audio (= 5.1)
+    - FLAC-framework (= 1.4.2-2)
     - FlutterMacOS
   - contextual_menu (0.0.1):
     - FlutterMacOS
   - ffmpeg-kit-macos-audio (5.1)
+  - FLAC-framework (1.4.2-2)
   - FlutterMacOS (1.0.0)
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
@@ -59,6 +61,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - ffmpeg-kit-macos-audio
+    - FLAC-framework
     - FMDB
     - taglib-framework
 
@@ -97,9 +100,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   audio_service: b88ff778e0e3915efd4cd1a5ad6f0beef0c950a9
   audio_session: dea1f41890dbf1718f04a56f1d6150fd50039b72
-  audiotranscode_ffi: 41f05a995eb15c19facfca9294c7183ad7dd9569
+  audiotranscode_ffi: 463db511c09bc19f974055764993a9e43685aa30
   contextual_menu: 6d35fb15942c0d8769f5eae8d3bda653994a6f5a
   ffmpeg-kit-macos-audio: 1c0a574fd51501c7227a2c8181ffd4e9c2005051
+  FLAC-framework: 92d06bed602b884866a5d58048ace29c3206cada
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   just_audio: 9b67ca7b97c61cfc9784ea23cd8cc55eb226d489
