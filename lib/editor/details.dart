@@ -104,8 +104,8 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   @override
   void initState() {
     super.initState();
-    loadCache();
     loadData();
+    loadCache();
   }
 
   @override
@@ -136,6 +136,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
 
     // so now sort
     _allGenres.sort();
+
+    // update
+    setState(() {});
   }
 
   void loadData() {
@@ -200,35 +203,35 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
             t.tagAlbum,
             _albumController,
             placeholder: mixedTextPlaceholder,
-            results: _allAlbums,
+            completionResults: _allAlbums,
           ),
           _textFieldRow(
             const Key('artist'),
             t.tagArtist,
             _artistController,
             placeholder: mixedTextPlaceholder,
-            results: _allArtists,
+            completionResults: _allArtists,
           ),
           _textFieldRow(
             const Key('performer'),
             t.tagPerformer,
             _performerController,
             placeholder: mixedTextPlaceholder,
-            results: _allPerformers,
+            completionResults: _allPerformers,
           ),
           _textFieldRow(
             const Key('composer'),
             t.tagComposer,
             _composerController,
             placeholder: mixedTextPlaceholder,
-            results: _allComposers,
+            completionResults: _allComposers,
           ),
           _textFieldRow(
             const Key('genre'),
             t.tagGenre,
             _genreController,
             placeholder: mixedTextPlaceholder,
-            results: _allGenres,
+            completionResults: _allGenres,
             showResultsWhenEmpty: true,
           ),
           _textFieldRow(
@@ -295,8 +298,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     TextEditingController controller, {
     String? placeholder,
     TextInputType? keyboardType,
-    List<String>? results,
+    List<String>? completionResults,
     bool showResultsWhenEmpty = false,
+    bool showResultsStartingWithFirst = true,
     int? maxLength,
     int? minLines,
     double? width,
@@ -308,8 +312,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       controller,
       placeholder,
       minLines,
-      results: results,
+      completionResults: completionResults,
       showResultsWhenEmpty: showResultsWhenEmpty,
+      showResultsStartingWithFirst: showResultsStartingWithFirst,
     );
     return _row(label, 6, [
       width == null
@@ -433,8 +438,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
     TextEditingController controller,
     String? placeholder,
     int? minLines, {
-    List<String>? results,
+    List<String>? completionResults,
     bool showResultsWhenEmpty = false,
+    bool showResultsStartingWithFirst = true,
   }) {
     // check controller value
     bool isMixed = false;
@@ -480,8 +486,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       keyboardType: keyboardType,
       maxLength: maxLength,
       controller: controller,
-      results: results?.map((e) => SearchResultItem(e)).toList(),
+      results: completionResults?.map((e) => SearchResultItem(e)).toList(),
       showResultsWhenEmpty: showResultsWhenEmpty,
+      showResultsStartingWithFirst: showResultsStartingWithFirst,
       placeholder: isMixed ? placeholder : null,
       minLines: minLines ?? 1,
       maxLines: minLines ?? 1,
