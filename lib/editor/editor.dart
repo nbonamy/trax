@@ -235,6 +235,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           _artworkBytes == null
               ? AsyncArtwork(
                   track: currentTrack,
+                  useCache: false,
                   size: kArtworkSize,
                   radius: 4.0,
                   defaultPlaceholderBorderColor: CupertinoColors.systemGrey3,

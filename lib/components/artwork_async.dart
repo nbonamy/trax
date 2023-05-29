@@ -9,12 +9,14 @@ class AsyncArtwork extends StatelessWidget {
   final Track? track;
   final double size;
   final double radius;
+  final bool useCache;
   final Widget? placeholder;
   final Color defaultPlaceholderBorderColor;
   const AsyncArtwork({
     super.key,
     required this.track,
     required this.size,
+    this.useCache = true,
     this.radius = 8.0,
     this.placeholder,
     this.defaultPlaceholderBorderColor = CupertinoColors.lightBackgroundGray,
@@ -24,7 +26,7 @@ class AsyncArtwork extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ArtworkProvider>(
       builder: (context, artworkProvider, child) => FutureBuilder(
-        future: artworkProvider.getArwork(track),
+        future: artworkProvider.getArwork(track, useCache: useCache),
         builder: (context, snapshot) => ArtworkWidget(
           bytes: snapshot.connectionState == ConnectionState.done
               ? snapshot.data

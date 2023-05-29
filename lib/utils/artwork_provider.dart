@@ -51,7 +51,7 @@ class ArtworkProvider extends ChangeNotifier {
   int get size =>
       _cache.values.fold(0, (size, entry) => size + (entry.bytes?.length ?? 0));
 
-  Future<Uint8List?> getArwork(Track? track) async {
+  Future<Uint8List?> getArwork(Track? track, {bool useCache = false}) async {
     // check
     if (track == null) {
       return null;
@@ -59,16 +59,18 @@ class ArtworkProvider extends ChangeNotifier {
 
     // check cache
     _CacheKey cacheKey = _CacheKey.fromTrack(track);
-    if (_cache.containsKey(cacheKey.toString())) {
-      _CacheEntry entry = _cache[cacheKey.toString()]!;
-      entry.lastAccess = DateTime.now();
-      return entry.bytes;
+    if (useCache) {
+      if (_cache.containsKey(cacheKey.toString())) {
+        _CacheEntry entry = _cache[cacheKey.toString()]!;
+        entry.lastAccess = DateTime.now();
+        return entry.bytes;
+      }
     }
 
     // we need to grab it
     String filename = track.filename;
     Uint8List? artworkBytes = await _tagLib.getArtworkBytes(filename);
-    if (artworkBytes != null) {
+    if (artworkBytes != null && useCache) {
       _cache[cacheKey.toString()] = _CacheEntry(cacheKey, artworkBytes);
       _purge();
     }
