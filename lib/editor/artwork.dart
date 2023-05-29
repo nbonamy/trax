@@ -185,10 +185,10 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (widget.track == null || _bytes != null) ...[
-          Button(t.artworkDelete, _delete),
+          Button(t.artworkDelete, onPressed: _delete),
           const SizedBox(width: 16),
         ],
-        Button(t.artworkUpdate, _add),
+        Button(t.artworkUpdate, onPressed: _add),
       ],
     );
   }

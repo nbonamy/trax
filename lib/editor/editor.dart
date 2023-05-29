@@ -315,20 +315,20 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           if (singleTrackMode) ...[
             Button(
               '〈',
-              _canPrev() ? _prevTrack : null,
+              onPressed: _canPrev() ? _prevTrack : null,
               noBorder: true,
             ),
             const SizedBox(width: 4),
             Button(
               '〉',
-              _canNext() ? _nextTrack : null,
+              onPressed: _canNext() ? _nextTrack : null,
               noBorder: true,
             ),
             const Spacer(),
           ],
-          Button(t.cancel, _onClose),
+          Button(t.cancel, onPressed: _onClose),
           const SizedBox(width: 8),
-          Button(t.ok, _onSave, defaultButton: true),
+          Button(t.ok, onPressed: _onSave, defaultButton: true),
         ],
       ),
     );

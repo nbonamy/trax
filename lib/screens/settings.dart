@@ -80,7 +80,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
             const SizedBox(width: 16),
             Button(
               t.browse,
-              () async {
+              onPressed: () async {
                 String? folder = await FilePicker.platform.getDirectoryPath(
                   initialDirectory: Directory(_musicFolder).existsSync()
                       ? _musicFolder
@@ -154,9 +154,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       footer: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Button(t.cancel, _onClose),
+          Button(t.cancel, onPressed: _onClose),
           const SizedBox(width: 8),
-          Button(t.save, _onSave, defaultButton: true),
+          Button(t.save, onPressed: _onSave, defaultButton: true),
         ],
       ),
     );

@@ -9,9 +9,9 @@ class Button extends StatelessWidget {
   final bool defaultButton;
   final bool noBorder;
   const Button(
-    this.label,
-    this.onPressed, {
+    this.label, {
     super.key,
+    required this.onPressed,
     this.verticalPadding = 3,
     this.horizontalPadding,
     this.defaultButton = false,

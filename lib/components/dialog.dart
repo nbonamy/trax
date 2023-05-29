@@ -24,7 +24,7 @@ class TraxDialog {
           width: 100,
           child: Button(
             t.ok,
-            () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).pop(),
             verticalPadding: 6,
             defaultButton: true,
           ),

@@ -281,14 +281,15 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
                     if (_destinationFolder != null) ...[
                       Button(
                         t.clear,
-                        () => setState(() => _destinationFolder = null),
+                        onPressed: () =>
+                            setState(() => _destinationFolder = null),
                         horizontalPadding: 8,
                       ),
                       const SizedBox(width: 8),
                     ],
                     Button(
                       t.browse,
-                      () async {
+                      onPressed: () async {
                         String? folder =
                             await FilePicker.platform.getDirectoryPath();
                         setState(() => _destinationFolder = folder);
@@ -313,9 +314,9 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
       footer: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Button(t.cancel, _onClose),
+          Button(t.cancel, onPressed: _onClose),
           const SizedBox(width: 8),
-          Button(t.save, _onTranscode, defaultButton: true),
+          Button(t.save, onPressed: _onTranscode, defaultButton: true),
         ],
       ),
     );
