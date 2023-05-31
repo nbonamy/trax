@@ -143,13 +143,13 @@ class _TranscoderWidgetState extends State<TranscoderWidget> {
 
     // decide
     if (format != null) {
-      if (AudioTranscoder.isBitrateFormat(format)) {
+      if (Track.isBitrateFormat(format)) {
         String desc = Track.getFormatString(format, shortDescription: true);
         desc += bitrate == null
             ? ', ${t.transcodeInfoVariousBitrates}'
             : ', $bitrate bps';
         return desc;
-      } else if (AudioTranscoder.isSampleFormat(format)) {
+      } else if (Track.isSampleFormat(format)) {
         String desc = Track.getFormatString(format, shortDescription: true);
         desc += bitsPerSample == null
             ? ', ${t.transcodeInfoVariousBitsPerSample}'

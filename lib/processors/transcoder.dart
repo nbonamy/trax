@@ -194,16 +194,8 @@ class AudioTranscoder {
     }
   }
 
-  static bool isBitrateFormat(Format format) {
-    return [Format.mp3, Format.aac, Format.vorbis].contains(format);
-  }
-
   static bool isBitrateTranscode(TranscodeFormat format) {
     return [TranscodeFormat.mp3, TranscodeFormat.aac].contains(format);
-  }
-
-  static bool isSampleFormat(Format format) {
-    return [Format.flac, Format.alac].contains(format);
   }
 
   static bool isSampleTranscode(TranscodeFormat format) {

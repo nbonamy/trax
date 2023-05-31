@@ -71,6 +71,18 @@ class Track {
     return getFormatString(format);
   }
 
+  String get formatStringShort {
+    return getFormatString(format, shortDescription: true);
+  }
+
+  String get formatDescription {
+    if (isBitrateFormat(format)) {
+      return '${tags!.bitrate} kbps';
+    } else {
+      return '${tags!.bitsPerSample} bits ${tags!.sampleRate / 1000} kHz';
+    }
+  }
+
   String get channelsString {
     if (safeTags.numChannels == 0) return 'Unknown';
     if (safeTags.numChannels == 1) return 'Mono';
@@ -134,5 +146,13 @@ class Track {
       case Format.alac:
         return shortDescription ? 'ALAC' : 'Apple Lossless Audio Codec';
     }
+  }
+
+  static bool isBitrateFormat(Format format) {
+    return [Format.mp3, Format.aac, Format.vorbis].contains(format);
+  }
+
+  static bool isSampleFormat(Format format) {
+    return [Format.flac, Format.alac].contains(format);
   }
 }

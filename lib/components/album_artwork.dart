@@ -9,12 +9,14 @@ class AlbumArtworkWidget extends StatelessWidget {
   final double size;
   final int trackCount;
   final int playtime;
+  final String format;
   const AlbumArtworkWidget({
     super.key,
     required this.track,
     required this.size,
     required this.trackCount,
     required this.playtime,
+    required this.format,
   });
 
   @override
@@ -33,7 +35,15 @@ class AlbumArtworkWidget extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   '$trackCount SONGS, $playtime MINUTES',
-                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black.withOpacity(Consts.fadedOpacity),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  format.toUpperCase(),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

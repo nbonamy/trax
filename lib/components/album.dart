@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../model/track.dart';
 import 'album_artwork.dart';
@@ -36,6 +37,19 @@ class _AlbumWidgetState extends State<AlbumWidget> {
         .round()
         .toInt();
 
+    AppLocalizations t = AppLocalizations.of(context)!;
+    String formatString = widget.tracks.first.formatStringShort;
+    String formatDescription = widget.tracks.first.formatDescription;
+    for (Track track in widget.tracks) {
+      if (track.formatStringShort != formatString) {
+        formatString = t.variousFormats;
+        formatDescription = '';
+        break;
+      } else if (track.formatDescription != formatDescription) {
+        formatDescription = t.variousFormats;
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 48),
       child: LayoutBuilder(
@@ -48,6 +62,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
               size: _artworkSize(constraints),
               trackCount: trackCount,
               playtime: playtimeMinutes,
+              format: '$formatString $formatDescription',
             ),
             SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
             Expanded(
