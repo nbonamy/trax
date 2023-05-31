@@ -57,6 +57,7 @@
 
   "scanInProgress": "Analyse en cours",
   "importInProgress": "Analyse en cours",
+  "saveInProgress": "Sauvegarde en cours",
   "transcodeInProgress": "Conversion en cours ({index} de {count})",
 
   "unknownTitle": "Titre inconnu",

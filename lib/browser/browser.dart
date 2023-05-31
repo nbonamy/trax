@@ -134,25 +134,32 @@ class BrowserWidgetState extends State<BrowserWidget> {
     // needed
     AppLocalizations t = AppLocalizations.of(context)!;
     if (event is BackgroundActionStartEvent) {
-      if (event.action == BackgroundAction.scan) {
-        _actionStream.sink.add(ActionInProgress(
-          t.scanInProgress,
-          cancel: stopScan,
-        ));
-      }
-      if (event.action == BackgroundAction.import) {
-        _actionStream.sink.add(ActionInProgress(
-          t.importInProgress,
-        ));
-      }
-      if (event.action == BackgroundAction.transcode) {
-        _actionStream.sink.add(ActionInProgress(
-          t.transcodeInProgress(
-            event.data['count'],
-            event.data['index'],
-          ),
-          cancel: () => eventBus.fire(StopTranscodeEvent()),
-        ));
+      switch (event.action) {
+        case BackgroundAction.scan:
+          _actionStream.sink.add(ActionInProgress(
+            t.scanInProgress,
+            cancel: stopScan,
+          ));
+          break;
+        case BackgroundAction.import:
+          _actionStream.sink.add(ActionInProgress(
+            t.importInProgress,
+          ));
+          break;
+        case BackgroundAction.save:
+          _actionStream.sink.add(ActionInProgress(
+            t.saveInProgress,
+          ));
+          break;
+        case BackgroundAction.transcode:
+          _actionStream.sink.add(ActionInProgress(
+            t.transcodeInProgress(
+              event.data['count'],
+              event.data['index'],
+            ),
+            cancel: () => eventBus.fire(StopTranscodeEvent()),
+          ));
+          break;
       }
     } else if (event is BackgroundActionEndEvent) {
       _actionStream.sink.add(null);

@@ -57,6 +57,7 @@
 
   "scanInProgress": "Scanning audio files",
   "importInProgress": "Parsing imported files",
+  "saveInProgress": "Saving files",
   "transcodeInProgress": "Converting audio files ({index} of {count})",
 
   "unknownTitle": "Unknown title",

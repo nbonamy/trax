@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
@@ -19,6 +21,7 @@ import '../model/preferences.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
 import '../utils/artwork_provider.dart';
+import '../utils/events.dart';
 import '../utils/track_utils.dart';
 import 'artwork.dart';
 import 'details.dart';
@@ -92,6 +95,8 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   late EditableTags tags;
 
   int _activeIndex = -1;
+
+  bool _saveInProgress = false;
 
   Uint8List? _artworkBytes;
 
@@ -274,39 +279,44 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
           ),
         ],
       ),
-      body: TabView(
-        controller: _tabsController,
-        labels: [
-          t.editorDetails,
-          t.editorArtwork,
-          t.editorLyrics,
-          if (singleTrackMode) t.editorFile,
-        ],
+      body: Stack(
         children: [
-          EditorDetailsWidget(
-            key: _detailsKey,
-            tags: tags,
-            singleTrackMode: singleTrackMode,
-            onComplete: _onSave,
+          TabView(
+            controller: _tabsController,
+            labels: [
+              t.editorDetails,
+              t.editorArtwork,
+              t.editorLyrics,
+              if (singleTrackMode) t.editorFile,
+            ],
+            children: [
+              EditorDetailsWidget(
+                key: _detailsKey,
+                tags: tags,
+                singleTrackMode: singleTrackMode,
+                onComplete: _onSave,
+              ),
+              EditorArtworkWidget(
+                key: _artworkKey,
+                track: currentTrack,
+                selection: widget.selection,
+                artworkCallback: (bytes) {
+                  if (_artworkBytes == null) {
+                    setState(() => _artworkBytes = bytes);
+                  }
+                },
+              ),
+              EditorLyricsWidget(
+                key: _lyricsKey,
+                track: currentTrack,
+              ),
+              if (singleTrackMode)
+                EditorFileWidget(
+                  track: currentTrack!,
+                ),
+            ],
           ),
-          EditorArtworkWidget(
-            key: _artworkKey,
-            track: currentTrack,
-            selection: widget.selection,
-            artworkCallback: (bytes) {
-              if (_artworkBytes == null) {
-                setState(() => _artworkBytes = bytes);
-              }
-            },
-          ),
-          EditorLyricsWidget(
-            key: _lyricsKey,
-            track: currentTrack,
-          ),
-          if (singleTrackMode)
-            EditorFileWidget(
-              track: currentTrack!,
-            ),
+          if (_saveInProgress) Container(color: Colors.white.withOpacity(0.5)),
         ],
       ),
       footer: Row(
@@ -326,9 +336,16 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
             ),
             const Spacer(),
           ],
-          Button(t.cancel, onPressed: _onClose),
+          Button(
+            t.cancel,
+            onPressed: _saveInProgress ? null : _onClose,
+          ),
           const SizedBox(width: 8),
-          Button(t.ok, onPressed: _onSave, defaultButton: true),
+          Button(
+            t.ok,
+            defaultButton: true,
+            onPressed: _saveInProgress ? null : _onSave,
+          ),
         ],
       ),
     );
@@ -339,7 +356,10 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
   }
 
   void _onSave() async {
-    if (await _save()) {
+    setState(() => _saveInProgress = true);
+    bool rc = await _save();
+    setState(() => _saveInProgress = false);
+    if (rc) {
       widget.onComplete?.call();
       _onClose();
     } else {
@@ -395,6 +415,10 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
       return false;
     }
 
+    // notify
+    eventBus.fire(BackgroundActionStartEvent(BackgroundAction.save));
+    await Future.delayed(Duration.zero, () {});
+
     // get the data
     EditableTags updatedTags = _detailsKey.currentState!.tags;
     Uint8List? updatedArtwork = _artworkKey.currentState?.bytes;
@@ -422,8 +446,17 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
         updatedLyrics,
         notify: widget.notify && widget.selection.last == track,
       );
-      if (!rc) return false;
+      if (!rc) {
+        eventBus.fire(BackgroundActionEndEvent(BackgroundAction.save));
+        return false;
+      } else {
+        await Future.delayed(Duration.zero, () {});
+      }
     }
+
+    // done
+    eventBus.fire(BackgroundActionEndEvent(BackgroundAction.save));
+    await Future.delayed(Duration.zero, () {});
 
     // done
     return true;
