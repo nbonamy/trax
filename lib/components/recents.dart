@@ -13,13 +13,13 @@ class RecentlyAddedWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DatabaseBuilder(
-      future: (database) => database.recents(),
+      future: (database) => database.recents(20),
       builder: (context, database, recents) => ExtendedWrap(
         maxLines: 2,
         spacing: 32,
         runSpacing: 32,
         clipBehavior: Clip.hardEdge,
-        children: recents.keys.toList().take(20).map((a) {
+        children: recents.keys.toList().map((a) {
           Track track = recents[a]!.first;
           return MouseRegion(
             cursor: SystemMouseCursors.click,

@@ -162,9 +162,9 @@ class TraxDatabase extends ChangeNotifier {
     return _dehydrateAlbums(resultSet, AlbumOrdering.alpha);
   }
 
-  Future<AlbumList> recents() async {
+  Future<AlbumList> recents(int limit) async {
     final List<Map> resultSet = await _database!.rawQuery(
-        'SELECT * FROM tracks WHERE imported_at>(UNIXEPOCH()-30*24*60*60)*1000 ORDER BY imported_at DESC, id DESC');
+        'SELECT * FROM tracks WHERE imported_at>(UNIXEPOCH()-30*24*60*60)*1000 GROUP BY artist,album ORDER BY imported_at DESC, id DESC LIMIT $limit');
     return _dehydrateAlbums(resultSet, AlbumOrdering.none);
   }
 
