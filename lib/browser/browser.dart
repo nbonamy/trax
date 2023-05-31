@@ -161,8 +161,10 @@ class BrowserWidgetState extends State<BrowserWidget> {
           ));
           break;
       }
+      Future.delayed(Duration.zero, () {});
     } else if (event is BackgroundActionEndEvent) {
       _actionStream.sink.add(null);
+      Future.delayed(Duration.zero, () {});
     } else if (event is SelectArtistEvent) {
       onSelectArtist(event.artist);
     } else if (event is SelectArtistAlbumEvent) {

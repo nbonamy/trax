@@ -305,7 +305,6 @@ class _TraxHomePageState extends State<TraxHomePage>
     TrackList tracks = [];
     TagLib tagLib = TagLib();
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.import));
-    await Future.delayed(Duration.zero, () {});
     for (String? filepath in result.paths) {
       if (filepath == null) continue;
       Track track = Track.parse(filepath, tagLib);
@@ -313,7 +312,6 @@ class _TraxHomePageState extends State<TraxHomePage>
       await Future.delayed(Duration.zero, () {});
     }
     eventBus.fire(BackgroundActionEndEvent(BackgroundAction.import));
-    await Future.delayed(Duration.zero, () {});
 
     // now show import
     // ignore: use_build_context_synchronously

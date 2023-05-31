@@ -417,7 +417,6 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
     // notify
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.save));
-    await Future.delayed(Duration.zero, () {});
 
     // get the data
     EditableTags updatedTags = _detailsKey.currentState!.tags;
@@ -456,7 +455,6 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
 
     // done
     eventBus.fire(BackgroundActionEndEvent(BackgroundAction.save));
-    await Future.delayed(Duration.zero, () {});
 
     // done
     return true;
