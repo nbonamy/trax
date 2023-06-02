@@ -64,9 +64,12 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
   @override
   void didUpdateWidget(EditorArtworkWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _action = MetadataAction.loading;
-    _checkingMultiple = null;
-    _bytes = null;
+    if (oldWidget.track != widget.track ||
+        oldWidget.selection != widget.selection) {
+      _action = MetadataAction.loading;
+      _checkingMultiple = null;
+      _bytes = null;
+    }
   }
 
   @override

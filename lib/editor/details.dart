@@ -111,7 +111,9 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
   @override
   void didUpdateWidget(EditorDetailsWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    loadData();
+    if (oldWidget.tags != widget.tags) {
+      loadData();
+    }
   }
 
   void loadCache() async {
