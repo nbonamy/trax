@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -114,33 +115,43 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                (widget.track == null && _bytes == null)
-                    ? _multiplePlaceholder()
-                    : ctxm.ContextMenu(
-                        menu: ctxm.Menu(
-                          items: [
-                            if (_bytes != null)
+                DropTarget(
+                  onDragDone: (detail) async {
+                    Uint8List fileBytes =
+                        await detail.files.first.readAsBytes();
+                    setState(() {
+                      _bytes = fileBytes;
+                      _action = MetadataAction.updated;
+                    });
+                  },
+                  child: (widget.track == null && _bytes == null)
+                      ? _multiplePlaceholder()
+                      : ctxm.ContextMenu(
+                          menu: ctxm.Menu(
+                            items: [
+                              if (_bytes != null)
+                                ctxm.MenuItem(
+                                  label: t.menuEditCopy,
+                                  onClick: (_) => _copy(bytes!),
+                                ),
                               ctxm.MenuItem(
-                                label: t.menuEditCopy,
-                                onClick: (_) => _copy(bytes!),
+                                label: t.menuEditPaste,
+                                onClick: (_) => _paste(),
                               ),
-                            ctxm.MenuItem(
-                              label: t.menuEditPaste,
-                              onClick: (_) => _paste(),
-                            ),
-                            ctxm.MenuItem.separator(),
-                            ctxm.MenuItem(
-                              label: t.menuEditDelete,
-                              onClick: (_) => _delete(),
-                            ),
-                          ],
+                              ctxm.MenuItem.separator(),
+                              ctxm.MenuItem(
+                                label: t.menuEditDelete,
+                                onClick: (_) => _delete(),
+                              ),
+                            ],
+                          ),
+                          child: ArtworkWidget(
+                            bytes: _bytes,
+                            size: kArtworkSize,
+                            radius: 0.0,
+                          ),
                         ),
-                        child: ArtworkWidget(
-                          bytes: _bytes,
-                          size: kArtworkSize,
-                          radius: 0.0,
-                        ),
-                      ),
+                ),
                 const SizedBox(height: 8),
                 _actionButtons()
               ],

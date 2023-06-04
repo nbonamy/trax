@@ -9,6 +9,8 @@ PODS:
     - FlutterMacOS
   - contextual_menu (0.0.1):
     - FlutterMacOS
+  - desktop_drop (0.0.1):
+    - FlutterMacOS
   - ffmpeg-kit-macos-audio (5.1)
   - FLAC-framework (1.4.2-2)
   - FlutterMacOS (1.0.0)
@@ -46,6 +48,7 @@ DEPENDENCIES:
   - audio_session (from `Flutter/ephemeral/.symlinks/plugins/audio_session/macos`)
   - audiotranscode_ffi (from `Flutter/ephemeral/.symlinks/plugins/audiotranscode_ffi/macos`)
   - contextual_menu (from `Flutter/ephemeral/.symlinks/plugins/contextual_menu/macos`)
+  - desktop_drop (from `Flutter/ephemeral/.symlinks/plugins/desktop_drop/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - just_audio (from `Flutter/ephemeral/.symlinks/plugins/just_audio/macos`)
   - macos_ui (from `Flutter/ephemeral/.symlinks/plugins/macos_ui/macos`)
@@ -74,6 +77,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/audiotranscode_ffi/macos
   contextual_menu:
     :path: Flutter/ephemeral/.symlinks/plugins/contextual_menu/macos
+  desktop_drop:
+    :path: Flutter/ephemeral/.symlinks/plugins/desktop_drop/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   just_audio:
@@ -102,6 +107,7 @@ SPEC CHECKSUMS:
   audio_session: dea1f41890dbf1718f04a56f1d6150fd50039b72
   audiotranscode_ffi: 463db511c09bc19f974055764993a9e43685aa30
   contextual_menu: 6d35fb15942c0d8769f5eae8d3bda653994a6f5a
+  desktop_drop: 69eeff437544aa619c8db7f4481b3a65f7696898
   ffmpeg-kit-macos-audio: 1c0a574fd51501c7227a2c8181ffd4e9c2005051
   FLAC-framework: 92d06bed602b884866a5d58048ace29c3206cada
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24

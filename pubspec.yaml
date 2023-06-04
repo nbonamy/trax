@@ -24,6 +24,7 @@ dependencies:
       url: https://github.com/nbonamy/contextual_menu
   audiotranscode_ffi: ^1.2.0
   cached_network_image: ^3.2.3
+  desktop_drop: ^0.4.1
   event_bus: ^2.0.0
   extended_wrap: ^0.1.5
   file_picker: ^5.2.7
