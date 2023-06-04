@@ -322,7 +322,9 @@ class _TraxHomePageState extends State<TraxHomePage>
       notify: true,
       onComplete: () {
         eventBus.fire(SelectArtistAlbumEvent(
-          tracks.first.safeTags.artist,
+          tracks.first.safeTags.compilation
+              ? Track.kArtistCompilations
+              : tracks.first.safeTags.artist,
           tracks.first.safeTags.album,
         ));
       },
