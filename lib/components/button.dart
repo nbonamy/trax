@@ -21,7 +21,7 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     PushButton button = PushButton(
-      buttonSize: ButtonSize.large,
+      controlSize: ControlSize.large,
       padding: EdgeInsets.only(
         top: verticalPadding,
         bottom: verticalPadding + 2,

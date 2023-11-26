@@ -153,8 +153,8 @@
   "transcodeInfoVariousSampleRates": "various sample rates",
   "transcodeInfoVariousBitsPerSample": "various bits per sample",
 
-  "cleanupTitleWithCopyToComment": "Common suffix found in selected tracks titles. Do you want to move it to the comments?",
-  "cleanupTitleWithoutCopyToComment": "Common suffix found in selected tracks titles. Do you want to remove it?",
+  "cleanupTitleCommentsEmpty": "Title notes like \"(Remastered 2023)\" will be moved to comments. Continue?",
+  "cleanupTitleCommentsNotEmpty": "Title notes like \"(Remastered 2023)\" will overwrite current comments. Continue?",
 
   "appName": "Trax"
 

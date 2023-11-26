@@ -20,8 +20,8 @@ class TraxDialog {
       builder: (context) => MacosAlertDialog(
         appIcon: const AppIcon(),
         message: Text(message),
-        primaryButton: SizedBox(
-          width: 100,
+        primaryButton: PushButton(
+          controlSize: ControlSize.large,
           child: Button(
             t.ok,
             onPressed: () => Navigator.of(context).pop(),
@@ -43,6 +43,7 @@ class TraxDialog {
     required DialogCallback onConfirmed,
     DialogCallback? onCancel,
     bool isDestructive = false,
+    bool horizontalActions = true,
     Color? barrierColor,
   }) {
     AppLocalizations t = AppLocalizations.of(context)!;
@@ -63,15 +64,16 @@ class TraxDialog {
           textAlign: TextAlign.center,
           style: MacosTheme.of(context).typography.callout,
         ),
+        horizontalActions: horizontalActions,
         primaryButton: PushButton(
-          isSecondary: isDestructive,
-          buttonSize: ButtonSize.large,
+          secondary: isDestructive,
+          controlSize: ControlSize.large,
           onPressed: () => onConfirmed(context),
           child: Text(confirmLabel ?? t.yes),
         ),
         secondaryButton: PushButton(
-          isSecondary: !isDestructive,
-          buttonSize: ButtonSize.large,
+          secondary: !isDestructive,
+          controlSize: ControlSize.large,
           onPressed: () => onCancel != null
               ? onCancel(context)
               : Navigator.of(context).pop(),
@@ -109,8 +111,8 @@ class TraxDialog {
                   children: [
                     Expanded(
                       child: PushButton(
-                        buttonSize: ButtonSize.small,
-                        isSecondary: true,
+                        controlSize: ControlSize.small,
+                        secondary: true,
                         onPressed: () => onCancel != null
                             ? onCancel(context)
                             : Navigator.of(context).pop(),
@@ -121,7 +123,7 @@ class TraxDialog {
                     Expanded(
                       child: PushButton(
                         color: Colors.green,
-                        buttonSize: ButtonSize.small,
+                        controlSize: ControlSize.small,
                         onPressed: () =>
                             onConfirmed(context, controller.value.text),
                         child: Text(t.ok),

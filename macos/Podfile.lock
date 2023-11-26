@@ -116,9 +116,9 @@ SPEC CHECKSUMS:
   macos_ui: 6229a8922cd97bafb7d9636c8eb8dfb0744183ca
   macos_window_utils: 933f91f64805e2eb91a5bd057cf97cd097276663
   pasteboard: 9b69dba6fedbb04866be632205d532fe2f6b1d99
-  path_provider_foundation: eaf5b3e458fc0e5fbb9940fb09980e853fe058b8
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
-  shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
   taglib-framework: 66b9b6eed87597adb846fcd87669f6122a3a8d0f
   taglib_ffi: a0f65635de6b53d49fa0d59d5ec3d532747e9f62

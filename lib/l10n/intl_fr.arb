@@ -153,8 +153,8 @@
   "transcodeInfoVariousSampleRates": "fréquences variables",
   "transcodeInfoVariousBitsPerSample": "tailles variables",
 
-  "cleanupTitleWithCopyToComment": "Suffixe commun trouvé dans les titres des pistes sélectionnées. Voulez-vous le déplacer vers les commentaires ?",
-  "cleanupTitleWithoutCopyToComment": "Suffixe commun trouvé dans les titres des pistes sélectionnées. Voulez-vous le supprimer ?",
+  "cleanupTitleCommentsEmpty": "Les notes de titre comme \"(Remastered 2023)\" vont être déplacées vers les commentaires. Continuer ?",
+  "cleanupTitleCommentsNotEmpty": "Les notes de titre comme \"(Remastered 2023)\" vont écrasés les commentaires existants. Continuer ?",
 
   "appName": "Trax"
 
