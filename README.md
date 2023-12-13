@@ -1,16 +1,27 @@
 # trax
 
-A new Flutter project.
+macOS Music management application written in Flutter.
+
+- Apple Music like UI
+- Browse local music files
+- Import new files into libraruy (MP3, FLAC, M4A)
+- Edit audio tags (including artwork and lyrics)
+- Audio format conversion
+- Local audio playback
+
+
+<img src="doc/home.jpg" height=256>
+<img src="doc/album.jpg" height=256>
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```
+flutter pub get
+flutter run macos
+```
 
-A few resources to get you started if this is your first Flutter project:
+You can deploy to your `Applications` folder using
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+make deploy
+```
