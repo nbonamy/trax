@@ -111,7 +111,7 @@ class _DraggableDialogState extends State<DraggableDialog> {
                     direction: Axis.vertical,
                     children: [
                       Expanded(child: widget.body),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       widget.footer,
                     ],
                   ),
