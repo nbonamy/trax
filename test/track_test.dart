@@ -5,7 +5,7 @@ import 'package:trax/utils/track_utils.dart';
 import 'test_utils.dart';
 
 void main() {
-  test('isTrack', () {
+  test('getFormat', () {
     expect(Track.getFormat('test.mp3'), Format.mp3);
     expect(Track.getFormat('test.ogg'), Format.vorbis);
     expect(Track.getFormat('test.m4a'), Format.alac);
