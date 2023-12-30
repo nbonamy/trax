@@ -7,7 +7,7 @@ install deploy: release
 	sudo cp -rf ./build/macos/Build/Products/Release/trax.app /Applications
 
 tag = $(filter-out $@,$(MAKECMDGOALS))
-publish:
+publish: release
 	@[ "${tag}" ] && echo "Publishing version ${tag}" || ( echo "Usage: make publish <tag>"; exit 1 )
 	@-cd ./build/macos/Build/Products/Release/ &&  rm trax.zip > /dev/null 2>&1
 	@cd ./build/macos/Build/Products/Release/ &&  zip -q -r trax.zip trax.app
