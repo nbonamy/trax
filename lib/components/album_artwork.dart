@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../model/track.dart';
 import '../utils/consts.dart';
+import '../utils/num_utils.dart';
 import 'artwork_async.dart';
 
 class AlbumArtworkWidget extends StatelessWidget {
@@ -10,6 +11,7 @@ class AlbumArtworkWidget extends StatelessWidget {
   final int trackCount;
   final int playtime;
   final String format;
+  final int filesize;
   const AlbumArtworkWidget({
     super.key,
     required this.track,
@@ -17,6 +19,7 @@ class AlbumArtworkWidget extends StatelessWidget {
     required this.trackCount,
     required this.playtime,
     required this.format,
+    required this.filesize,
   });
 
   @override
@@ -44,6 +47,15 @@ class AlbumArtworkWidget extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   format.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black.withOpacity(Consts.fadedOpacity),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  filesize.formatFilesize(),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

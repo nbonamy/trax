@@ -31,6 +31,8 @@ class _AlbumWidgetState extends State<AlbumWidget> {
   @override
   Widget build(BuildContext context) {
     int trackCount = widget.tracks.length;
+    int filesize =
+        widget.tracks.fold(0, (size, track) => size + track.filesize);
     int playtimeMinutes = (widget.tracks
                 .fold(0, (time, track) => time + track.safeTags.duration) /
             60)
@@ -63,6 +65,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
               trackCount: trackCount,
               playtime: playtimeMinutes,
               format: '$formatString $formatDescription',
+              filesize: filesize,
             ),
             SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
             Expanded(
