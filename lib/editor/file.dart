@@ -84,7 +84,7 @@ class EditorFileWidget extends StatelessWidget {
     bool tabularFigures = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Flex(
         direction: Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +108,7 @@ class EditorFileWidget extends StatelessWidget {
 
   Widget _label(String label, double paddingTop) {
     return SizedBox(
-      width: 130,
+      width: 120,
       child: Padding(
         padding: EdgeInsets.only(top: paddingTop, right: 8),
         child: Text(

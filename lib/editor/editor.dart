@@ -233,7 +233,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     // return
     return DraggableDialog(
       width: 500,
-      height: 585,
+      height: 590,
       preferenceKey: 'editor.alignment',
       header: Row(
         children: [
