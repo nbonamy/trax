@@ -2,7 +2,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:path/path.dart' as path;
 import 'package:taglib_ffi/taglib_ffi.dart';
+import 'package:tuple_dart/tuple_dart.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../browser/browser.dart';
@@ -16,6 +18,7 @@ import '../processors/saver.dart';
 import '../processors/scanner.dart';
 import '../utils/events.dart';
 import '../utils/logger.dart';
+import '../utils/track_utils.dart';
 import 'settings.dart';
 import 'transcoder.dart';
 
@@ -302,14 +305,30 @@ class _TraxHomePageState extends State<TraxHomePage>
     if (result == null) return;
 
     // we need to parse them
+    int index = 1;
     TrackList tracks = [];
     TagLib tagLib = TagLib();
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.import));
     for (String? filepath in result.paths) {
       if (filepath == null) continue;
       Track track = Track.parse(filepath, tagLib);
+      if (track.tags != null) {
+        String filename = path.basenameWithoutExtension(filepath);
+        Tuple2<String, int> parts = TrackUtils.parseTrackFilename(filename);
+        if (track.tags!.title == "") {
+          track.tags!.title = parts.item1;
+        }
+        if (track.tags!.trackIndex == 0) {
+          if (parts.item2 != 0) {
+            track.tags!.trackIndex = parts.item2;
+          } else {
+            track.tags!.trackIndex = index;
+          }
+        }
+      }
       tracks.add(track);
       await Future.delayed(Duration.zero, () {});
+      index++;
     }
     eventBus.fire(BackgroundActionEndEvent(BackgroundAction.import));
 

@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tuple_dart/tuple_dart.dart';
 
 import '../model/track.dart';
 
@@ -8,6 +11,34 @@ extension TrackUtils on Track {
   static AppLocalizations? _t;
   static initLocalization(AppLocalizations? t) {
     _t = t;
+  }
+
+  static Tuple2<String, int> parseTrackFilename(String filename) {
+    // find a separator
+    var index = -1;
+    var index1 = filename.indexOf('-');
+    var index2 = filename.indexOf('.');
+    if (index1 == -1 && index2 == -1) {
+      return Tuple2(filename, 0);
+    } else if (index1 == -1) {
+      index = index2;
+    } else if (index2 == -1) {
+      index = index1;
+    } else {
+      index = min(index1, index2);
+    }
+
+    // new get prefix and check it is only digits
+    var prefix = filename.substring(0, index).trim();
+    if (prefix.isEmpty) return Tuple2(filename, 0);
+    if (prefix.contains(RegExp(r'[^0-9]'))) return Tuple2(filename, 0);
+
+    // get the rest of the filename
+    var rest = filename.substring(index + 1).trim();
+    if (rest.isEmpty) return Tuple2(filename, 0);
+
+    // return the parts
+    return Tuple2(rest, int.parse(prefix));
   }
 
   String get displayTitle {

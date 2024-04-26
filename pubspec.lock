@@ -701,6 +701,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
+  tuple_dart:
+    dependency: "direct main"
+    description:
+      name: tuple_dart
+      sha256: "0db473430e680e43111ae7d0cf4e1c222f0dc20350378c845b70c4daa4195708"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.2"
   typed_data:
     dependency: transitive
     description:
