@@ -6,7 +6,7 @@ class LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingAnimationWidget.prograssiveDots(
+    return LoadingAnimationWidget.progressiveDots(
       size: 64,
       color: CupertinoColors.systemGrey,
     );

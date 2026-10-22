@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:trax/l10n/app_localizations.dart';
 
 import '../utils/consts.dart';
 import '../utils/num_utils.dart';

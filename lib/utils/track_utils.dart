@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:trax/l10n/app_localizations.dart';
 import 'package:tuple_dart/tuple_dart.dart';
 
 import '../model/track.dart';

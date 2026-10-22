@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:trax/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../components/context_menu.dart' as ctxm;

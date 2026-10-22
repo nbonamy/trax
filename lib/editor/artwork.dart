@@ -4,7 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:trax/l10n/app_localizations.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
@@ -183,7 +183,7 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
                 ),
                 if (_checkingMultiple != null && _checkingMultiple!) ...[
                   const SizedBox(height: 8),
-                  LoadingAnimationWidget.prograssiveDots(
+                  LoadingAnimationWidget.progressiveDots(
                     size: 32,
                     color: CupertinoColors.lightBackgroundGray,
                   ),
