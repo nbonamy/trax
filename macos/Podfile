@@ -30,10 +30,22 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  # upstream binaries are gone (ffmpeg-kit) or not self-contained (libogg): see vendor/
+  pod 'ffmpeg-kit-macos-audio', :path => 'vendor/ffmpeg-kit-macos-audio'
+  pod 'libogg-framework', :path => 'vendor/libogg'
+
   flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
 end
 
 post_install do |installer|
+  # the prebuilt FLAC framework ships with homebrew install names, which makes the
+  # app depend on specific homebrew libFLAC and libogg versions at runtime
+  flac = File.join(installer.sandbox.root.to_s, 'FLAC-framework', 'FLAC.framework', 'Versions', 'A', 'FLAC')
+  if File.exist?(flac)
+    system('install_name_tool', '-id', '@rpath/FLAC.framework/Versions/A/FLAC', flac)
+    system('install_name_tool', '-change', '/opt/homebrew/opt/libogg/lib/libogg.0.dylib', '@rpath/Ogg.framework/Versions/A/Ogg', flac)
+  end
+
   installer.pods_project.targets.each do |target|
     flutter_additional_macos_build_settings(target)
     target.build_configurations.each do |config|
