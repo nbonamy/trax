@@ -26,9 +26,9 @@ class FileUtils {
       confirmLabel: AppLocalizations.of(context)?.menuEditDeleteSoft,
       onConfirmed: (context) {
         delete(files).then((value) {
-          Navigator.of(context).pop(true);
+          if (context.mounted) Navigator.of(context).pop(true);
         }).onError((error, stackTrace) {
-          Navigator.of(context).pop();
+          if (context.mounted) Navigator.of(context).pop();
         });
       },
     );

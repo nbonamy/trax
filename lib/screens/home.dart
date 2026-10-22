@@ -333,7 +333,7 @@ class _TraxHomePageState extends State<TraxHomePage>
     eventBus.fire(BackgroundActionEndEvent(BackgroundAction.import));
 
     // now show import
-    // ignore: use_build_context_synchronously
+    if (!mounted) return;
     TagEditorWidget.show(
       context,
       editorMode,

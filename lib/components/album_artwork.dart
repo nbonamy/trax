@@ -41,7 +41,7 @@ class AlbumArtworkWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(Consts.fadedOpacity),
+                    color: Colors.black.withValues(alpha: Consts.fadedOpacity),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -50,7 +50,7 @@ class AlbumArtworkWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(Consts.fadedOpacity),
+                    color: Colors.black.withValues(alpha: Consts.fadedOpacity),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -59,7 +59,7 @@ class AlbumArtworkWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(Consts.fadedOpacity),
+                    color: Colors.black.withValues(alpha: Consts.fadedOpacity),
                   ),
                 ),
               ],

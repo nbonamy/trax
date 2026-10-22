@@ -15,21 +15,13 @@ class PlatformKeyboard {
   }
 
   static bool get selectionExtendActive {
-    return RawKeyboard.instance.keysPressed
+    return HardwareKeyboard.instance.logicalKeysPressed
         .contains(PlatformKeyboard.selectionExtendModifier);
   }
 
   static bool get selectionToggleActive {
-    return RawKeyboard.instance.keysPressed
+    return HardwareKeyboard.instance.logicalKeysPressed
         .contains(PlatformKeyboard.selectionToggleModifier);
-  }
-
-  static bool commandModifierPressed(RawKeyEvent event) {
-    if (metaIsCommandModifier()) {
-      return event.isMetaPressed;
-    } else {
-      return event.isControlPressed;
-    }
   }
 
   static bool metaIsCommandModifier() {

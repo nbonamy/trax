@@ -64,8 +64,8 @@ class ArtistProfilePic extends StatelessWidget {
           ? null
           : BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.black.withOpacity(0.25)),
-              color: Colors.black.withOpacity(0.2),
+              border: Border.all(color: Colors.black.withValues(alpha: 0.25)),
+              color: Colors.black.withValues(alpha: 0.2),
               // gradient: const LinearGradient(
               //   begin: Alignment.bottomCenter,
               //   end: Alignment.topCenter,
@@ -78,7 +78,7 @@ class ArtistProfilePic extends StatelessWidget {
       child: MacosIcon(
         _iconData,
         size: _kIconSize,
-        color: selected ? Colors.white : Colors.black.withOpacity(0.7),
+        color: selected ? Colors.white : Colors.black.withValues(alpha: 0.7),
       ),
     );
   }

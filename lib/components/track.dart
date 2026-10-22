@@ -31,7 +31,7 @@ class TrackWidget extends StatelessWidget {
         Color bgColor = selected ? Colors.blue : Colors.transparent;
         Color fgColor = selected ? Colors.white : Colors.black;
         Color fgColor2 =
-            selected ? fgColor : fgColor.withOpacity(Consts.fadedOpacity);
+            selected ? fgColor : fgColor.withValues(alpha: Consts.fadedOpacity);
         return GestureDetector(
           onTapDown: (_) => onTap(track),
           onDoubleTap: () => onDoubleTap(track),

@@ -41,12 +41,12 @@ class _StatusBarWidgetState extends State<StatusBarWidget> {
                         onTap: () => widget.onStop?.call(),
                         child: Icon(
                           CupertinoIcons.stop_circle,
-                          color: Colors.black.withOpacity(0.8),
+                          color: Colors.black.withValues(alpha: 0.8),
                           size: 12,
                         ),
                       )
                     : LoadingAnimationWidget.staggeredDotsWave(
-                        color: Colors.black.withOpacity(0.8),
+                        color: Colors.black.withValues(alpha: 0.8),
                         size: 12,
                       ),
               ),

@@ -48,7 +48,7 @@ class HeaderAlbumWidget extends StatelessWidget {
           '$genreStr${yearStr == null ? "" : " · $yearStr"}${durationStr == null ? "" : " · $durationStr"}',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.black.withOpacity(Consts.fadedOpacity),
+            color: Colors.black.withValues(alpha: Consts.fadedOpacity),
             fontSize: 12,
           ),
         ),

@@ -316,7 +316,8 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                 ),
             ],
           ),
-          if (_saveInProgress) Container(color: Colors.white.withOpacity(0.5)),
+          if (_saveInProgress)
+            Container(color: Colors.white.withValues(alpha: 0.5)),
         ],
       ),
       footer: Row(

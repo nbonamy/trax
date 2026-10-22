@@ -56,7 +56,8 @@ class TrackListWidget extends StatelessWidget {
                     'Disc ${track.volumeIndex}'.toUpperCase(),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.black.withOpacity(Consts.fadedOpacity),
+                      color:
+                          Colors.black.withValues(alpha: Consts.fadedOpacity),
                       fontSize: 13,
                     ),
                   ),

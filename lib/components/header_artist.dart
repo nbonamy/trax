@@ -78,7 +78,7 @@ class _HeaderArtistWidgetState extends State<HeaderArtistWidget> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Colors.black.withOpacity(Consts.fadedOpacity),
+              color: Colors.black.withValues(alpha: Consts.fadedOpacity),
             ),
           ),
         ],
