@@ -7,6 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
 import '../model/library_health.dart';
+import '../model/library_query.dart';
 import '../model/track.dart';
 import '../utils/logger.dart';
 import '../utils/path_utils.dart';
@@ -83,19 +84,47 @@ class TraxDatabase extends ChangeNotifier {
   }
 
   Future<LibraryHealth> health() async {
-    final List<Map> resultSet = await _database!.rawQuery(
-        'SELECT artist, album, genre, year, format, bitrate, compilation FROM tracks');
+    final List<Map> resultSet = await _database!
+        .rawQuery('SELECT artist, album, genre, year, compilation FROM tracks');
     return LibraryHealth.compute(resultSet
         .map((r) => HealthRow(
               artist: r['artist'].toString(),
               album: r['album'].toString(),
               genre: r['genre'].toString(),
               year: int.tryParse(r['year'].toString()) ?? 0,
-              lossy: Track.isBitrateFormat(r['format'].toString().toFormat()),
-              bitrate: r['bitrate'] ?? 0,
               compilation: r['compilation'] == 1,
             ))
         .toList());
+  }
+
+  /// Tracks whose title, album, artist or performer contain every word.
+  Future<TrackList> searchTracks(String query, {int limit = 2000}) async {
+    final List<String> tokens = LibraryQuery.tokens(query);
+    if (tokens.isEmpty) return [];
+    final List<String> clauses = [];
+    final List<Object> args = [];
+    for (final String token in tokens) {
+      final String pattern =
+          '%${token.replaceAll(r'\', r'\\').replaceAll('%', r'\%').replaceAll('_', r'\_')}%';
+      clauses.add(
+          "(LOWER(title) LIKE (?) ESCAPE '\\' OR LOWER(album) LIKE (?) ESCAPE '\\' OR LOWER(artist) LIKE (?) ESCAPE '\\' OR LOWER(performer) LIKE (?) ESCAPE '\\')");
+      args.addAll([pattern, pattern, pattern, pattern]);
+    }
+    final List<Map> resultSet = await _database!.rawQuery(
+        'SELECT * FROM tracks WHERE ${clauses.join(' AND ')} LIMIT $limit',
+        args);
+    return resultSet.map(_dehydrateTrack).toList();
+  }
+
+  Future<TrackList> allTracks() async {
+    final List<Map> resultSet =
+        await _database!.rawQuery('SELECT * FROM tracks');
+    return resultSet.map(_dehydrateTrack).toList();
+  }
+
+  /// Exactly the tracks a review screen has to show.
+  Future<TrackList> reviewTracks(ReviewKind kind) async {
+    return LibraryQuery.reviewTracks(kind, await allTracks());
   }
 
   Future<bool> get isEmpty async {
@@ -270,7 +299,7 @@ class TraxDatabase extends ChangeNotifier {
 
   Future<void> _createSchema(Database db, int version) async {
     // tracks table
-    await _database!.execute('''
+    await db.execute('''
     CREATE TABLE tracks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       filename TEXT UNIQUE, filesize INTEGER, last_modification INTEGER, format TEXT,
@@ -283,7 +312,7 @@ class TraxDatabase extends ChangeNotifier {
     ''');
 
     // indexes
-    await _database!.execute('''
+    await db.execute('''
       CREATE INDEX tracks_idx1 ON tracks(artist, compilation);
     ''');
   }

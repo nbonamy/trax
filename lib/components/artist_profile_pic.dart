@@ -8,7 +8,7 @@ import 'trax_colors.dart';
 /// Round avatar of an artist: their picture when one can be found, otherwise a
 /// colored monogram that is stable for a given name.
 class ArtistProfilePic extends StatelessWidget {
-  static const double kDefaultSize = 22;
+  static const double kDefaultSize = 24;
 
   final String name;
   final bool selected;

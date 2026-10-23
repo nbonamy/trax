@@ -67,33 +67,34 @@ void main() {
   });
 
   group('tidy panel', () {
-    testWidgets('lists what needs attention and jumps to it', (tester) async {
-      final SelectArtistAlbumEvent? jumped =
-          await _captureJump(tester, () async {
-        await tester.pumpWidget(await bootstrapWidget(
-          tester,
-          const TidyPanel(
-            health: LibraryHealth(
-              totalTracks: 100,
-              lowBitrateTracks: 12,
-              mixedGenreAlbums: 1,
-              affectedTracks: 20,
-              firstLowBitrate: HealthTarget('AaRON', 'Artificial Animals'),
-            ),
+    testWidgets('lists what needs attention and opens its review',
+        (tester) async {
+      final List<ShowReviewEvent> shown = [];
+      final sub = eventBus.on<ShowReviewEvent>().listen(shown.add);
+      await tester.pumpWidget(await bootstrapWidget(
+        tester,
+        const TidyPanel(
+          health: LibraryHealth(
+            totalTracks: 100,
+            mixedGenreAlbums: 1,
+            noYearTracks: 5,
+            affectedTracks: 20,
           ),
-        ));
-        await tester.pumpAndSettle();
-        expect(find.text('2 things to tidy'), findsOneWidget);
-        expect(find.text('12 tracks are below 192 kbps'), findsOneWidget);
-        expect(find.text('1 album mixes several genres'), findsOneWidget);
-        expect(find.text('80%'), findsOneWidget);
-        // only the problem we can point at gets a Review button
-        expect(find.text('Review'), findsOneWidget);
-        await tester.tap(find.text('Review'));
-        await tester.pump();
-      });
-      expect(jumped?.artist, 'AaRON');
-      expect(jumped?.album, 'Artificial Animals');
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('2 things to tidy'), findsOneWidget);
+      expect(find.text('1 album mixes several genres'), findsOneWidget);
+      expect(find.text('5 tracks have no year'), findsOneWidget);
+      expect(find.text('80%'), findsOneWidget);
+      expect(find.text('Review'), findsNWidgets(2));
+      // bitrate is not something to tidy
+      expect(find.textContaining('kbps'), findsNothing);
+
+      await tester.tap(find.text('Review').last);
+      await tester.pump();
+      sub.cancel();
+      expect(shown.map((e) => e.kind), [ReviewKind.noYear]);
     });
 
     testWidgets('a tidy library says so', (tester) async {
@@ -177,18 +178,4 @@ void main() {
       expect(opacity.opacity, 0);
     });
   });
-}
-
-/// Runs [body] while recording the first album jump requested on the bus.
-/// (Not awaiting the cancel: inside testWidgets' fake clock it never completes.)
-Future<SelectArtistAlbumEvent?> _captureJump(
-  WidgetTester tester,
-  Future<void> Function() body,
-) async {
-  SelectArtistAlbumEvent? seen;
-  final sub = eventBus.on<SelectArtistAlbumEvent>().listen((e) => seen ??= e);
-  await body();
-  await tester.pump();
-  sub.cancel();
-  return seen;
 }

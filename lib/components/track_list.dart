@@ -13,6 +13,7 @@ class TrackListWidget extends StatelessWidget {
   final TrackCallback onExecuteTrack;
   final bool shrinkWrap;
   final bool primary;
+  final TrackColumns columns;
   const TrackListWidget({
     super.key,
     required this.tracks,
@@ -20,6 +21,7 @@ class TrackListWidget extends StatelessWidget {
     required this.onExecuteTrack,
     this.shrinkWrap = true,
     this.primary = true,
+    this.columns = const TrackColumns(),
   });
 
   @override
@@ -44,6 +46,7 @@ class TrackListWidget extends StatelessWidget {
       rows.add(TrackWidget(
         track: tracks[i],
         index: i,
+        columns: columns,
         onTap: (track) => onSelectTrack(track, tracks),
         onDoubleTap: (track) => onExecuteTrack(track, tracks),
       ));
@@ -63,6 +66,16 @@ class TrackListWidget extends StatelessWidget {
             children: [
               SizedBox(width: 36, child: Text('#', style: headerStyle)),
               Expanded(child: Text(t.trackColumnTitle, style: headerStyle)),
+              if (columns.genre)
+                SizedBox(
+                  width: 110,
+                  child: Text(t.trackColumnGenre, style: headerStyle),
+                ),
+              if (columns.year)
+                SizedBox(
+                  width: 56,
+                  child: Text(t.trackColumnYear, style: headerStyle),
+                ),
               SizedBox(
                 width: 112,
                 child: Text(t.trackColumnFormat, style: headerStyle),

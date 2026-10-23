@@ -6,7 +6,7 @@ import 'trax_colors.dart';
 
 /// One row of the source list.
 class ArtistWidget extends StatefulWidget {
-  static const double kHeight = 32;
+  static const double kHeight = 34;
 
   final String name;
   final bool selected;
@@ -56,7 +56,7 @@ class _ArtistWidgetState extends State<ArtistWidget> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: widget.selected ? colors.accentInk : colors.text,
                   ),
@@ -84,7 +84,7 @@ class SidebarSectionHeader extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
           color: TraxColors.of(context).faint,
         ),

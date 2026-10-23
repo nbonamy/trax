@@ -6,18 +6,25 @@ import 'package:trax/l10n/app_localizations.dart';
 import '../model/track.dart';
 import 'album_artwork.dart';
 import 'header_album.dart';
+import 'track.dart';
 import 'track_list.dart';
 
 typedef TrackCallback = void Function(Track, TrackList);
 
 class AlbumWidget extends StatefulWidget {
   final String title;
+
+  /// Shown above the title when albums of several artists are listed.
+  final String? artist;
+  final TrackColumns columns;
   final TrackList tracks;
   final TrackCallback onSelectTrack;
   final TrackCallback onExecuteTrack;
   const AlbumWidget({
     super.key,
     required this.title,
+    this.artist,
+    this.columns = const TrackColumns(),
     required this.tracks,
     required this.onSelectTrack,
     required this.onExecuteTrack,
@@ -74,6 +81,9 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                 children: [
                   HeaderAlbumWidget(
                     title: widget.title,
+                    artist: widget.artist,
+                    showDetails: widget.columns.genre == false &&
+                        widget.columns.year == false,
                     genre: widget.tracks.first.safeTags.genre,
                     year: widget.tracks.first.safeTags.year,
                     duration: 0, //widget.tracks.duration,
@@ -81,6 +91,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                   const SizedBox(height: 14),
                   TrackListWidget(
                     tracks: widget.tracks,
+                    columns: widget.columns,
                     onSelectTrack: widget.onSelectTrack,
                     onExecuteTrack: widget.onExecuteTrack,
                     primary: false,

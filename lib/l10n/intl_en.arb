@@ -99,8 +99,6 @@
   "tidyAllGood": "Everything is in order",
   "tidyIssues": "{count,plural ,=1{One thing to tidy} other{{count} things to tidy}}",
   "@tidyIssues": { "placeholders": { "count": { "type": "int" } } },
-  "tidyLowBitrate": "{count,plural ,=1{1 track is} other{{count} tracks are}} below 192 kbps",
-  "@tidyLowBitrate": { "placeholders": { "count": { "type": "int" } } },
   "tidyMixedGenres": "{count,plural ,=1{1 album mixes} other{{count} albums mix}} several genres",
   "@tidyMixedGenres": { "placeholders": { "count": { "type": "int" } } },
   "tidyNoYear": "{count,plural ,=1{1 track has} other{{count} tracks have}} no year",
@@ -108,7 +106,17 @@
   "tidyReview": "Review",
 
   "recentLossless": "lossless",
-  "recentLowBitrate": "low",
+
+  "searchResultsTitle": "Results for “{query}”",
+  "@searchResultsTitle": { "placeholders": { "query": {} } },
+  "searchNoResults": "No tracks match “{query}”.",
+  "@searchNoResults": { "placeholders": { "query": {} } },
+  "reviewMixedGenresTitle": "Albums with several genres",
+  "reviewNoYearTitle": "Tracks without a year",
+  "reviewMixedGenresHint": "Open a track's tags to give every track of an album the same genre.",
+  "reviewNoYearHint": "Select tracks and edit their tags to set the year.",
+  "trackColumnGenre": "Genre",
+  "trackColumnYear": "Year",
 
   "albumsAndSongs": "{albums,plural ,=1{1 album} other{{albums} albums}}, {songs,plural ,=1{1 song} other{{songs} songs}}",
   "@albumsAndSongs": { "placeholders": { "albums": { "type": "int" }, "songs": { "type": "int" } } },

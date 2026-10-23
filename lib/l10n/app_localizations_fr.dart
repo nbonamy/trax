@@ -271,17 +271,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String tidyLowBitrate(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count pistes sont',
-      one: '1 piste est',
-    );
-    return '$_temp0 en dessous de 192 kbps';
-  }
-
-  @override
   String tidyMixedGenres(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -310,7 +299,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get recentLossless => 'sans perte';
 
   @override
-  String get recentLowBitrate => 'faible';
+  String searchResultsTitle(Object query) {
+    return 'Résultats pour « $query »';
+  }
+
+  @override
+  String searchNoResults(Object query) {
+    return 'Aucune piste ne correspond à « $query ».';
+  }
+
+  @override
+  String get reviewMixedGenresTitle => 'Albums avec plusieurs genres';
+
+  @override
+  String get reviewNoYearTitle => 'Pistes sans année';
+
+  @override
+  String get reviewMixedGenresHint =>
+      'Modifiez les tags pour donner le même genre à toutes les pistes d\'un album.';
+
+  @override
+  String get reviewNoYearHint =>
+      'Sélectionnez des pistes et modifiez leurs tags pour définir l\'année.';
+
+  @override
+  String get trackColumnGenre => 'Genre';
+
+  @override
+  String get trackColumnYear => 'Année';
 
   @override
   String albumsAndSongs(int albums, int songs) {

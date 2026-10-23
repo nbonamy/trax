@@ -1,7 +1,9 @@
 import 'dart:ui' show Brightness;
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart' hide Tags;
+import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/model/library_health.dart';
+import 'package:trax/model/library_query.dart';
 import 'package:trax/model/track.dart';
 import 'package:trax/utils/monogram.dart';
 
@@ -10,8 +12,6 @@ HealthRow row({
   String album = 'GUTS',
   String genre = 'Pop',
   int year = 2023,
-  bool lossy = false,
-  int bitrate = 0,
   bool compilation = false,
 }) =>
     HealthRow(
@@ -19,9 +19,34 @@ HealthRow row({
       album: album,
       genre: genre,
       year: year,
-      lossy: lossy,
-      bitrate: bitrate,
       compilation: compilation,
+    );
+
+Track track(
+  String title, {
+  String artist = 'Olivia Rodrigo',
+  String album = 'GUTS',
+  String genre = 'Pop',
+  int year = 2023,
+  int index = 1,
+  int volume = 1,
+  bool compilation = false,
+}) =>
+    Track(
+      filename: '/m/$artist/$album/$title.flac',
+      filesize: 1,
+      lastModified: 0,
+      format: Format.flac,
+      tags: Tags(
+        title: title,
+        album: album,
+        artist: artist,
+        genre: genre,
+        year: year,
+        trackIndex: index,
+        volumeIndex: volume,
+        compilation: compilation,
+      ),
     );
 
 void main() {
@@ -33,22 +58,10 @@ void main() {
     });
 
     test('a clean library scores 100', () {
-      final h =
-          LibraryHealth.compute([row(), row(), row(lossy: true, bitrate: 320)]);
+      final h = LibraryHealth.compute([row(), row(), row(album: 'SOUR')]);
       expect(h.isTidy, isTrue);
       expect(h.issueCount, 0);
       expect(h.score, 100);
-    });
-
-    test('flags lossy tracks below 192 kbps, never lossless ones', () {
-      final h = LibraryHealth.compute([
-        row(lossy: true, bitrate: 181),
-        row(lossy: true, bitrate: 192),
-        row(lossy: false, bitrate: 0),
-        row(lossy: true, bitrate: 0), // unknown bitrate is not a verdict
-      ]);
-      expect(h.lowBitrateTracks, 1);
-      expect(h.firstLowBitrate?.album, 'GUTS');
     });
 
     test('flags albums whose tracks disagree on genre', () {
@@ -60,22 +73,19 @@ void main() {
         row(album: 'SOUR', genre: ''), // empty is not a genre
       ]);
       expect(h.mixedGenreAlbums, 1);
-      expect(h.firstMixedGenre?.album, 'SOUR');
     });
 
-    test('compilations may mix genres and are reviewed under Compilations', () {
+    test('compilations may mix genres', () {
       final h = LibraryHealth.compute([
         row(album: 'Hits', genre: 'Pop', compilation: true),
-        row(album: 'Hits', genre: 'Rock', compilation: true, year: 0),
+        row(album: 'Hits', genre: 'Rock', compilation: true),
       ]);
       expect(h.mixedGenreAlbums, 0);
-      expect(h.firstNoYear?.artist, Track.kArtistCompilations);
     });
 
     test('flags tracks without a year', () {
       final h = LibraryHealth.compute([row(year: 0), row(), row(year: 0)]);
       expect(h.noYearTracks, 2);
-      expect(h.firstNoYear?.artist, 'Olivia Rodrigo');
     });
 
     test('score is the share of tracks without any issue', () {
@@ -92,11 +102,102 @@ void main() {
 
     test('a track with several issues is only counted once', () {
       final h = LibraryHealth.compute([
-        row(year: 0, lossy: true, bitrate: 128),
-        row(),
+        row(year: 0, genre: 'Pop'),
+        row(year: 0, genre: 'Rock'),
+        row(album: 'Other'),
       ]);
-      expect(h.affectedTracks, 1);
-      expect(h.score, 50);
+      expect(h.affectedTracks, 2);
+      expect(h.score, 33);
+    });
+  });
+
+  group('review: exactly what the panel counted', () {
+    final all = [
+      track('a', album: 'GUTS', genre: 'Pop', index: 1),
+      track('b', album: 'GUTS', genre: 'Rock', index: 2),
+      track('c', album: 'SOUR', genre: 'Pop', year: 0),
+      track('d', album: 'SOUR', genre: 'Pop'),
+      track('e', album: 'Clean'),
+    ];
+
+    test('mixed genres lists every track of every such album', () {
+      final tracks = LibraryQuery.reviewTracks(ReviewKind.mixedGenres, all);
+      expect(tracks.map((t) => t.safeTags.title), ['a', 'b']);
+      final h = LibraryHealth.compute(all.map(HealthRow.fromTrack).toList());
+      expect(
+        LibraryQuery.groupAlbums(tracks).length,
+        h.mixedGenreAlbums,
+      );
+    });
+
+    test('no year lists only the tracks without one', () {
+      final tracks = LibraryQuery.reviewTracks(ReviewKind.noYear, all);
+      expect(tracks.map((t) => t.safeTags.title), ['c']);
+      final h = LibraryHealth.compute(all.map(HealthRow.fromTrack).toList());
+      expect(tracks.length, h.noYearTracks);
+    });
+
+    test('nothing to review, nothing listed', () {
+      expect(
+        LibraryQuery.reviewTracks(ReviewKind.noYear, [track('a')]),
+        isEmpty,
+      );
+    });
+  });
+
+  group('grouping', () {
+    test('albums by artist then year, tracks in disc and track order', () {
+      final groups = LibraryQuery.groupAlbums([
+        track('late', artist: 'The Zebras', album: 'Z2', year: 2010),
+        track('t2', album: 'GUTS', year: 2023, index: 2),
+        track('t1', album: 'GUTS', year: 2023, index: 1),
+        track('old', album: 'SOUR', year: 2021),
+        track('d2', artist: 'Aaron', album: 'Two Discs', volume: 2, index: 1),
+        track('d1', artist: 'Aaron', album: 'Two Discs', volume: 1, index: 9),
+      ]);
+      expect(groups.map((g) => g.album), ['Two Discs', 'SOUR', 'GUTS', 'Z2']);
+      expect(groups[2].tracks.map((t) => t.safeTags.title), ['t1', 't2']);
+      expect(groups[0].tracks.map((t) => t.safeTags.title), ['d1', 'd2']);
+    });
+
+    test('compilations are grouped together whoever the artist is', () {
+      final groups = LibraryQuery.groupAlbums([
+        track('a', artist: 'X', album: 'Hits', compilation: true),
+        track('b', artist: 'Y', album: 'Hits', compilation: true),
+        track('c', artist: 'X', album: 'Hits'), // not a compilation
+      ]);
+      expect(groups.length, 2);
+      expect(
+        groups
+            .where((g) => g.artist == Track.kArtistCompilations)
+            .single
+            .tracks
+            .length,
+        2,
+      );
+    });
+  });
+
+  group('search matching', () {
+    final t = track('vampire', album: 'GUTS');
+
+    test('tokens', () {
+      expect(LibraryQuery.tokens('  Olivia   GUTS '), ['olivia', 'guts']);
+      expect(LibraryQuery.tokens('   '), isEmpty);
+    });
+
+    test('every word must match somewhere, in any order', () {
+      expect(LibraryQuery.matches(t, LibraryQuery.tokens('vamp')), isTrue);
+      expect(
+          LibraryQuery.matches(t, LibraryQuery.tokens('rodrigo guts')), isTrue);
+      expect(
+          LibraryQuery.matches(t, LibraryQuery.tokens('guts olivia')), isTrue);
+      expect(LibraryQuery.matches(t, LibraryQuery.tokens('vampire sour')),
+          isFalse);
+    });
+
+    test('an empty search matches nothing', () {
+      expect(LibraryQuery.matches(t, const []), isFalse);
     });
   });
 

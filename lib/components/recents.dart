@@ -2,7 +2,6 @@ import 'package:extended_wrap/extended_wrap.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:trax/l10n/app_localizations.dart';
 
-import '../model/library_health.dart';
 import '../model/track.dart';
 import '../utils/events.dart';
 import '../utils/track_utils.dart';
@@ -10,29 +9,19 @@ import 'artwork_async.dart';
 import 'database_builder.dart';
 import 'trax_colors.dart';
 
-/// "FLAC · lossless" or "MP3 181 kbps · low": what an album is made of.
+/// "FLAC · lossless" or "MP3 181 kbps": what an album is made of.
 class FormatChip {
   final String text;
-  final bool warning;
-  const FormatChip(this.text, {this.warning = false});
+  const FormatChip(this.text);
 
-  static FormatChip? of(
-    Track track, {
-    required String losslessLabel,
-    required String lowLabel,
-  }) {
+  static FormatChip? of(Track track, {required String losslessLabel}) {
     if (track.tags == null || track.format == Format.notAudio) return null;
     final String name = track.formatStringShort;
     if (Track.isBitrateFormat(track.format)) {
       final int bitrate = track.safeTags.bitrate;
-      if (bitrate <= 0) return FormatChip(name);
-      final bool low = bitrate < LibraryHealth.kMinBitrate;
-      return FormatChip(
-        '$name $bitrate kbps${low ? ' · $lowLabel' : ''}',
-        warning: low,
-      );
+      return FormatChip(bitrate > 0 ? '$name $bitrate kbps' : name);
     }
-    return FormatChip('$name · $losslessLabel');
+    return FormatChip('$name \u00b7 $losslessLabel');
   }
 }
 
@@ -74,11 +63,8 @@ class _RecentCardState extends State<_RecentCard> {
     final AppLocalizations t = AppLocalizations.of(context)!;
     final TraxColors colors = TraxColors.of(context);
     final Track track = widget.track;
-    final FormatChip? chip = FormatChip.of(
-      track,
-      losslessLabel: t.recentLossless,
-      lowLabel: t.recentLowBitrate,
-    );
+    final FormatChip? chip =
+        FormatChip.of(track, losslessLabel: t.recentLossless);
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
@@ -151,7 +137,7 @@ class _RecentCardState extends State<_RecentCard> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: chip.warning ? colors.warning : colors.hover,
+                      color: colors.hover,
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Text(

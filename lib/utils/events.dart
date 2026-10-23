@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:event_bus/event_bus.dart';
 
+import '../model/library_health.dart';
 import '../model/menu_actions.dart';
 
 extension MenuBus on EventBus {
@@ -46,4 +47,9 @@ class StopTranscodeEvent {}
 class ImportFilesEvent {
   final List<String> paths;
   ImportFilesEvent(this.paths);
+}
+
+class ShowReviewEvent {
+  final ReviewKind kind;
+  ShowReviewEvent(this.kind);
 }

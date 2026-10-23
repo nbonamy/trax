@@ -7,12 +7,16 @@ import 'trax_colors.dart';
 
 class HeaderAlbumWidget extends StatelessWidget {
   final String title;
+  final String? artist;
+  final bool showDetails;
   final String genre;
   final int year;
   final int duration;
   const HeaderAlbumWidget({
     super.key,
     required this.title,
+    this.artist,
+    this.showDetails = true,
     required this.genre,
     required this.year,
     required this.duration,
@@ -47,10 +51,16 @@ class HeaderAlbumWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          '$genreStr${yearStr == null ? "" : " · $yearStr"}${durationStr == null ? "" : " · $durationStr"}',
-          style: TextStyle(fontSize: 12, color: colors.muted),
-        ),
+        if (artist != null || showDetails)
+          Text(
+            [
+              if (artist != null) TrackUtils.getDisplayArtist(artist!),
+              if (showDetails) genreStr,
+              if (showDetails && yearStr != null) yearStr,
+              if (showDetails && durationStr != null) durationStr,
+            ].join(' · '),
+            style: TextStyle(fontSize: 12, color: colors.muted),
+          ),
       ],
     );
   }

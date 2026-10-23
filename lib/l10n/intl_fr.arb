@@ -99,8 +99,6 @@
   "tidyAllGood": "Tout est en ordre",
   "tidyIssues": "{count,plural ,=1{Une chose à ranger} other{{count} choses à ranger}}",
   "@tidyIssues": { "placeholders": { "count": { "type": "int" } } },
-  "tidyLowBitrate": "{count,plural ,=1{1 piste est} other{{count} pistes sont}} en dessous de 192 kbps",
-  "@tidyLowBitrate": { "placeholders": { "count": { "type": "int" } } },
   "tidyMixedGenres": "{count,plural ,=1{1 album mélange} other{{count} albums mélangent}} plusieurs genres",
   "@tidyMixedGenres": { "placeholders": { "count": { "type": "int" } } },
   "tidyNoYear": "{count,plural ,=1{1 piste n'a} other{{count} pistes n'ont}} pas d'année",
@@ -108,7 +106,17 @@
   "tidyReview": "Voir",
 
   "recentLossless": "sans perte",
-  "recentLowBitrate": "faible",
+
+  "searchResultsTitle": "Résultats pour « {query} »",
+  "@searchResultsTitle": { "placeholders": { "query": {} } },
+  "searchNoResults": "Aucune piste ne correspond à « {query} ».",
+  "@searchNoResults": { "placeholders": { "query": {} } },
+  "reviewMixedGenresTitle": "Albums avec plusieurs genres",
+  "reviewNoYearTitle": "Pistes sans année",
+  "reviewMixedGenresHint": "Modifiez les tags pour donner le même genre à toutes les pistes d'un album.",
+  "reviewNoYearHint": "Sélectionnez des pistes et modifiez leurs tags pour définir l'année.",
+  "trackColumnGenre": "Genre",
+  "trackColumnYear": "Année",
 
   "albumsAndSongs": "{albums,plural ,=1{1 album} other{{albums} albums}}, {songs,plural ,=1{1 morceau} other{{songs} morceaux}}",
   "@albumsAndSongs": { "placeholders": { "albums": { "type": "int" }, "songs": { "type": "int" } } },

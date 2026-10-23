@@ -4,8 +4,12 @@ import 'package:macos_ui/macos_ui.dart';
 import 'trax_colors.dart';
 
 class SearchBoxWidget extends StatelessWidget {
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
   const SearchBoxWidget({
     super.key,
+    this.controller,
+    this.onChanged,
   });
 
   @override
@@ -17,6 +21,8 @@ class SearchBoxWidget extends StatelessWidget {
         vertical: 8,
       ),
       child: MacosSearchField(
+        controller: controller,
+        onChanged: onChanged,
         decoration: BoxDecoration(
           color: colors.well,
           border: Border.all(color: colors.line),

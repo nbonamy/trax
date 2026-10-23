@@ -549,12 +549,6 @@ abstract class AppLocalizations {
   /// **'{count,plural ,=1{One thing to tidy} other{{count} things to tidy}}'**
   String tidyIssues(int count);
 
-  /// No description provided for @tidyLowBitrate.
-  ///
-  /// In en, this message translates to:
-  /// **'{count,plural ,=1{1 track is} other{{count} tracks are}} below 192 kbps'**
-  String tidyLowBitrate(int count);
-
   /// No description provided for @tidyMixedGenres.
   ///
   /// In en, this message translates to:
@@ -579,11 +573,53 @@ abstract class AppLocalizations {
   /// **'lossless'**
   String get recentLossless;
 
-  /// No description provided for @recentLowBitrate.
+  /// No description provided for @searchResultsTitle.
   ///
   /// In en, this message translates to:
-  /// **'low'**
-  String get recentLowBitrate;
+  /// **'Results for “{query}”'**
+  String searchResultsTitle(Object query);
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No tracks match “{query}”.'**
+  String searchNoResults(Object query);
+
+  /// No description provided for @reviewMixedGenresTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Albums with several genres'**
+  String get reviewMixedGenresTitle;
+
+  /// No description provided for @reviewNoYearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks without a year'**
+  String get reviewNoYearTitle;
+
+  /// No description provided for @reviewMixedGenresHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a track\'s tags to give every track of an album the same genre.'**
+  String get reviewMixedGenresHint;
+
+  /// No description provided for @reviewNoYearHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select tracks and edit their tags to set the year.'**
+  String get reviewNoYearHint;
+
+  /// No description provided for @trackColumnGenre.
+  ///
+  /// In en, this message translates to:
+  /// **'Genre'**
+  String get trackColumnGenre;
+
+  /// No description provided for @trackColumnYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get trackColumnYear;
 
   /// No description provided for @albumsAndSongs.
   ///

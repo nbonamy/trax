@@ -1,13 +1,14 @@
 import 'track.dart';
 
+/// What a review screen shows: only the data that has the problem.
+enum ReviewKind { mixedGenres, noYear }
+
 /// The few tag facts needed to judge how tidy a library is.
 class HealthRow {
   final String artist;
   final String album;
   final String genre;
   final int year;
-  final bool lossy;
-  final int bitrate;
   final bool compilation;
 
   const HealthRow({
@@ -15,46 +16,37 @@ class HealthRow {
     required this.album,
     required this.genre,
     required this.year,
-    required this.lossy,
-    required this.bitrate,
     this.compilation = false,
   });
-}
 
-/// Where to send the user to look at a problem.
-class HealthTarget {
-  final String artist;
-  final String album;
-  const HealthTarget(this.artist, this.album);
+  factory HealthRow.fromTrack(Track track) {
+    return HealthRow(
+      artist: track.safeTags.artist,
+      album: track.safeTags.album,
+      genre: track.safeTags.genre,
+      year: track.safeTags.year,
+      compilation: track.safeTags.compilation,
+    );
+  }
+
+  String get albumKey => LibraryHealth.albumKey(artist, album, compilation);
 }
 
 class LibraryHealth {
-  static const int kMinBitrate = 192;
-
   final int totalTracks;
-  final int lowBitrateTracks;
   final int mixedGenreAlbums;
   final int noYearTracks;
   final int affectedTracks;
-  final HealthTarget? firstLowBitrate;
-  final HealthTarget? firstMixedGenre;
-  final HealthTarget? firstNoYear;
 
   const LibraryHealth({
     this.totalTracks = 0,
-    this.lowBitrateTracks = 0,
     this.mixedGenreAlbums = 0,
     this.noYearTracks = 0,
     this.affectedTracks = 0,
-    this.firstLowBitrate,
-    this.firstMixedGenre,
-    this.firstNoYear,
   });
 
   int get issueCount =>
-      (lowBitrateTracks > 0 ? 1 : 0) +
-      (mixedGenreAlbums > 0 ? 1 : 0) +
-      (noYearTracks > 0 ? 1 : 0);
+      (mixedGenreAlbums > 0 ? 1 : 0) + (noYearTracks > 0 ? 1 : 0);
 
   bool get isTidy => issueCount == 0;
 
@@ -66,72 +58,42 @@ class LibraryHealth {
     return (clean * 100).floor().clamp(0, 100);
   }
 
-  factory LibraryHealth.compute(List<HealthRow> rows) {
-    int total = 0;
-    int lowBitrate = 0;
-    int noYear = 0;
-    HealthTarget? firstLow;
-    HealthTarget? firstNoYear;
+  /// Same album, same key: case does not matter, compilations are one bucket
+  /// per album title whoever the track artist is.
+  static String albumKey(String artist, String album, bool compilation) {
+    final String who = compilation ? '\u0001' : artist.toLowerCase();
+    return '$who\u0000${album.toLowerCase()}';
+  }
 
-    // album key -> genres seen and tracks in it
+  /// Albums whose tracks disagree on genre. Empty genres are not a genre, and
+  /// compilations are expected to mix them.
+  static Set<String> mixedGenreAlbumKeys(List<HealthRow> rows) {
     final Map<String, Set<String>> genres = {};
-    final Map<String, int> albumTracks = {};
-    final Map<String, HealthTarget> albumTarget = {};
-
     for (final HealthRow row in rows) {
-      total++;
-      final String key =
-          '${row.artist.toLowerCase()}\u0000${row.album.toLowerCase()}';
-      albumTracks[key] = (albumTracks[key] ?? 0) + 1;
-      albumTarget.putIfAbsent(
-        key,
-        () => HealthTarget(
-          row.compilation ? Track.kArtistCompilations : row.artist,
-          row.album,
-        ),
-      );
-
       final String genre = row.genre.trim().toLowerCase();
-      // compilations are expected to mix genres
-      if (genre.isNotEmpty && !row.compilation) {
-        (genres[key] ??= {}).add(genre);
-      }
-
-      if (row.lossy && row.bitrate > 0 && row.bitrate < kMinBitrate) {
-        lowBitrate++;
-        firstLow ??= albumTarget[key];
-      }
-      if (row.year == 0) {
-        noYear++;
-        firstNoYear ??= albumTarget[key];
-      }
+      if (genre.isEmpty || row.compilation) continue;
+      (genres[row.albumKey] ??= {}).add(genre);
     }
-
-    final List<String> mixed = genres.entries
+    return genres.entries
         .where((e) => e.value.length > 1)
         .map((e) => e.key)
-        .toList();
+        .toSet();
+  }
 
-    // tracks touched by at least one issue
+  factory LibraryHealth.compute(List<HealthRow> rows) {
+    final Set<String> mixed = mixedGenreAlbumKeys(rows);
+    int noYear = 0;
     int affected = 0;
-    final Set<String> affectedAlbums = {...mixed};
     for (final HealthRow row in rows) {
-      final String key =
-          '${row.artist.toLowerCase()}\u0000${row.album.toLowerCase()}';
-      final bool low =
-          row.lossy && row.bitrate > 0 && row.bitrate < kMinBitrate;
-      if (low || row.year == 0 || affectedAlbums.contains(key)) affected++;
+      final bool missingYear = row.year == 0;
+      if (missingYear) noYear++;
+      if (missingYear || mixed.contains(row.albumKey)) affected++;
     }
-
     return LibraryHealth(
-      totalTracks: total,
-      lowBitrateTracks: lowBitrate,
+      totalTracks: rows.length,
       mixedGenreAlbums: mixed.length,
       noYearTracks: noYear,
       affectedTracks: affected,
-      firstLowBitrate: firstLow,
-      firstMixedGenre: mixed.isEmpty ? null : albumTarget[mixed.first],
-      firstNoYear: firstNoYear,
     );
   }
 }

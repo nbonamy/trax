@@ -11,17 +11,26 @@ import '../utils/events.dart';
 import '../utils/num_utils.dart';
 import '../utils/track_utils.dart';
 
+/// Optional columns, for screens where the point is a tag's value.
+class TrackColumns {
+  final bool genre;
+  final bool year;
+  const TrackColumns({this.genre = false, this.year = false});
+}
+
 class TrackWidget extends StatelessWidget {
   static const double kHeight = 34;
 
   final Track track;
   final int index;
+  final TrackColumns columns;
   final Function onTap;
   final Function onDoubleTap;
   const TrackWidget({
     super.key,
     required this.track,
     this.index = 0,
+    this.columns = const TrackColumns(),
     required this.onTap,
     required this.onDoubleTap,
   });
@@ -69,6 +78,26 @@ class TrackWidget extends StatelessWidget {
                       style: style,
                     ),
                   ),
+                  if (columns.genre)
+                    SizedBox(
+                      width: 110,
+                      child: Text(
+                        TrackUtils.getDisplayGenre(track.safeTags.genre),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: style,
+                      ),
+                    ),
+                  if (columns.year)
+                    SizedBox(
+                      width: 56,
+                      child: Text(
+                        track.safeTags.year == 0
+                            ? '\u2014'
+                            : '${track.safeTags.year}',
+                        style: style,
+                      ),
+                    ),
                   SizedBox(
                     width: 112,
                     child: Text(

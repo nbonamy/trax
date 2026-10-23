@@ -19,18 +19,13 @@ class TidyPanel extends StatelessWidget {
     final TraxColors colors = TraxColors.of(context);
 
     final List<_Issue> issues = [
-      if (health.lowBitrateTracks > 0)
-        _Issue(
-          t.tidyLowBitrate(health.lowBitrateTracks),
-          health.firstLowBitrate,
-        ),
       if (health.mixedGenreAlbums > 0)
         _Issue(
           t.tidyMixedGenres(health.mixedGenreAlbums),
-          health.firstMixedGenre,
+          ReviewKind.mixedGenres,
         ),
       if (health.noYearTracks > 0)
-        _Issue(t.tidyNoYear(health.noYearTracks), health.firstNoYear),
+        _Issue(t.tidyNoYear(health.noYearTracks), ReviewKind.noYear),
     ];
 
     return Container(
@@ -85,19 +80,13 @@ class TidyPanel extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (issue.target != null) ...[
-                          const SizedBox(width: 10),
-                          PillButton(
-                            label: t.tidyReview,
-                            height: 24,
-                            onPressed: () => eventBus.fire(
-                              SelectArtistAlbumEvent(
-                                issue.target!.artist,
-                                issue.target!.album,
-                              ),
-                            ),
-                          ),
-                        ],
+                        const SizedBox(width: 10),
+                        PillButton(
+                          label: t.tidyReview,
+                          height: 24,
+                          onPressed: () =>
+                              eventBus.fire(ShowReviewEvent(issue.kind)),
+                        ),
                       ],
                     ),
                   ),
@@ -112,8 +101,8 @@ class TidyPanel extends StatelessWidget {
 
 class _Issue {
   final String text;
-  final HealthTarget? target;
-  const _Issue(this.text, this.target);
+  final ReviewKind kind;
+  const _Issue(this.text, this.kind);
 }
 
 class _Ring extends StatelessWidget {

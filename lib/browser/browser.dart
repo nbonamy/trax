@@ -10,6 +10,7 @@ import '../components/inspector.dart';
 import '../components/search_box.dart';
 import '../components/status_bar.dart';
 import '../components/trax_colors.dart';
+import '../model/library_health.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../processors/scanner.dart';
@@ -35,7 +36,18 @@ class BrowserWidget extends StatefulWidget {
 class BrowserWidgetState extends State<BrowserWidget> {
   String _artist = Track.kArtistsHome;
   String? _initialAlbum;
+
+  // what is searched, or reviewed, instead of an artist
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
+  String _query = '';
+  ReviewKind? _review;
+
   final StreamController<ActionInProgress?> _actionStream = StreamController();
+
+  bool get _searching => _query.isNotEmpty;
+  bool get _showingHome =>
+      _artist == Track.kArtistsHome && !_searching && _review == null;
 
   @override
   void initState() {
@@ -45,6 +57,8 @@ class BrowserWidgetState extends State<BrowserWidget> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -56,7 +70,10 @@ class BrowserWidgetState extends State<BrowserWidget> {
         minWidth: 240,
         padding: const EdgeInsets.fromLTRB(10, 16, 10, 10),
         decoration: BoxDecoration(color: colors.sidebar),
-        top: const SearchBoxWidget(),
+        top: SearchBoxWidget(
+          controller: _searchController,
+          onChanged: _onSearchChanged,
+        ),
         builder: (context, controller) {
           return GestureDetector(
             behavior: HitTestBehavior.translucent,
@@ -67,7 +84,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
                   child: BrowserSidebar(
                     scrollController: controller,
                     onSelectArtist: onSelectArtist,
-                    artist: _artist,
+                    artist: (_searching || _review != null) ? '_' : _artist,
                   ),
                 ),
                 StreamBuilder(
@@ -109,7 +126,7 @@ class BrowserWidgetState extends State<BrowserWidget> {
                             onTap: () => SelectionModel.of(context).clear(),
                             child: Builder(
                               builder: (context) {
-                                if (_artist == Track.kArtistsHome) {
+                                if (_showingHome) {
                                   return DatabaseBuilder<bool>(
                                     future: (database) => database.isEmpty,
                                     builder: (context, database, isEmpty) =>
@@ -118,9 +135,14 @@ class BrowserWidgetState extends State<BrowserWidget> {
                                             : const StartWidget(),
                                   );
                                 } else {
+                                  final bool collection =
+                                      _searching || _review != null;
                                   return BrowserContent(
-                                    artist: _artist,
+                                    artist: collection ? null : _artist,
                                     initialAlbum: _initialAlbum,
+                                    query: _review == null ? _query : null,
+                                    review: _review,
+                                    onBack: () => onSelectArtist(null),
                                   );
                                 }
                               },
@@ -136,7 +158,6 @@ class BrowserWidgetState extends State<BrowserWidget> {
                       ],
                     ),
                   ),
-                  if (_artist != Track.kArtistsHome) const InspectorPanel(),
                 ],
               ),
             ),
@@ -145,14 +166,52 @@ class BrowserWidgetState extends State<BrowserWidget> {
       ),
     );
 
-    return window;
+    // the inspector is a drawer on its own: it runs the full height of the
+    // window, up to the title bar, while the toolbar stops at its edge
+    return Row(
+      children: [
+        Expanded(child: window),
+        if (!_showingHome) const InspectorPanel(),
+      ],
+    );
   }
 
   void onSelectArtist(String? artist, {String? album}) {
     SelectionModel.of(context).clear(notify: false);
+    _searchDebounce?.cancel();
+    _searchController.clear();
     setState(() {
       _artist = artist ?? Track.kArtistsHome;
       _initialAlbum = album;
+      _query = '';
+      _review = null;
+    });
+  }
+
+  // filter as you type: a short pause lets fast typists finish the word
+  void _onSearchChanged(String text) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 180), () {
+      if (!mounted) return;
+      final String query = text.trim();
+      if (query == _query) return;
+      SelectionModel.of(context).clear(notify: false);
+      setState(() {
+        _query = query;
+        _review = null;
+        _initialAlbum = null;
+      });
+    });
+  }
+
+  void _showReview(ReviewKind kind) {
+    SelectionModel.of(context).clear(notify: false);
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    setState(() {
+      _query = '';
+      _review = kind;
+      _initialAlbum = null;
     });
   }
 
@@ -195,6 +254,8 @@ class BrowserWidgetState extends State<BrowserWidget> {
       onSelectArtist(event.artist);
     } else if (event is SelectArtistAlbumEvent) {
       onSelectArtist(event.artist, album: event.album);
+    } else if (event is ShowReviewEvent) {
+      _showReview(event.kind);
     }
   }
 }
