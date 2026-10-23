@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../model/track.dart';
+import '../utils/artist_image_provider.dart';
 import '../utils/monogram.dart';
 import 'trax_colors.dart';
 
@@ -33,21 +35,28 @@ class ArtistProfilePic extends StatelessWidget {
       return _monogram(context);
     }
 
-    // try
-    return CachedNetworkImage(
-      imageUrl: _getProfilePicUrl(),
-      width: size,
-      height: size,
-      placeholder: (context, url) => _monogram(context),
-      errorWidget: (context, url, error) => _monogram(context),
-      imageBuilder: (context, imageProvider) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-        ),
-      ),
+    return FutureBuilder<String?>(
+      key: ValueKey(name),
+      future: context.read<ArtistImageProvider>().imageUrl(name),
+      builder: (context, snapshot) {
+        final url = snapshot.data;
+        if (url == null) return _monogram(context);
+        return CachedNetworkImage(
+          imageUrl: url,
+          width: size,
+          height: size,
+          placeholder: (context, url) => _monogram(context),
+          errorWidget: (context, url, error) => _monogram(context),
+          imageBuilder: (context, imageProvider) => Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -87,9 +96,5 @@ class ArtistProfilePic extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getProfilePicUrl() {
-    return 'https://scrapper.bonamy.fr/lastfm.php?artist=${Uri.encodeComponent(name.toLowerCase())}&exact=true&auto=true';
   }
 }

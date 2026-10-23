@@ -14,6 +14,7 @@ import 'model/selection.dart';
 import 'processors/http.dart';
 import 'screens/home.dart';
 import 'utils/artwork_provider.dart';
+import 'utils/artist_image_provider.dart';
 import 'utils/consts.dart';
 import 'utils/logger.dart';
 import 'utils/system_accessibility.dart';
@@ -110,6 +111,10 @@ class TraxApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => artworkProvider,
+        ),
+        Provider(
+          create: (_) => ArtistImageProvider(),
+          dispose: (_, images) => images.dispose(),
         ),
         ChangeNotifierProvider(
           create: (_) => AudioPlayer(),

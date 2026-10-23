@@ -104,7 +104,9 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(find.text('Everything is in order'), findsOneWidget);
-      expect(find.text('100%'), findsOneWidget);
+      expect(find.text('All done'), findsOneWidget);
+      expect(find.text('100%'), findsNothing);
+      expect(find.text('tidy'), findsNothing);
       expect(find.text('Review'), findsNothing);
     });
   });

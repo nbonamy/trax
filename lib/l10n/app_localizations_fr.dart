@@ -181,6 +181,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get home => 'Accueil';
 
   @override
+  String get back => 'Retour';
+
+  @override
   String get compilations => 'Compilations';
 
   @override
@@ -258,6 +261,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tidyAllGood => 'Tout est en ordre';
+
+  @override
+  String get tidyAllDone => 'Terminé';
 
   @override
   String tidyIssues(int count) {

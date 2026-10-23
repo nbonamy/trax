@@ -37,14 +37,12 @@ class BrowserContent extends StatefulWidget {
   final String? initialAlbum;
   final String? query;
   final ReviewKind? review;
-  final VoidCallback? onBack;
   const BrowserContent({
     super.key,
     this.artist,
     this.initialAlbum,
     this.query,
     this.review,
-    this.onBack,
   });
 
   bool get isCollection => artist == null;
@@ -156,7 +154,6 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
                         albumCount: groups.length,
                         trackCount: all.length,
                         hint: _collectionHint(t),
-                        onBack: widget.onBack,
                       )
                     : HeaderArtistWidget(
                         artist: widget.artist!,

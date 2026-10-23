@@ -45,6 +45,7 @@ dependencies:
   taglib_ffi: ^0.1.0
   window_manager: ^0.3.2
   tuple_dart: ^1.4.2
+  html: ^0.15.4
 
 dev_dependencies:
   flutter_test:

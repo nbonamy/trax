@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'trax_colors.dart';
 
-enum PillStyle { filled, tinted }
+enum PillStyle { filled, tinted, plain }
 
 /// Compact rounded button used across the redesigned screens.
 class PillButton extends StatefulWidget {
@@ -34,8 +34,13 @@ class _PillButtonState extends State<PillButton> {
     final TraxColors colors = TraxColors.of(context);
     final bool enabled = widget.onPressed != null;
     final bool filled = widget.style == PillStyle.filled;
-    Color background = filled ? colors.accent : colors.hover;
-    if (_hovered && enabled) {
+    final bool plain = widget.style == PillStyle.plain;
+    Color background = plain
+        ? Colors.transparent
+        : filled
+            ? colors.accent
+            : colors.hover;
+    if (_hovered && enabled && !plain) {
       background = filled
           ? Color.lerp(colors.accent, colors.text, 0.08)!
           : Color.lerp(colors.hover, colors.text, 0.06)!;
@@ -66,7 +71,7 @@ class _PillButtonState extends State<PillButton> {
                 decoration: BoxDecoration(
                   color: background,
                   borderRadius: BorderRadius.circular(8),
-                  border: filled
+                  border: filled || plain
                       ? null
                       : Border.all(color: colors.line, width: 0.5),
                 ),

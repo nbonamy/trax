@@ -37,7 +37,12 @@ class TidyPanel extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _Ring(score: health.score, label: t.tidyLabel),
+          _Ring(
+            score: health.score,
+            label: t.tidyLabel,
+            isTidy: health.isTidy,
+            doneLabel: t.tidyAllDone,
+          ),
           const SizedBox(width: 24),
           Expanded(
             child: Column(
@@ -109,7 +114,14 @@ class _Ring extends StatelessWidget {
   static const double kSize = 112;
   final int score;
   final String label;
-  const _Ring({required this.score, required this.label});
+  final bool isTidy;
+  final String doneLabel;
+  const _Ring({
+    required this.score,
+    required this.label,
+    required this.isTidy,
+    required this.doneLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -125,32 +137,47 @@ class _Ring extends StatelessWidget {
           painter: _RingPainter(
             progress: value,
             track: colors.line,
-            fill: colors.accent,
+            fill: isTidy ? colors.success : colors.accent,
           ),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '${(value * 100).round()}%',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
-                    color: colors.text,
-                    decoration: TextDecoration.none,
+                if (isTidy) ...[
+                  Icon(CupertinoIcons.check_mark,
+                      size: 28, color: colors.success),
+                  const SizedBox(height: 6),
+                  Text(
+                    doneLabel,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: colors.text,
+                      decoration: TextDecoration.none,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: colors.muted,
-                    decoration: TextDecoration.none,
+                ] else ...[
+                  Text(
+                    '${(value * 100).round()}%',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      height: 1,
+                      color: colors.text,
+                      decoration: TextDecoration.none,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 3),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: colors.muted,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

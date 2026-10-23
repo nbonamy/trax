@@ -178,6 +178,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String get back => 'Back';
+
+  @override
   String get compilations => 'Compilations';
 
   @override
@@ -255,6 +258,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tidyAllGood => 'Everything is in order';
+
+  @override
+  String get tidyAllDone => 'All done';
 
   @override
   String tidyIssues(int count) {

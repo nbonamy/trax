@@ -1,27 +1,26 @@
-# trax
+# Trax
 
-macOS Music management application written in Flutter.
+Organize, edit, and play your local music library on macOS.
 
-- Apple Music like UI
-- Browse local music files
-- Import new files into libraruy (MP3, FLAC, M4A)
-- Edit audio tags (including artwork and lyrics)
-- Audio format conversion
-- Local audio playback
+- Browse artists and albums, or search across your library.
+- Import MP3, FLAC, and M4A files or whole folders.
+- Edit tags, artwork, and lyrics for individual tracks or a selection.
+- Find missing years and inconsistent album genres.
+- Convert audio formats.
+- Play your music with a floating player, shuffle, and repeat.
 
-
-<img src="doc/home.jpg" height=256>
-<img src="doc/album.jpg" height=256>
+![Library overview with artist photos, import options, and recently added albums](doc/home.jpg)
+![Library search with track selection and tag inspector](doc/album.jpg)
 
 ## Getting Started
 
-```
+```sh
 flutter pub get
-flutter run macos
+flutter run -d macos
 ```
 
-You can deploy to your `Applications` folder using
+Build and install a release in `/Applications`:
 
-```
+```sh
 make deploy
 ```

@@ -67,6 +67,7 @@
   "variousFormats": "Formats Mélangés",
 
   "home": "Accueil",
+  "back": "Retour",
   "compilations": "Compilations",
 
   "welcomeTitle": "Bienvenue !",
@@ -97,6 +98,7 @@
 
   "tidyLabel": "en ordre",
   "tidyAllGood": "Tout est en ordre",
+  "tidyAllDone": "Terminé",
   "tidyIssues": "{count,plural ,=1{Une chose à ranger} other{{count} choses à ranger}}",
   "@tidyIssues": { "placeholders": { "count": { "type": "int" } } },
   "tidyMixedGenres": "{count,plural ,=1{1 album mélange} other{{count} albums mélangent}} plusieurs genres",

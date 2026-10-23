@@ -33,6 +33,7 @@ class TraxColors {
   final Color accentInk;
   final Color accentFill;
   final Color warning;
+  final Color success;
   final Color shadow;
 
   const TraxColors._({
@@ -53,6 +54,7 @@ class TraxColors {
     required this.accentInk,
     required this.accentFill,
     required this.warning,
+    required this.success,
     required this.shadow,
   });
 
@@ -76,6 +78,7 @@ class TraxColors {
     accentInk: Color(0xFFFFFFFF),
     accentFill: Color(0x2E0A64D8),
     warning: Color(0x47FF9F0A),
+    success: Color(0xFF248A3D),
     shadow: Color(0x38000000),
   );
 
@@ -97,6 +100,7 @@ class TraxColors {
     accentInk: Color(0xFF0B1A33),
     accentFill: Color(0x40609AE6),
     warning: Color(0x57FF9F0A),
+    success: Color(0xFF30D158),
     shadow: Color(0x80000000),
   );
 

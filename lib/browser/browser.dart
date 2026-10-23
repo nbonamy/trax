@@ -7,6 +7,7 @@ import 'package:macos_ui/macos_ui.dart';
 import '../audioplayer/glass_player.dart';
 import '../components/database_builder.dart';
 import '../components/inspector.dart';
+import '../components/pill_button.dart';
 import '../components/search_box.dart';
 import '../components/status_bar.dart';
 import '../components/trax_colors.dart';
@@ -108,6 +109,19 @@ class BrowserWidgetState extends State<BrowserWidget> {
       child: MacosScaffold(
         toolBar: ToolBar(
           height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 4),
+          automaticallyImplyLeading: false,
+          leading: _showingHome
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: PillButton(
+                    label: AppLocalizations.of(context)!.back,
+                    icon: CupertinoIcons.chevron_back,
+                    style: PillStyle.plain,
+                    onPressed: () => onSelectArtist(null),
+                  ),
+                ),
           decoration: BoxDecoration(color: colors.background),
           dividerColor: const Color(0x00000000),
         ),
@@ -142,7 +156,6 @@ class BrowserWidgetState extends State<BrowserWidget> {
                                     initialAlbum: _initialAlbum,
                                     query: _review == null ? _query : null,
                                     review: _review,
-                                    onBack: () => onSelectArtist(null),
                                   );
                                 }
                               },

@@ -67,6 +67,7 @@
   "variousFormats": "Various Formats",
 
   "home": "Home",
+  "back": "Back",
   "compilations": "Compilations",
 
   "welcomeTitle": "Welcome!",
@@ -97,6 +98,7 @@
 
   "tidyLabel": "tidy",
   "tidyAllGood": "Everything is in order",
+  "tidyAllDone": "All done",
   "tidyIssues": "{count,plural ,=1{One thing to tidy} other{{count} things to tidy}}",
   "@tidyIssues": { "placeholders": { "count": { "type": "int" } } },
   "tidyMixedGenres": "{count,plural ,=1{1 album mixes} other{{count} albums mix}} several genres",

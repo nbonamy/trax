@@ -404,6 +404,12 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
   /// No description provided for @compilations.
   ///
   /// In en, this message translates to:
@@ -542,6 +548,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Everything is in order'**
   String get tidyAllGood;
+
+  /// No description provided for @tidyAllDone.
+  ///
+  /// In en, this message translates to:
+  /// **'All done'**
+  String get tidyAllDone;
 
   /// No description provided for @tidyIssues.
   ///
