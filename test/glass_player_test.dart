@@ -5,7 +5,9 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 import 'package:trax/audioplayer/glass_player.dart';
 import 'package:trax/audioplayer/player_math.dart';
+import 'package:trax/components/draggable_dialog.dart';
 import 'package:trax/components/glass.dart';
+import 'package:trax/utils/system_accessibility.dart';
 import 'package:trax/model/track.dart';
 
 Track _track({int duration = 227}) => Track(
@@ -109,6 +111,39 @@ void main() {
       expect(find.text('hello'), findsOneWidget);
     });
 
+    testWidgets('actually paints its tint (a gradient box ignores its color)',
+        (tester) async {
+      const Color tint = Color(0x80FF0000);
+      await tester.pumpWidget(_host(
+        const GlassSurface(
+          radius: 20,
+          style: GlassStyle(
+            tint: tint,
+            gloss: Color(0x40FFFFFF),
+            edgeTop: Color(0xFFFFFFFF),
+            edgeBottom: Color(0xFFFFFFFF),
+            shadow: Color(0x00000000),
+            solid: Color(0xFFFFFFFF),
+            contrastEdge: Color(0xFF000000),
+          ),
+          child: Text('hello'),
+        ),
+      ));
+      final Iterable<BoxDecoration> boxes = tester
+          .widgetList<DecoratedBox>(find.descendant(
+            of: find.byType(GlassSurface),
+            matching: find.byType(DecoratedBox),
+          ))
+          .map((d) => d.decoration)
+          .whereType<BoxDecoration>();
+      // the tint is drawn by a box of its own...
+      expect(boxes.where((d) => d.color == tint && d.gradient == null),
+          hasLength(1));
+      // ...and no box carries both: Flutter would drop the color
+      expect(
+          boxes.where((d) => d.color != null && d.gradient != null), isEmpty);
+    });
+
     testWidgets('picks the style from the theme brightness', (tester) async {
       late Brightness seen;
       await tester.pumpWidget(_host(
@@ -123,6 +158,100 @@ void main() {
         GlassStyle.forBrightness(Brightness.dark).tint,
         isNot(GlassStyle.forBrightness(Brightness.light).tint),
       );
+    });
+  });
+
+  group('system accessibility', () {
+    tearDown(() => SystemAccessibility.instance.set(
+          reduceTransparency: false,
+          increaseContrast: false,
+        ));
+
+    testWidgets('reduce transparency turns glass into a plain surface',
+        (tester) async {
+      await tester.pumpWidget(_host(
+        const GlassSurface(radius: 20, child: Text('hello')),
+      ));
+      expect(find.byType(BackdropFilter), findsOneWidget);
+
+      SystemAccessibility.instance.set(reduceTransparency: true);
+      await tester.pump();
+      expect(find.byType(BackdropFilter), findsNothing);
+      expect(find.text('hello'), findsOneWidget);
+
+      // and back, live, when the setting is switched off again
+      SystemAccessibility.instance.set(reduceTransparency: false);
+      await tester.pump();
+      expect(find.byType(BackdropFilter), findsOneWidget);
+    });
+
+    testWidgets('increase contrast keeps the glass but sharpens its edge',
+        (tester) async {
+      await tester.pumpWidget(_host(
+        const GlassSurface(radius: 20, child: Text('hello')),
+      ));
+      SystemAccessibility.instance.set(increaseContrast: true);
+      await tester.pump();
+      expect(find.byType(BackdropFilter), findsOneWidget);
+    });
+
+    test('only notifies when something changed', () {
+      final system = SystemAccessibility();
+      int calls = 0;
+      system.addListener(() => calls++);
+      system.set(reduceTransparency: true);
+      system.set(reduceTransparency: true);
+      system.set(increaseContrast: true);
+      expect(calls, 2);
+      expect(system.reduceTransparency, isTrue);
+      expect(system.increaseContrast, isTrue);
+    });
+
+    test('translucent panels are tinted more than the player', () {
+      expect(
+        GlassStyle.panelLight.tint.a,
+        greaterThan(GlassStyle.light.tint.a),
+      );
+      expect(
+        GlassStyle.panelDark.tint.a,
+        greaterThan(GlassStyle.dark.tint.a),
+      );
+    });
+  });
+
+  group('dialogs', () {
+    testWidgets('are glass, so the app shows through them', (tester) async {
+      await tester.pumpWidget(_host(
+        const DraggableDialog(
+          width: 400,
+          height: 300,
+          header: Text('header'),
+          body: Text('body'),
+          footer: Text('footer'),
+        ),
+      ));
+      expect(find.byType(GlassSurface), findsOneWidget);
+      expect(find.byType(BackdropFilter), findsOneWidget);
+      expect(find.text('header'), findsOneWidget);
+      expect(find.text('footer'), findsOneWidget);
+    });
+
+    testWidgets('are solid when transparency is reduced', (tester) async {
+      SystemAccessibility.instance.set(reduceTransparency: true);
+      addTearDown(() => SystemAccessibility.instance.set(
+            reduceTransparency: false,
+          ));
+      await tester.pumpWidget(_host(
+        const DraggableDialog(
+          width: 400,
+          height: 300,
+          header: Text('header'),
+          body: Text('body'),
+          footer: Text('footer'),
+        ),
+      ));
+      expect(find.byType(BackdropFilter), findsNothing);
+      expect(find.text('body'), findsOneWidget);
     });
   });
 

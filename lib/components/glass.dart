@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import '../utils/system_accessibility.dart';
+
 /// Colors and blur strength of a [GlassSurface].
 class GlassStyle {
   final Color tint;
@@ -12,33 +14,73 @@ class GlassStyle {
   final Color shadow;
   final double blur;
 
+  /// What the surface becomes when the user asked for reduced transparency.
+  final Color solid;
+
+  /// Edge used when the user asked for increased contrast.
+  final Color contrastEdge;
+
   const GlassStyle({
     required this.tint,
     required this.gloss,
     required this.edgeTop,
     required this.edgeBottom,
     required this.shadow,
+    required this.solid,
+    required this.contrastEdge,
     this.blur = 30,
   });
 
   static const GlassStyle light = GlassStyle(
-    tint: Color(0x85FFFFFF),
-    gloss: Color(0x8CFFFFFF),
+    tint: Color(0x24FFFFFF),
+    gloss: Color(0x7AFFFFFF),
     edgeTop: Color(0xF2FFFFFF),
     edgeBottom: Color(0x66FFFFFF),
     shadow: Color(0x38000000),
+    solid: Color(0xFFF4F3F1),
+    contrastEdge: Color(0x73000000),
+  );
+
+  /// Larger surfaces (dialogs) stay translucent but carry more tint so that
+  /// forms remain easy to read.
+  static const GlassStyle panelLight = GlassStyle(
+    tint: Color(0xC2FFFFFF),
+    gloss: Color(0x66FFFFFF),
+    edgeTop: Color(0xF2FFFFFF),
+    edgeBottom: Color(0x66FFFFFF),
+    shadow: Color(0x4D000000),
+    solid: Color(0xFFF4F3F1),
+    contrastEdge: Color(0x73000000),
+    blur: 40,
   );
 
   static const GlassStyle dark = GlassStyle(
-    tint: Color(0x6B46444E),
+    tint: Color(0x2646444E),
     gloss: Color(0x1AFFFFFF),
     edgeTop: Color(0x42FFFFFF),
     edgeBottom: Color(0x14FFFFFF),
     shadow: Color(0x80000000),
+    solid: Color(0xFF3A393E),
+    contrastEdge: Color(0x99FFFFFF),
+  );
+
+  static const GlassStyle panelDark = GlassStyle(
+    tint: Color(0xB839383F),
+    gloss: Color(0x14FFFFFF),
+    edgeTop: Color(0x47FFFFFF),
+    edgeBottom: Color(0x14FFFFFF),
+    shadow: Color(0x99000000),
+    solid: Color(0xFF3A393E),
+    contrastEdge: Color(0x99FFFFFF),
+    blur: 40,
   );
 
   static GlassStyle forBrightness(Brightness brightness) {
     return brightness == Brightness.dark ? dark : light;
+  }
+
+  static GlassStyle panelForBrightness(Brightness brightness) {
+    return brightness == Brightness.dark ? panelDark : panelLight;
   }
 }
 
@@ -71,38 +113,60 @@ class GlassSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GlassStyle glass =
+    final GlassStyle base =
         style ?? GlassStyle.forBrightness(glassBrightness(context));
     final BorderRadius borderRadius = BorderRadius.circular(radius);
-    return CustomPaint(
-      painter: _GlassShadowPainter(radius: radius, color: glass.shadow),
-      foregroundPainter: _GlassEdgePainter(
-        radius: radius,
-        top: glass.edgeTop,
-        bottom: glass.edgeBottom,
-      ),
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: glass.blur,
-            sigmaY: glass.blur,
-            tileMode: TileMode.mirror,
+    // follows System Settings > Accessibility > Display
+    return ListenableBuilder(
+      listenable: SystemAccessibility.instance,
+      builder: (context, _) {
+        final SystemAccessibility system = SystemAccessibility.instance;
+        final Color edgeTop =
+            system.increaseContrast ? base.contrastEdge : base.edgeTop;
+        final Color edgeBottom =
+            system.increaseContrast ? base.contrastEdge : base.edgeBottom;
+        final Widget content = Padding(padding: padding, child: child);
+        return CustomPaint(
+          painter: _GlassShadowPainter(radius: radius, color: base.shadow),
+          foregroundPainter: _GlassEdgePainter(
+            radius: radius,
+            top: edgeTop,
+            bottom: edgeBottom,
           ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: glass.tint,
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [glass.gloss, glass.gloss.withValues(alpha: 0)],
-                stops: const [0.0, 0.5],
-              ),
-            ),
-            child: Padding(padding: padding, child: child),
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: system.reduceTransparency
+                // no see-through: plain, opaque, same shape
+                ? ColoredBox(color: base.solid, child: content)
+                : BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: base.blur,
+                      sigmaY: base.blur,
+                      tileMode: TileMode.mirror,
+                    ),
+                    // two layers: a box with a gradient ignores its color, so
+                    // the tint and the highlight cannot share one decoration
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(color: base.tint),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              base.gloss,
+                              base.gloss.withValues(alpha: 0),
+                            ],
+                            stops: const [0.0, 0.5],
+                          ),
+                        ),
+                        child: content,
+                      ),
+                    ),
+                  ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

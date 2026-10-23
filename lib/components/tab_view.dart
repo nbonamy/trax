@@ -1,9 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'tab_header.dart';
 import 'trax_colors.dart';
 
+/// Tabs over a framed page. Like MacosTabView, but the page stays see-through
+/// (a hairline frame and a faint wash) instead of a solid grey slab, so that
+/// forms sit directly on the glass of their dialog.
 class TabView extends StatelessWidget {
   final MacosTabController controller;
   final List<String> labels;
@@ -19,25 +22,36 @@ class TabView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MacosTabView(
-      padding: padding,
-      controller: controller,
-      tabs: labels
-          .map(
-            (l) => MacosTab2(
-              label: l,
-              fontSize: 13.0,
+    final TraxColors colors = TraxColors.of(context);
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Padding(
+          padding: padding,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.stripe,
+              border: Border.all(color: colors.line, width: 0.5),
+              borderRadius: BorderRadius.circular(10),
             ),
-          )
-          .toList(),
-      children: children
-          .map(
-            (w) => Container(
-              color: TraxColors.of(context).background,
-              child: w,
+            child: AnimatedBuilder(
+              animation: controller,
+              builder: (context, _) => IndexedStack(
+                index: controller.index,
+                children: KeyedSubtree.ensureUniqueKeysForList(children),
+              ),
             ),
-          )
-          .toList(),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          child: MacosSegmentedControl(
+            controller: controller,
+            tabs:
+                labels.map((l) => MacosTab2(label: l, fontSize: 13.0)).toList(),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:macos_ui/macos_ui.dart';
 
 import '../model/preferences.dart';
 import 'draggable_widget.dart';
+import 'glass.dart';
 import 'trax_colors.dart';
 
 class DraggableDialog extends StatefulWidget {
-  static const kDialogBorderRadius = 8.0;
+  static const kDialogBorderRadius = 16.0;
   final double width;
   final double height;
   final Widget header;
@@ -45,8 +47,9 @@ class _DraggableDialogState extends State<DraggableDialog> {
   @override
   Widget build(BuildContext context) {
     final TraxColors colors = TraxColors.of(context);
-    final Color headerBg = widget.headerBgColor ?? colors.sidebar;
-    final Color contentsBg = widget.contentsBgColor ?? colors.background;
+    // the header is a faint wash over the glass, not a solid slab
+    final Color headerBg = widget.headerBgColor ?? colors.hover;
+    final Color? contentsBg = widget.contentsBgColor;
     return Align(
       alignment: _alignment,
       child: DraggableWidget(
@@ -63,63 +66,50 @@ class _DraggableDialogState extends State<DraggableDialog> {
             }
           });
         },
-        child: Container(
+        child: SizedBox(
           width: widget.width,
           height: widget.height,
-          decoration: BoxDecoration(
-            border: Border.all(color: colors.line, width: 0.5),
-            borderRadius: const BorderRadius.all(
-              Radius.circular(DraggableDialog.kDialogBorderRadius),
+          // translucent: what is behind the dialog shows through, blurred
+          // controls sit on solid fields so they read clearly on the glass
+          child: MacosPopupButtonTheme(
+            data: MacosPopupButtonTheme.of(context).copyWith(
+              backgroundColor: colors.field,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow,
-                spreadRadius: 2,
-                blurRadius: 36,
-                offset: const Offset(0, 12),
-              )
-            ],
-          ),
-          child: Flex(
-            direction: Axis.vertical,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: headerBg,
-                  borderRadius: const BorderRadius.only(
-                    topLeft:
-                        Radius.circular(DraggableDialog.kDialogBorderRadius),
-                    topRight:
-                        Radius.circular(DraggableDialog.kDialogBorderRadius),
+            child: GlassSurface(
+              radius: DraggableDialog.kDialogBorderRadius,
+              style: GlassStyle.panelForBrightness(colors.brightness),
+              child: Flex(
+                direction: Axis.vertical,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: headerBg,
+                      border: Border(
+                        bottom: BorderSide(color: colors.line, width: 0.5),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 24),
+                    child: widget.header,
                   ),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                child: widget.header,
-              ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: contentsBg,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft:
-                          Radius.circular(DraggableDialog.kDialogBorderRadius),
-                      bottomRight:
-                          Radius.circular(DraggableDialog.kDialogBorderRadius),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      color: contentsBg,
+                      child: Flex(
+                        direction: Axis.vertical,
+                        children: [
+                          Expanded(child: widget.body),
+                          const SizedBox(height: 16),
+                          widget.footer,
+                        ],
+                      ),
                     ),
                   ),
-                  child: Flex(
-                    direction: Axis.vertical,
-                    children: [
-                      Expanded(child: widget.body),
-                      const SizedBox(height: 16),
-                      widget.footer,
-                    ],
-                  ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

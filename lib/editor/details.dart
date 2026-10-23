@@ -5,6 +5,7 @@ import 'package:trax/l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import '../data/database.dart';
+import '../components/trax_colors.dart';
 import '../model/editable_tags.dart';
 import '../processors/saver.dart';
 import '../utils/consts.dart';
@@ -13,6 +14,9 @@ import '../utils/track_utils.dart';
 extension Int on TextEditingController {
   int get intValue => num.tryParse(text)?.toInt() ?? 0;
 }
+
+/// Width of the focus ring MacosTextField paints (invisible when unfocused).
+const double kFocusRing = 3.0;
 
 class EditorDetailsWidget extends StatefulWidget {
   final EditableTags tags;
@@ -476,7 +480,7 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       }
       return KeyEventResult.ignored;
     };
-    return MacosAutoCompleteField(
+    final Widget field = MacosAutoCompleteField(
       key: key,
       focusNode: focusNode,
       autofocus: controller == _focusedController,
@@ -504,18 +508,37 @@ class EditorDetailsWidgetState extends State<EditorDetailsWidget> {
       onEditingComplete: () {
         widget.onComplete();
       },
+      // border only: the library paints its focus ring around whatever
+      // color these decorations carry, so the fill lives in a wrapper
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color.fromRGBO(192, 192, 192, 1.0),
-          width: 0.8,
-        ),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: TraxColors.of(context).line, width: 0.8),
       ),
       focusedDecoration: BoxDecoration(
-        border: Border.all(
-          color: const Color.fromRGBO(109, 148, 220, 1.0),
-          width: 0.8,
-        ),
+        borderRadius: BorderRadius.circular(5),
       ),
+    );
+    return _filled(field);
+  }
+
+  /// White (or dark) inside the field's own border and nothing beyond it: the
+  /// library reserves a [kFocusRing] wide invisible ring around every field.
+  Widget _filled(Widget field) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.all(kFocusRing),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: TraxColors.of(context).field,
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          ),
+        ),
+        field,
+      ],
     );
   }
 

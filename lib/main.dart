@@ -16,6 +16,7 @@ import 'screens/home.dart';
 import 'utils/artwork_provider.dart';
 import 'utils/consts.dart';
 import 'utils/logger.dart';
+import 'utils/system_accessibility.dart';
 import 'utils/track_utils.dart';
 
 void main() async {
@@ -37,6 +38,9 @@ void main() async {
   // and a server
   TraxServer server = TraxServer(logger, traxDatabase, artworkProvider);
   server.start();
+
+  // glass needs to know about reduced transparency
+  await SystemAccessibility.instance.init();
 
   // audio service
   await JustAudioBackground.init(

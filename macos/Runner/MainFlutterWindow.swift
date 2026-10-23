@@ -37,6 +37,8 @@ class BlurryContainerViewController: NSViewController {
 
 class MainFlutterWindow: NSWindow, NSWindowDelegate {
     
+    private var accessibilityObserver: NSObjectProtocol?
+    
     override func awakeFromNib() {
         delegate = self
         let blurryContainerViewController = BlurryContainerViewController()
@@ -73,6 +75,32 @@ class MainFlutterWindow: NSWindow, NSWindowDelegate {
             } else {
                 result(FlutterMethodNotImplemented)
             }
+        }
+        
+        // system "Reduce transparency" / "Increase contrast" for the glass
+        let accessibilityChannel = FlutterMethodChannel(
+            name: "trax/accessibility",
+            binaryMessenger: blurryContainerViewController.flutterViewController.engine.binaryMessenger)
+        func accessibilityState() -> [String: Bool] {
+            let workspace = NSWorkspace.shared
+            return [
+                "reduceTransparency": workspace.accessibilityDisplayShouldReduceTransparency,
+                "increaseContrast": workspace.accessibilityDisplayShouldIncreaseContrast,
+            ]
+        }
+        accessibilityChannel.setMethodCallHandler { (call, result) in
+            if ("get" == call.method) {
+                result(accessibilityState())
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        }
+        accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            accessibilityChannel.invokeMethod("changed", arguments: accessibilityState())
         }
         
         RegisterGeneratedPlugins(registry: blurryContainerViewController.flutterViewController)

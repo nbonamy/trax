@@ -5,6 +5,8 @@ import 'package:trax/l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../components/trax_colors.dart';
+import 'details.dart' show kFocusRing;
 import '../model/preferences.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
@@ -116,21 +118,37 @@ class EditorLyricsWidgetState extends State<EditorLyricsWidget> {
                     snapshot.data == false) {
                   return const LoadingWidget();
                 } else {
-                  return MacosTextField(
-                    controller: _controller,
-                    minLines: 24,
-                    maxLines: 24,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color.fromRGBO(192, 192, 192, 1.0),
-                        width: 0.8,
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Padding(
+                          padding: const EdgeInsets.all(kFocusRing),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: TraxColors.of(context).field,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    style: const TextStyle(
-                      fontFeatures: [
-                        FontFeature.tabularFigures(),
-                      ],
-                    ),
+                      MacosTextField(
+                        controller: _controller,
+                        minLines: 24,
+                        maxLines: 24,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: TraxColors.of(context).line,
+                            width: 0.8,
+                          ),
+                        ),
+                        style: const TextStyle(
+                          fontFeatures: [
+                            FontFeature.tabularFigures(),
+                          ],
+                        ),
+                      ),
+                    ],
                   );
                 }
               },
