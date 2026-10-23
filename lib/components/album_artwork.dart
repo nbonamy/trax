@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:trax/l10n/app_localizations.dart';
 
 import '../model/track.dart';
-import '../utils/consts.dart';
 import '../utils/num_utils.dart';
 import 'artwork_async.dart';
+import 'trax_colors.dart';
 
 class AlbumArtworkWidget extends StatelessWidget {
   final Track track;
@@ -24,6 +25,9 @@ class AlbumArtworkWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations t = AppLocalizations.of(context)!;
+    final TraxColors colors = TraxColors.of(context);
+    final TextStyle style = TextStyle(fontSize: 12, color: colors.muted);
     return SizedBox(
       width: size,
       child: Column(
@@ -31,37 +35,32 @@ class AlbumArtworkWidget extends StatelessWidget {
         children: size == 0
             ? []
             : [
-                AsyncArtwork(
-                  track: track,
-                  size: size,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '$trackCount SONGS, $playtime MINUTES',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withValues(alpha: Consts.fadedOpacity),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.shadow.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: AsyncArtwork(
+                    track: track,
+                    size: size,
+                    defaultPlaceholderBorderColor: colors.line,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 14),
                 Text(
-                  format.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withValues(alpha: Consts.fadedOpacity),
-                  ),
+                  '${t.statsTracks(trackCount)}, $playtime${t.statsDurationMinutes.trimRight()}',
+                  style: style,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  filesize.formatFilesize(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withValues(alpha: Consts.fadedOpacity),
-                  ),
-                ),
+                const SizedBox(height: 3),
+                Text(format.trim(), style: style),
+                const SizedBox(height: 3),
+                Text(filesize.formatFilesize(), style: style),
               ],
       ),
     );

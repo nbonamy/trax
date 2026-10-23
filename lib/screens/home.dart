@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +19,7 @@ import '../model/track.dart';
 import '../processors/saver.dart';
 import '../processors/scanner.dart';
 import '../utils/events.dart';
+import '../utils/import_utils.dart';
 import '../utils/logger.dart';
 import '../utils/track_utils.dart';
 import 'settings.dart';
@@ -32,16 +35,22 @@ class TraxHomePage extends StatefulWidget {
 class _TraxHomePageState extends State<TraxHomePage>
     with WindowListener, MenuHandler {
   final GlobalKey<BrowserWidgetState> _keyBrowser = GlobalKey();
+  StreamSubscription? _importSubscription;
+
   @override
   void initState() {
     super.initState();
     initMenuSubscription();
     windowManager.addListener(this);
+    _importSubscription = eventBus.on<ImportFilesEvent>().listen(
+          (event) => _importPaths(event.paths),
+        );
   }
 
   @override
   void dispose() {
     cancelMenuSubscription();
+    _importSubscription?.cancel();
     super.dispose();
   }
 
@@ -303,14 +312,26 @@ class _TraxHomePageState extends State<TraxHomePage>
       allowedExtensions: ['mp3', 'm4a', 'flac'],
     );
     if (result == null) return;
+    await _parseAndEdit(
+      editorMode,
+      result.paths.whereType<String>().toList(),
+    );
+  }
 
+  // files or folders dropped on the library
+  void _importPaths(List<String> paths) async {
+    final List<String> files = ImportUtils.collectAudioFiles(paths);
+    if (files.isEmpty) return;
+    await _parseAndEdit(EditorMode.import, files);
+  }
+
+  Future<void> _parseAndEdit(EditorMode editorMode, List<String> paths) async {
     // we need to parse them
     int index = 1;
     TrackList tracks = [];
     TagLib tagLib = TagLib();
     eventBus.fire(BackgroundActionStartEvent(BackgroundAction.import));
-    for (String? filepath in result.paths) {
-      if (filepath == null) continue;
+    for (String filepath in paths) {
       Track track = Track.parse(filepath, tagLib);
       if (track.tags != null) {
         String filename = path.basenameWithoutExtension(filepath);
@@ -333,7 +354,7 @@ class _TraxHomePageState extends State<TraxHomePage>
     eventBus.fire(BackgroundActionEndEvent(BackgroundAction.import));
 
     // now show import
-    if (!mounted) return;
+    if (!mounted || tracks.isEmpty) return;
     TagEditorWidget.show(
       context,
       editorMode,

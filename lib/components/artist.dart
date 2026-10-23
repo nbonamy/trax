@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../utils/consts.dart';
 import '../utils/track_utils.dart';
 import 'artist_profile_pic.dart';
+import 'trax_colors.dart';
 
-class ArtistWidget extends StatelessWidget {
+/// One row of the source list.
+class ArtistWidget extends StatefulWidget {
+  static const double kHeight = 32;
+
   final String name;
   final bool selected;
   final Function onSelectArtist;
@@ -16,38 +19,74 @@ class ArtistWidget extends StatelessWidget {
   });
 
   @override
+  State<ArtistWidget> createState() => _ArtistWidgetState();
+}
+
+class _ArtistWidgetState extends State<ArtistWidget> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 2),
-      decoration: BoxDecoration(
-          color: selected ? Consts.sideBarSelectBgColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(6)),
+    final TraxColors colors = TraxColors.of(context);
+    final Color background = widget.selected
+        ? colors.accent
+        : (_hovered ? colors.hover : Colors.transparent);
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => onSelectArtist(name),
+        behavior: HitTestBehavior.opaque,
+        onTap: () => widget.onSelectArtist(widget.name),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          height: ArtistWidget.kHeight,
+          margin: const EdgeInsets.symmetric(vertical: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(7),
+          ),
           child: Row(
             children: [
-              ArtistProfilePic(
-                name: name,
-                selected: selected,
-              ),
-              const SizedBox(width: 16),
+              ArtistProfilePic(name: widget.name, selected: widget.selected),
+              const SizedBox(width: 9),
               Expanded(
                 child: Text(
-                  TrackUtils.getDisplayArtist(name),
-                  maxLines: 3,
+                  TrackUtils.getDisplayArtist(widget.name),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: selected
-                        ? Consts.sideBarSelectFgColor
-                        : Consts.sideBarFgColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: widget.selected ? colors.accentInk : colors.text,
                   ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small gray caption introducing a group of rows.
+class SidebarSectionHeader extends StatelessWidget {
+  final String label;
+  const SidebarSectionHeader({super.key, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: ArtistWidget.kHeight + 2,
+      alignment: Alignment.bottomLeft,
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: TraxColors.of(context).faint,
         ),
       ),
     );

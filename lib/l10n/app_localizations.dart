@@ -494,6 +494,145 @@ abstract class AppLocalizations {
   /// **' minutes '**
   String get statsDurationMinutes;
 
+  /// No description provided for @sidebarLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get sidebarLibrary;
+
+  /// No description provided for @sidebarArtists.
+  ///
+  /// In en, this message translates to:
+  /// **'Artists'**
+  String get sidebarArtists;
+
+  /// No description provided for @startSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{tracks} · {duration} · {artists} · {albums}'**
+  String startSubtitle(
+      Object tracks, Object duration, Object artists, Object albums);
+
+  /// No description provided for @dropTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop music here'**
+  String get dropTitle;
+
+  /// No description provided for @dropDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'MP3, FLAC and M4A, files or whole folders. Trax reads the tags, fills gaps from file names and files everything in your Music folder.'**
+  String get dropDescription;
+
+  /// No description provided for @dropOnImport.
+  ///
+  /// In en, this message translates to:
+  /// **'On import'**
+  String get dropOnImport;
+
+  /// No description provided for @tidyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'tidy'**
+  String get tidyLabel;
+
+  /// No description provided for @tidyAllGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is in order'**
+  String get tidyAllGood;
+
+  /// No description provided for @tidyIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural ,=1{One thing to tidy} other{{count} things to tidy}}'**
+  String tidyIssues(int count);
+
+  /// No description provided for @tidyLowBitrate.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural ,=1{1 track is} other{{count} tracks are}} below 192 kbps'**
+  String tidyLowBitrate(int count);
+
+  /// No description provided for @tidyMixedGenres.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural ,=1{1 album mixes} other{{count} albums mix}} several genres'**
+  String tidyMixedGenres(int count);
+
+  /// No description provided for @tidyNoYear.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural ,=1{1 track has} other{{count} tracks have}} no year'**
+  String tidyNoYear(int count);
+
+  /// No description provided for @tidyReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get tidyReview;
+
+  /// No description provided for @recentLossless.
+  ///
+  /// In en, this message translates to:
+  /// **'lossless'**
+  String get recentLossless;
+
+  /// No description provided for @recentLowBitrate.
+  ///
+  /// In en, this message translates to:
+  /// **'low'**
+  String get recentLowBitrate;
+
+  /// No description provided for @albumsAndSongs.
+  ///
+  /// In en, this message translates to:
+  /// **'{albums,plural ,=1{1 album} other{{albums} albums}}, {songs,plural ,=1{1 song} other{{songs} songs}}'**
+  String albumsAndSongs(int albums, int songs);
+
+  /// No description provided for @trackColumnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get trackColumnTitle;
+
+  /// No description provided for @trackColumnFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get trackColumnFormat;
+
+  /// No description provided for @trackColumnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get trackColumnTime;
+
+  /// No description provided for @inspectorNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Select one or more tracks to see and edit their tags.'**
+  String get inspectorNone;
+
+  /// No description provided for @inspectorSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural ,=1{1 track selected} other{{count} tracks selected}}'**
+  String inspectorSelected(int count);
+
+  /// No description provided for @inspectorEditTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Tags…'**
+  String get inspectorEditTags;
+
+  /// No description provided for @inspectorMixedArtwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed artwork'**
+  String get inspectorMixedArtwork;
+
   /// No description provided for @editorDetails.
   ///
   /// In en, this message translates to:

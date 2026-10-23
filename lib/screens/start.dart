@@ -1,63 +1,155 @@
 import 'package:flutter/cupertino.dart';
 import 'package:trax/l10n/app_localizations.dart';
 
+import '../audioplayer/glass_player.dart';
 import '../components/database_builder.dart';
+import '../components/drop_zone.dart';
+import '../components/pill_button.dart';
 import '../components/recents.dart';
-import '../components/title.dart';
+import '../components/tidy_panel.dart';
+import '../components/trax_colors.dart';
+import '../model/menu_actions.dart';
+import '../utils/events.dart';
 import '../utils/num_utils.dart';
 
 class StartWidget extends StatelessWidget {
+  static const double kWideLayout = 860;
+
   const StartWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     AppLocalizations t = AppLocalizations.of(context)!;
+    TraxColors colors = TraxColors.of(context);
     return SizedBox(
       width: double.infinity,
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 128),
-          child: Flex(
-            direction: Axis.vertical,
+          padding: const EdgeInsets.fromLTRB(
+            48,
+            12,
+            48,
+            48 + GlassPlayerBar.kContentInset,
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TitleWidget(title: t.startLibrary),
-              DatabaseBuilder(
-                future: (database) => database.info(),
-                placeholder: const SizedBox(height: 46),
-                builder: (context, database, info) {
-                  TextStyle infoStyle = const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.inactiveGray,
-                  );
-                  String durationStr = info.duration.formatDuration(
-                    skipSeconds: true,
-                    suffixHours: t.statsDurationHours,
-                    suffixMinutes: t.statsDurationMinutes,
-                  );
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${t.statsTracks(info.tracks).toUpperCase()} / ${durationStr.toUpperCase()}',
-                        style: infoStyle,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${t.statsArtists(info.artists).toUpperCase()} / ${t.statsAlbums(info.albums).toUpperCase()}',
-                        style: infoStyle,
-                      ),
-                    ],
-                  );
-                },
+              _header(context, t, colors),
+              const SizedBox(height: 28),
+              _overview(),
+              const SizedBox(height: 36),
+              Text(
+                t.addedRecently,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: colors.text,
+                  decoration: TextDecoration.none,
+                ),
               ),
-              const SizedBox(height: 32),
-              TitleWidget(title: t.addedRecently),
+              const SizedBox(height: 16),
               const RecentlyAddedWidget(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _header(BuildContext context, AppLocalizations t, TraxColors colors) {
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.end,
+      runSpacing: 16,
+      spacing: 24,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              t.startLibrary,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
+                color: colors.text,
+                decoration: TextDecoration.none,
+              ),
+            ),
+            const SizedBox(height: 6),
+            DatabaseBuilder(
+              future: (database) => database.info(),
+              placeholder: const SizedBox(height: 18),
+              builder: (context, database, info) => Text(
+                t.startSubtitle(
+                  t.statsTracks(info.tracks),
+                  info.duration
+                      .formatDuration(
+                        skipSeconds: true,
+                        suffixHours: t.statsDurationHours,
+                        suffixMinutes: t.statsDurationMinutes,
+                      )
+                      .trim(),
+                  t.statsArtists(info.artists),
+                  t.statsAlbums(info.albums),
+                ),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: colors.muted,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PillButton(
+              label: t.menuFileImport,
+              icon: CupertinoIcons.add,
+              style: PillStyle.filled,
+              onPressed: () =>
+                  eventBus.fire(MenuActionEvent(MenuAction.fileImport)),
+            ),
+            const SizedBox(width: 8),
+            PillButton(
+              label: t.menuToolsTranscode,
+              icon: CupertinoIcons.arrow_right_arrow_left,
+              onPressed: () =>
+                  eventBus.fire(MenuActionEvent(MenuAction.toolsTranscode)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _overview() {
+    return DatabaseBuilder(
+      future: (database) => database.health(),
+      placeholder: const SizedBox(height: 120),
+      builder: (context, database, health) => LayoutBuilder(
+        builder: (context, constraints) {
+          final Widget tidy = TidyPanel(health: health);
+          const Widget drop = DropZone();
+          if (constraints.maxWidth < kWideLayout) {
+            return Column(
+              children: [tidy, const SizedBox(height: 16), drop],
+            );
+          }
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(flex: 14, child: tidy),
+                const SizedBox(width: 16),
+                const Expanded(flex: 10, child: drop),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

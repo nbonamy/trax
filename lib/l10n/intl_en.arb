@@ -86,6 +86,42 @@
   "statsDurationHours": " hours ",
   "statsDurationMinutes": " minutes ",
 
+  "sidebarLibrary": "Library",
+  "sidebarArtists": "Artists",
+
+  "startSubtitle": "{tracks} · {duration} · {artists} · {albums}",
+  "@startSubtitle": { "placeholders": { "tracks": {}, "duration": {}, "artists": {}, "albums": {} } },
+  "dropTitle": "Drop music here",
+  "dropDescription": "MP3, FLAC and M4A, files or whole folders. Trax reads the tags, fills gaps from file names and files everything in your Music folder.",
+  "dropOnImport": "On import",
+
+  "tidyLabel": "tidy",
+  "tidyAllGood": "Everything is in order",
+  "tidyIssues": "{count,plural ,=1{One thing to tidy} other{{count} things to tidy}}",
+  "@tidyIssues": { "placeholders": { "count": { "type": "int" } } },
+  "tidyLowBitrate": "{count,plural ,=1{1 track is} other{{count} tracks are}} below 192 kbps",
+  "@tidyLowBitrate": { "placeholders": { "count": { "type": "int" } } },
+  "tidyMixedGenres": "{count,plural ,=1{1 album mixes} other{{count} albums mix}} several genres",
+  "@tidyMixedGenres": { "placeholders": { "count": { "type": "int" } } },
+  "tidyNoYear": "{count,plural ,=1{1 track has} other{{count} tracks have}} no year",
+  "@tidyNoYear": { "placeholders": { "count": { "type": "int" } } },
+  "tidyReview": "Review",
+
+  "recentLossless": "lossless",
+  "recentLowBitrate": "low",
+
+  "albumsAndSongs": "{albums,plural ,=1{1 album} other{{albums} albums}}, {songs,plural ,=1{1 song} other{{songs} songs}}",
+  "@albumsAndSongs": { "placeholders": { "albums": { "type": "int" }, "songs": { "type": "int" } } },
+  "trackColumnTitle": "Title",
+  "trackColumnFormat": "Format",
+  "trackColumnTime": "Time",
+
+  "inspectorNone": "Select one or more tracks to see and edit their tags.",
+  "inspectorSelected": "{count,plural ,=1{1 track selected} other{{count} tracks selected}}",
+  "@inspectorSelected": { "placeholders": { "count": { "type": "int" } } },
+  "inspectorEditTags": "Edit Tags…",
+  "inspectorMixedArtwork": "Mixed artwork",
+
   "editorDetails": "Details",
   "editorArtwork": "Artwork",
   "editorLyrics": "Lyrics",

@@ -1,11 +1,40 @@
 import 'package:extended_wrap/extended_wrap.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:trax/l10n/app_localizations.dart';
 
+import '../model/library_health.dart';
 import '../model/track.dart';
 import '../utils/events.dart';
 import '../utils/track_utils.dart';
 import 'artwork_async.dart';
 import 'database_builder.dart';
+import 'trax_colors.dart';
+
+/// "FLAC · lossless" or "MP3 181 kbps · low": what an album is made of.
+class FormatChip {
+  final String text;
+  final bool warning;
+  const FormatChip(this.text, {this.warning = false});
+
+  static FormatChip? of(
+    Track track, {
+    required String losslessLabel,
+    required String lowLabel,
+  }) {
+    if (track.tags == null || track.format == Format.notAudio) return null;
+    final String name = track.formatStringShort;
+    if (Track.isBitrateFormat(track.format)) {
+      final int bitrate = track.safeTags.bitrate;
+      if (bitrate <= 0) return FormatChip(name);
+      final bool low = bitrate < LibraryHealth.kMinBitrate;
+      return FormatChip(
+        '$name $bitrate kbps${low ? ' · $lowLabel' : ''}',
+        warning: low,
+      );
+    }
+    return FormatChip('$name · $losslessLabel');
+  }
+}
 
 class RecentlyAddedWidget extends StatelessWidget {
   const RecentlyAddedWidget({super.key});
@@ -16,49 +45,129 @@ class RecentlyAddedWidget extends StatelessWidget {
       future: (database) => database.recents(20),
       builder: (context, database, recents) => ExtendedWrap(
         maxLines: 2,
-        spacing: 32,
-        runSpacing: 32,
+        spacing: 24,
+        runSpacing: 28,
         clipBehavior: Clip.hardEdge,
-        children: recents.keys.toList().map((a) {
-          Track track = recents[a]!.first;
-          return MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => eventBus.fire(SelectArtistAlbumEvent(
-                track.safeTags.compilation
-                    ? Track.kArtistCompilations
-                    : track.safeTags.artist,
-                track.safeTags.album,
-              )),
-              child: SizedBox(
-                width: 192,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AsyncArtwork(
-                      track: track,
-                      size: 192,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      track.displayAlbum,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.systemGrey,
+        children: recents.keys
+            .toList()
+            .map((a) => _RecentCard(track: recents[a]!.first))
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _RecentCard extends StatefulWidget {
+  static const double kSize = 176;
+  final Track track;
+  const _RecentCard({required this.track});
+
+  @override
+  State<_RecentCard> createState() => _RecentCardState();
+}
+
+class _RecentCardState extends State<_RecentCard> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations t = AppLocalizations.of(context)!;
+    final TraxColors colors = TraxColors.of(context);
+    final Track track = widget.track;
+    final FormatChip? chip = FormatChip.of(
+      track,
+      losslessLabel: t.recentLossless,
+      lowLabel: t.recentLowBitrate,
+    );
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: () => eventBus.fire(SelectArtistAlbumEvent(
+          track.safeTags.compilation
+              ? Track.kArtistCompilations
+              : track.safeTags.artist,
+          track.safeTags.album,
+        )),
+        child: SizedBox(
+          width: _RecentCard.kSize,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedScale(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                scale: _hovered ? 1.035 : 1,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.shadow.withValues(
+                          alpha: _hovered ? 0.5 : 0.25,
+                        ),
+                        blurRadius: _hovered ? 22 : 8,
+                        offset: Offset(0, _hovered ? 10 : 2),
                       ),
-                    ),
-                    Text(
-                      track.displayAlbumArtist,
-                      style: const TextStyle(
-                        color: CupertinoColors.systemGrey2,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: AsyncArtwork(
+                    track: track,
+                    size: _RecentCard.kSize,
+                    radius: 8,
+                    defaultPlaceholderBorderColor: colors.line,
+                  ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
+              const SizedBox(height: 10),
+              Text(
+                track.displayAlbum,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: colors.text,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              Text(
+                track.displayAlbumArtist,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: colors.muted,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              if (chip != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: chip.warning ? colors.warning : colors.hover,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      chip.text,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: colors.text,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

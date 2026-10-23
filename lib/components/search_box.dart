@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import 'trax_colors.dart';
+
 class SearchBoxWidget extends StatelessWidget {
   const SearchBoxWidget({
     super.key,
@@ -8,6 +10,7 @@ class SearchBoxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TraxColors colors = TraxColors.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 4,
@@ -15,8 +18,8 @@ class SearchBoxWidget extends StatelessWidget {
       ),
       child: MacosSearchField(
         decoration: BoxDecoration(
-          color: const Color.fromRGBO(229, 222, 217, 1.0),
-          border: Border.all(color: const Color.fromRGBO(224, 217, 212, 1.0)),
+          color: colors.well,
+          border: Border.all(color: colors.line),
           borderRadius: const BorderRadius.all(Radius.circular(7.0)),
         ),
         padding: const EdgeInsets.symmetric(

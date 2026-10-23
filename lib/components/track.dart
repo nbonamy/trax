@@ -6,18 +6,22 @@ import '../components/context_menu.dart' as ctxm;
 import '../model/menu_actions.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
-import '../utils/consts.dart';
+import 'trax_colors.dart';
 import '../utils/events.dart';
 import '../utils/num_utils.dart';
 import '../utils/track_utils.dart';
 
 class TrackWidget extends StatelessWidget {
+  static const double kHeight = 34;
+
   final Track track;
+  final int index;
   final Function onTap;
   final Function onDoubleTap;
   const TrackWidget({
     super.key,
     required this.track,
+    this.index = 0,
     required this.onTap,
     required this.onDoubleTap,
   });
@@ -27,11 +31,13 @@ class TrackWidget extends StatelessWidget {
     return Consumer<SelectionModel>(
       builder: (context, selectionModel, child) {
         AppLocalizations t = AppLocalizations.of(context)!;
+        final TraxColors colors = TraxColors.of(context);
         bool selected = selectionModel.contains(track);
-        Color bgColor = selected ? Colors.blue : Colors.transparent;
-        Color fgColor = selected ? Colors.white : Colors.black;
-        Color fgColor2 =
-            selected ? fgColor : fgColor.withValues(alpha: Consts.fadedOpacity);
+        Color bgColor = selected
+            ? colors.accentFill
+            : (index.isOdd ? colors.stripe : Colors.transparent);
+        TextStyle style = TextStyle(fontSize: 13, color: colors.text);
+        TextStyle muted = TextStyle(fontSize: 13, color: colors.muted);
         return GestureDetector(
           onTapDown: (_) => onTap(track),
           onDoubleTap: () => onDoubleTap(track),
@@ -39,34 +45,46 @@ class TrackWidget extends StatelessWidget {
             t,
             selectionModel,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-              color: bgColor,
+              height: kHeight,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
               child: Row(
                 children: [
-                  Text(
-                    track.displayTrackIndex,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: fgColor2,
-                      fontSize: 13,
+                  SizedBox(
+                    width: 28,
+                    child: Text(
+                      track.displayTrackIndex,
+                      style: muted,
                     ),
                   ),
-                  const SizedBox(width: 32),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       track.displayTitle,
                       maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: fgColor,
-                      ),
+                      overflow: TextOverflow.ellipsis,
+                      style: style,
                     ),
                   ),
-                  Text(
-                    track.tags?.duration.formatDuration(skipHours: true) ?? '',
-                    style: TextStyle(
-                      color: fgColor2,
-                      fontSize: 13,
+                  SizedBox(
+                    width: 112,
+                    child: Text(
+                      track.formatSummary,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: muted,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 48,
+                    child: Text(
+                      track.tags?.duration.formatDuration(skipHours: true) ??
+                          '',
+                      textAlign: TextAlign.right,
+                      style: muted,
                     ),
                   ),
                 ],

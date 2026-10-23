@@ -232,6 +232,134 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statsDurationMinutes => ' minutes ';
 
   @override
+  String get sidebarLibrary => 'Bibliothèque';
+
+  @override
+  String get sidebarArtists => 'Artistes';
+
+  @override
+  String startSubtitle(
+      Object tracks, Object duration, Object artists, Object albums) {
+    return '$tracks · $duration · $artists · $albums';
+  }
+
+  @override
+  String get dropTitle => 'Déposez votre musique ici';
+
+  @override
+  String get dropDescription =>
+      'MP3, FLAC et M4A, fichiers ou dossiers entiers. Trax lit les tags, complète à partir des noms de fichiers et range tout dans votre dossier Musique.';
+
+  @override
+  String get dropOnImport => 'À l\'import';
+
+  @override
+  String get tidyLabel => 'en ordre';
+
+  @override
+  String get tidyAllGood => 'Tout est en ordre';
+
+  @override
+  String tidyIssues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count choses à ranger',
+      one: 'Une chose à ranger',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String tidyLowBitrate(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pistes sont',
+      one: '1 piste est',
+    );
+    return '$_temp0 en dessous de 192 kbps';
+  }
+
+  @override
+  String tidyMixedGenres(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count albums mélangent',
+      one: '1 album mélange',
+    );
+    return '$_temp0 plusieurs genres';
+  }
+
+  @override
+  String tidyNoYear(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pistes n\'ont',
+      one: '1 piste n\'a',
+    );
+    return '$_temp0 pas d\'année';
+  }
+
+  @override
+  String get tidyReview => 'Voir';
+
+  @override
+  String get recentLossless => 'sans perte';
+
+  @override
+  String get recentLowBitrate => 'faible';
+
+  @override
+  String albumsAndSongs(int albums, int songs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      albums,
+      locale: localeName,
+      other: '$albums albums',
+      one: '1 album',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      songs,
+      locale: localeName,
+      other: '$songs morceaux',
+      one: '1 morceau',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get trackColumnTitle => 'Titre';
+
+  @override
+  String get trackColumnFormat => 'Format';
+
+  @override
+  String get trackColumnTime => 'Durée';
+
+  @override
+  String get inspectorNone =>
+      'Sélectionnez des pistes pour voir et modifier leurs tags.';
+
+  @override
+  String inspectorSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pistes sélectionnées',
+      one: '1 piste sélectionnée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get inspectorEditTags => 'Modifier les tags…';
+
+  @override
+  String get inspectorMixedArtwork => 'Pochettes différentes';
+
+  @override
   String get editorDetails => 'Détails';
 
   @override

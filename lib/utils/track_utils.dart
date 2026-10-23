@@ -61,6 +61,23 @@ extension TrackUtils on Track {
     return safeTags.compilation ? 'Compilation' : displayArtist;
   }
 
+  /// "MP3 181 kbps", "FLAC 16/44.1": a format at a glance.
+  String get formatSummary {
+    if (tags == null || format == Format.notAudio) return '';
+    if (Track.isBitrateFormat(format)) {
+      final int bitrate = safeTags.bitrate;
+      return bitrate > 0
+          ? '$formatStringShort $bitrate kbps'
+          : formatStringShort;
+    }
+    final int bits = safeTags.bitsPerSample;
+    final double khz = safeTags.sampleRate / 1000;
+    if (bits == 0 || khz == 0) return formatStringShort;
+    final String rate =
+        khz == khz.roundToDouble() ? khz.toStringAsFixed(0) : '$khz';
+    return '$formatStringShort $bits/$rate';
+  }
+
   String get displayGenre {
     return getDisplayGenre(safeTags.genre);
   }

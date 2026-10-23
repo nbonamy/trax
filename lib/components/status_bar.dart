@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import 'trax_colors.dart';
+
 class StatusBarWidget extends StatefulWidget {
   final String message;
   final Function? onStop;
@@ -19,16 +21,17 @@ class _StatusBarWidgetState extends State<StatusBarWidget> {
   bool _hovered = false;
   @override
   Widget build(BuildContext context) {
+    final TraxColors colors = TraxColors.of(context);
     return Column(
       children: [
-        const Divider(),
+        Divider(color: colors.line),
         const SizedBox(height: 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               widget.message,
-              style: const TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12, color: colors.text),
             ),
             const SizedBox(width: 8),
             MouseRegion(
@@ -41,12 +44,12 @@ class _StatusBarWidgetState extends State<StatusBarWidget> {
                         onTap: () => widget.onStop?.call(),
                         child: Icon(
                           CupertinoIcons.stop_circle,
-                          color: Colors.black.withValues(alpha: 0.8),
+                          color: colors.soft,
                           size: 12,
                         ),
                       )
                     : LoadingAnimationWidget.staggeredDotsWave(
-                        color: Colors.black.withValues(alpha: 0.8),
+                        color: colors.soft,
                         size: 12,
                       ),
               ),

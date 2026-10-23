@@ -56,7 +56,6 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     return DraggableDialog(
       width: 550,
       height: 340,
-      headerBgColor: const Color.fromRGBO(240, 234, 230, 1.0),
       //: const Color.fromRGBO(240, 234, 230, 1.0),
       // contentsBgColor: const Color.fromRGBO(246, 240, 236, 1.0),
       header: Row(

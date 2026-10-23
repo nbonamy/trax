@@ -4,16 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:trax/l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
 
-import '../audioplayer/toolbar.dart';
+import '../audioplayer/glass_player.dart';
 import '../components/database_builder.dart';
+import '../components/inspector.dart';
 import '../components/search_box.dart';
 import '../components/status_bar.dart';
+import '../components/trax_colors.dart';
 import '../model/selection.dart';
 import '../model/track.dart';
 import '../processors/scanner.dart';
 import '../screens/start.dart';
 import '../screens/welcome.dart';
-import '../utils/consts.dart';
 import '../utils/events.dart';
 import 'content.dart';
 import 'sidebar.dart';
@@ -49,11 +50,12 @@ class BrowserWidgetState extends State<BrowserWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final TraxColors colors = TraxColors.of(context);
     Widget window = MacosWindow(
       sidebar: Sidebar(
-        minWidth: 250,
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(color: Consts.sideBarBgColor),
+        minWidth: 240,
+        padding: const EdgeInsets.fromLTRB(10, 16, 10, 10),
+        decoration: BoxDecoration(color: colors.sidebar),
         top: const SearchBoxWidget(),
         builder: (context, controller) {
           return GestureDetector(
@@ -87,31 +89,55 @@ class BrowserWidgetState extends State<BrowserWidget> {
         },
       ),
       child: MacosScaffold(
-        toolBar: const AudioPlayerToolBar(),
+        toolBar: ToolBar(
+          height: 52,
+          decoration: BoxDecoration(color: colors.background),
+          dividerColor: const Color(0x00000000),
+        ),
         children: [
           ContentArea(
             builder: (context, scrollController) => Container(
-              color: CupertinoColors.white,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () => SelectionModel.of(context).clear(),
-                child: Builder(
-                  builder: (context) {
-                    if (_artist == Track.kArtistsHome) {
-                      return DatabaseBuilder<bool>(
-                        future: (database) => database.isEmpty,
-                        builder: (context, database, isEmpty) => isEmpty
-                            ? const WelcomeWidget()
-                            : const StartWidget(),
-                      );
-                    } else {
-                      return BrowserContent(
-                        artist: _artist,
-                        initialAlbum: _initialAlbum,
-                      );
-                    }
-                  },
-                ),
+              color: colors.background,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () => SelectionModel.of(context).clear(),
+                            child: Builder(
+                              builder: (context) {
+                                if (_artist == Track.kArtistsHome) {
+                                  return DatabaseBuilder<bool>(
+                                    future: (database) => database.isEmpty,
+                                    builder: (context, database, isEmpty) =>
+                                        isEmpty
+                                            ? const WelcomeWidget()
+                                            : const StartWidget(),
+                                  );
+                                } else {
+                                  return BrowserContent(
+                                    artist: _artist,
+                                    initialAlbum: _initialAlbum,
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        const Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 24,
+                          child: GlassPlayerBar(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_artist != Track.kArtistsHome) const InspectorPanel(),
+                ],
               ),
             ),
           ),

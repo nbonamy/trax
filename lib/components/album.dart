@@ -53,7 +53,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 48),
+      margin: const EdgeInsets.symmetric(vertical: 28),
       child: LayoutBuilder(
         builder: (context, constraints) => Row(
           mainAxisSize: MainAxisSize.max,
@@ -67,19 +67,18 @@ class _AlbumWidgetState extends State<AlbumWidget> {
               format: '$formatString $formatDescription',
               filesize: filesize,
             ),
-            SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 48),
+            SizedBox(width: _artworkSize(constraints) == 0 ? 0 : 32),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 8),
                   HeaderAlbumWidget(
                     title: widget.title,
                     genre: widget.tracks.first.safeTags.genre,
                     year: widget.tracks.first.safeTags.year,
                     duration: 0, //widget.tracks.duration,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 14),
                   TrackListWidget(
                     tracks: widget.tracks,
                     onSelectTrack: widget.onSelectTrack,
@@ -96,7 +95,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
   }
 
   double _artworkSize(BoxConstraints constraints) {
-    double size = constraints.maxWidth / 2 - 50.0;
-    return size < 150.0 ? 0.0 : min(size, 300.0);
+    double size = constraints.maxWidth / 3;
+    return size < 120.0 ? 0.0 : min(size, 200.0);
   }
 }

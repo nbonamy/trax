@@ -2,7 +2,6 @@
 
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trax/l10n/app_localizations.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -14,6 +13,7 @@ import '../components/button.dart';
 import '../components/dialog.dart';
 import '../components/draggable_dialog.dart';
 import '../components/tab_view.dart';
+import '../components/trax_colors.dart';
 import '../data/database.dart';
 import '../model/editable_tags.dart';
 import '../model/menu_actions.dart';
@@ -225,9 +225,16 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
     AppLocalizations t = AppLocalizations.of(context)!;
 
     // one of header text will be bold
-    TextStyle activeHeaderStyle = const TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 24,
+    final TraxColors colors = TraxColors.of(context);
+    TextStyle activeHeaderStyle = TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 20,
+      letterSpacing: -0.2,
+      color: colors.text,
+    );
+    TextStyle secondaryHeaderStyle = TextStyle(
+      fontSize: 14,
+      color: colors.muted,
     );
 
     // return
@@ -242,8 +249,8 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                   track: currentTrack,
                   useCache: false,
                   size: kArtworkSize,
-                  radius: 4.0,
-                  defaultPlaceholderBorderColor: CupertinoColors.systemGrey3,
+                  radius: 6.0,
+                  defaultPlaceholderBorderColor: colors.line,
                 )
               : ArtworkWidget(
                   bytes: _artworkBytes,
@@ -266,14 +273,16 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
                   Text(_activeAlbum,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: _activeTitle.isEmpty ? activeHeaderStyle : null),
+                      style: _activeTitle.isEmpty
+                          ? activeHeaderStyle
+                          : secondaryHeaderStyle),
                 if (_activeArtist.isNotEmpty)
                   Text(_activeArtist,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: _activeTitle.isEmpty && _activeAlbum.isEmpty
                           ? activeHeaderStyle
-                          : null),
+                          : secondaryHeaderStyle),
               ],
             ),
           ),
@@ -317,7 +326,7 @@ class _TagEditorWidgetState extends State<TagEditorWidget> with MenuHandler {
             ],
           ),
           if (_saveInProgress)
-            Container(color: Colors.white.withValues(alpha: 0.5)),
+            Container(color: colors.background.withValues(alpha: 0.5)),
         ],
       ),
       footer: Row(

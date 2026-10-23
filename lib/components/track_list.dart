@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:trax/l10n/app_localizations.dart';
 
 import '../model/track.dart';
-import '../utils/consts.dart';
 import '../utils/track_utils.dart';
 import 'album.dart';
 import 'track.dart';
+import 'trax_colors.dart';
 
 class TrackListWidget extends StatelessWidget {
   final TrackList tracks;
@@ -23,55 +24,70 @@ class TrackListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool sameVolume = _areAllSameVolume();
+    final AppLocalizations t = AppLocalizations.of(context)!;
+    final TraxColors colors = TraxColors.of(context);
+    final bool sameVolume = _areAllSameVolume();
     int previousVolume = -1;
 
-    return ListView.separated(
-      shrinkWrap: shrinkWrap,
-      primary: primary,
-      itemCount: tracks.length + 2,
-      itemBuilder: (context, index) {
-        if (index == 0 || index > tracks.length) {
-          return Container();
-        } else {
-          return TrackWidget(
-            track: tracks[index - 1],
-            onTap: (track) => onSelectTrack(track, tracks),
-            onDoubleTap: (track) => onExecuteTrack(track, tracks),
-          );
-        }
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        if (index <= tracks.length - 1) {
-          if (!sameVolume) {
-            Track track = tracks[index];
-            bool volumeChanged = track.volumeIndex != previousVolume;
-            previousVolume = track.volumeIndex;
-            if (volumeChanged) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: (index == 0 ? 12 : 24)),
-                  Text(
-                    'Disc ${track.volumeIndex}'.toUpperCase(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color:
-                          Colors.black.withValues(alpha: Consts.fadedOpacity),
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _lineDivider(),
-                ],
-              );
-            }
-          }
-        }
+    final TextStyle headerStyle = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+      color: colors.faint,
+    );
 
-        // default
-        return _lineDivider();
-      },
+    final List<Widget> rows = [];
+    for (int i = 0; i < tracks.length; i++) {
+      if (!sameVolume && tracks[i].volumeIndex != previousVolume) {
+        rows.add(_discHeader(tracks[i], i == 0, headerStyle));
+      }
+      previousVolume = tracks[i].volumeIndex;
+      rows.add(TrackWidget(
+        track: tracks[i],
+        index: i,
+        onTap: (track) => onSelectTrack(track, tracks),
+        onDoubleTap: (track) => onExecuteTrack(track, tracks),
+      ));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // column titles
+        Container(
+          height: 26,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: colors.line, width: 0.5)),
+          ),
+          child: Row(
+            children: [
+              SizedBox(width: 36, child: Text('#', style: headerStyle)),
+              Expanded(child: Text(t.trackColumnTitle, style: headerStyle)),
+              SizedBox(
+                width: 112,
+                child: Text(t.trackColumnFormat, style: headerStyle),
+              ),
+              SizedBox(
+                width: 48,
+                child: Text(
+                  t.trackColumnTime,
+                  textAlign: TextAlign.right,
+                  style: headerStyle,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 2),
+        ...rows,
+      ],
+    );
+  }
+
+  Widget _discHeader(Track track, bool first, TextStyle style) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(12, first ? 8 : 20, 12, 6),
+      child: Text('Disc ${track.volumeIndex}'.toUpperCase(), style: style),
     );
   }
 
@@ -82,9 +98,5 @@ class TrackListWidget extends StatelessWidget {
       }
     }
     return true;
-  }
-
-  Widget _lineDivider() {
-    return const Divider(height: 0.5);
   }
 }

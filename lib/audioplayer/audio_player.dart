@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../model/track.dart';
 import '../processors/http.dart';
 import '../utils/track_utils.dart';
+import 'player_math.dart';
 
 class AudioPlayer extends ChangeNotifier {
   static AudioPlayer of(BuildContext context) {
@@ -21,6 +22,9 @@ class AudioPlayer extends ChangeNotifier {
     //_player.currentIndexStream.listen(_notify);
     _player.playingStream.listen(_notify);
     _player.playbackEventStream.listen(_notify);
+    _player.shuffleModeEnabledStream.listen(_notify);
+    _player.loopModeStream.listen(_notify);
+    _player.volumeStream.listen(_notify);
   }
 
   bool get isStopped {
@@ -59,6 +63,21 @@ class AudioPlayer extends ChangeNotifier {
 
   double get volume {
     return _player.volume;
+  }
+
+  bool get shuffleEnabled {
+    return _player.shuffleModeEnabled;
+  }
+
+  PlayerRepeat get repeatMode {
+    switch (_player.loopMode) {
+      case ja.LoopMode.off:
+        return PlayerRepeat.off;
+      case ja.LoopMode.all:
+        return PlayerRepeat.all;
+      case ja.LoopMode.one:
+        return PlayerRepeat.one;
+    }
   }
 
   void play(
@@ -127,6 +146,30 @@ class AudioPlayer extends ChangeNotifier {
     if (canNext) {
       _player.seekToNext();
     }
+  }
+
+  void toggleShuffle() async {
+    final bool enabled = !_player.shuffleModeEnabled;
+    if (enabled) await _player.shuffle();
+    await _player.setShuffleModeEnabled(enabled);
+  }
+
+  void cycleRepeat() {
+    switch (repeatMode.next) {
+      case PlayerRepeat.off:
+        _player.setLoopMode(ja.LoopMode.off);
+        break;
+      case PlayerRepeat.all:
+        _player.setLoopMode(ja.LoopMode.all);
+        break;
+      case PlayerRepeat.one:
+        _player.setLoopMode(ja.LoopMode.one);
+        break;
+    }
+  }
+
+  void setVolume(double volume) {
+    _player.setVolume(volume.clamp(0.0, 1.0));
   }
 
   void _notify(dynamic event) {

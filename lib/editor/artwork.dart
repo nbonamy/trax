@@ -12,6 +12,7 @@ import 'package:taglib_ffi/taglib_ffi.dart';
 import '../components/context_menu.dart' as ctxm;
 import '../components/artwork.dart';
 import '../components/button.dart';
+import '../components/trax_colors.dart';
 import '../model/menu_actions.dart';
 import '../model/track.dart';
 import '../processors/saver.dart';
@@ -163,29 +164,28 @@ class EditorArtworkWidgetState extends State<EditorArtworkWidget>
   }
 
   Widget _multiplePlaceholder() {
+    final Color line = TraxColors.of(context).line;
     return Container(
       width: kArtworkSize,
       height: kArtworkSize,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: CupertinoColors.lightBackgroundGray,
-        ),
+        border: Border.all(color: line),
       ),
       child: _action == MetadataAction.deleted
           ? Container()
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.music_albums,
                   size: kArtworkSize * 0.5,
-                  color: CupertinoColors.lightBackgroundGray,
+                  color: line,
                 ),
                 if (_checkingMultiple != null && _checkingMultiple!) ...[
                   const SizedBox(height: 8),
                   LoadingAnimationWidget.progressiveDots(
                     size: 32,
-                    color: CupertinoColors.lightBackgroundGray,
+                    color: line,
                   ),
                 ]
               ],

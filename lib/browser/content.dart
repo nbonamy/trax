@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:trax/audioplayer/audio_player.dart';
+import 'package:trax/audioplayer/glass_player.dart';
 import 'package:trax/utils/track_utils.dart';
 
 import '../components/album.dart';
@@ -121,6 +122,9 @@ class _BrowserContentState extends State<BrowserContent> with MenuHandler {
               Expanded(
                 child: ScrollablePositionedList.builder(
                   itemScrollController: _itemScrollController,
+                  padding: const EdgeInsets.only(
+                    bottom: GlassPlayerBar.kContentInset,
+                  ),
                   initialScrollIndex: max(0,
                       _albums.keys.toList().indexOf(widget.initialAlbum ?? '')),
                   itemCount: _albums.length,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../model/preferences.dart';
 import 'draggable_widget.dart';
+import 'trax_colors.dart';
 
 class DraggableDialog extends StatefulWidget {
   static const kDialogBorderRadius = 8.0;
@@ -11,8 +12,8 @@ class DraggableDialog extends StatefulWidget {
   final Widget body;
   final Widget footer;
   final String? preferenceKey;
-  final Color headerBgColor;
-  final Color contentsBgColor;
+  final Color? headerBgColor;
+  final Color? contentsBgColor;
   const DraggableDialog({
     super.key,
     required this.width,
@@ -21,8 +22,8 @@ class DraggableDialog extends StatefulWidget {
     required this.body,
     required this.footer,
     this.preferenceKey,
-    this.headerBgColor = const Color.fromRGBO(238, 232, 230, 1.0),
-    this.contentsBgColor = Colors.white,
+    this.headerBgColor,
+    this.contentsBgColor,
   });
 
   @override
@@ -43,6 +44,9 @@ class _DraggableDialogState extends State<DraggableDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final TraxColors colors = TraxColors.of(context);
+    final Color headerBg = widget.headerBgColor ?? colors.sidebar;
+    final Color contentsBg = widget.contentsBgColor ?? colors.background;
     return Align(
       alignment: _alignment,
       child: DraggableWidget(
@@ -63,18 +67,16 @@ class _DraggableDialogState extends State<DraggableDialog> {
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: widget.headerBgColor,
-              width: 0.25,
-            ),
+            border: Border.all(color: colors.line, width: 0.5),
             borderRadius: const BorderRadius.all(
               Radius.circular(DraggableDialog.kDialogBorderRadius),
             ),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color.fromRGBO(170, 170, 170, 1),
-                spreadRadius: 8,
-                blurRadius: 24,
+                color: colors.shadow,
+                spreadRadius: 2,
+                blurRadius: 36,
+                offset: const Offset(0, 12),
               )
             ],
           ),
@@ -83,7 +85,7 @@ class _DraggableDialogState extends State<DraggableDialog> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: widget.headerBgColor,
+                  color: headerBg,
                   borderRadius: const BorderRadius.only(
                     topLeft:
                         Radius.circular(DraggableDialog.kDialogBorderRadius),
@@ -99,7 +101,7 @@ class _DraggableDialogState extends State<DraggableDialog> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: widget.contentsBgColor,
+                    color: contentsBg,
                     borderRadius: const BorderRadius.only(
                       bottomLeft:
                           Radius.circular(DraggableDialog.kDialogBorderRadius),

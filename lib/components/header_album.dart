@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:trax/l10n/app_localizations.dart';
 
-import '../utils/consts.dart';
 import '../utils/num_utils.dart';
 import '../utils/track_utils.dart';
+import 'trax_colors.dart';
 
 class HeaderAlbumWidget extends StatelessWidget {
   final String title;
@@ -21,7 +21,8 @@ class HeaderAlbumWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppLocalizations t = AppLocalizations.of(context)!;
-    String? genreStr = TrackUtils.getDisplayGenre(genre).toUpperCase();
+    TraxColors colors = TraxColors.of(context);
+    String genreStr = TrackUtils.getDisplayGenre(genre);
     String? yearStr = year == 0 ? null : '$year';
     String? durationStr = duration == 0
         ? null
@@ -31,26 +32,24 @@ class HeaderAlbumWidget extends StatelessWidget {
               skipSeconds: true,
               suffixMinutes: t.statsDurationMinutes,
             )
-            .toUpperCase();
+            .trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           TrackUtils.getDisplayAlbum(title),
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            letterSpacing: -0.2,
+            color: colors.text,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 4),
         Text(
           '$genreStr${yearStr == null ? "" : " · $yearStr"}${durationStr == null ? "" : " · $durationStr"}',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black.withValues(alpha: Consts.fadedOpacity),
-            fontSize: 12,
-          ),
+          style: TextStyle(fontSize: 12, color: colors.muted),
         ),
       ],
     );

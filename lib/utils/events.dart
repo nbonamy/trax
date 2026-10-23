@@ -42,3 +42,8 @@ class SelectArtistAlbumEvent {
 }
 
 class StopTranscodeEvent {}
+
+class ImportFilesEvent {
+  final List<String> paths;
+  ImportFilesEvent(this.paths);
+}

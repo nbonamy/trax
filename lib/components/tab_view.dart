@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'tab_header.dart';
+import 'trax_colors.dart';
 
 class TabView extends StatelessWidget {
   final MacosTabController controller;
@@ -32,7 +33,7 @@ class TabView extends StatelessWidget {
       children: children
           .map(
             (w) => Container(
-              color: CupertinoColors.white,
+              color: TraxColors.of(context).background,
               child: w,
             ),
           )

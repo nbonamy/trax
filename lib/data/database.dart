@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:taglib_ffi/taglib_ffi.dart';
 
+import '../model/library_health.dart';
 import '../model/track.dart';
 import '../utils/logger.dart';
 import '../utils/path_utils.dart';
@@ -79,6 +80,22 @@ class TraxDatabase extends ChangeNotifier {
       _cachedInfo!.albums = resultSet.first['count'];
     });
     return _cachedInfo!;
+  }
+
+  Future<LibraryHealth> health() async {
+    final List<Map> resultSet = await _database!.rawQuery(
+        'SELECT artist, album, genre, year, format, bitrate, compilation FROM tracks');
+    return LibraryHealth.compute(resultSet
+        .map((r) => HealthRow(
+              artist: r['artist'].toString(),
+              album: r['album'].toString(),
+              genre: r['genre'].toString(),
+              year: int.tryParse(r['year'].toString()) ?? 0,
+              lossy: Track.isBitrateFormat(r['format'].toString().toFormat()),
+              bitrate: r['bitrate'] ?? 0,
+              compilation: r['compilation'] == 1,
+            ))
+        .toList());
   }
 
   Future<bool> get isEmpty async {

@@ -86,6 +86,42 @@
   "statsDurationHours": " heures ",
   "statsDurationMinutes": " minutes ",
 
+  "sidebarLibrary": "Bibliothèque",
+  "sidebarArtists": "Artistes",
+
+  "startSubtitle": "{tracks} · {duration} · {artists} · {albums}",
+  "@startSubtitle": { "placeholders": { "tracks": {}, "duration": {}, "artists": {}, "albums": {} } },
+  "dropTitle": "Déposez votre musique ici",
+  "dropDescription": "MP3, FLAC et M4A, fichiers ou dossiers entiers. Trax lit les tags, complète à partir des noms de fichiers et range tout dans votre dossier Musique.",
+  "dropOnImport": "À l'import",
+
+  "tidyLabel": "en ordre",
+  "tidyAllGood": "Tout est en ordre",
+  "tidyIssues": "{count,plural ,=1{Une chose à ranger} other{{count} choses à ranger}}",
+  "@tidyIssues": { "placeholders": { "count": { "type": "int" } } },
+  "tidyLowBitrate": "{count,plural ,=1{1 piste est} other{{count} pistes sont}} en dessous de 192 kbps",
+  "@tidyLowBitrate": { "placeholders": { "count": { "type": "int" } } },
+  "tidyMixedGenres": "{count,plural ,=1{1 album mélange} other{{count} albums mélangent}} plusieurs genres",
+  "@tidyMixedGenres": { "placeholders": { "count": { "type": "int" } } },
+  "tidyNoYear": "{count,plural ,=1{1 piste n'a} other{{count} pistes n'ont}} pas d'année",
+  "@tidyNoYear": { "placeholders": { "count": { "type": "int" } } },
+  "tidyReview": "Voir",
+
+  "recentLossless": "sans perte",
+  "recentLowBitrate": "faible",
+
+  "albumsAndSongs": "{albums,plural ,=1{1 album} other{{albums} albums}}, {songs,plural ,=1{1 morceau} other{{songs} morceaux}}",
+  "@albumsAndSongs": { "placeholders": { "albums": { "type": "int" }, "songs": { "type": "int" } } },
+  "trackColumnTitle": "Titre",
+  "trackColumnFormat": "Format",
+  "trackColumnTime": "Durée",
+
+  "inspectorNone": "Sélectionnez des pistes pour voir et modifier leurs tags.",
+  "inspectorSelected": "{count,plural ,=1{1 piste sélectionnée} other{{count} pistes sélectionnées}}",
+  "@inspectorSelected": { "placeholders": { "count": { "type": "int" } } },
+  "inspectorEditTags": "Modifier les tags…",
+  "inspectorMixedArtwork": "Pochettes différentes",
+
   "editorDetails": "Détails",
   "editorArtwork": "Jaquette",
   "editorLyrics": "Paroles",
