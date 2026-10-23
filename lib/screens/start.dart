@@ -15,6 +15,10 @@ import '../utils/num_utils.dart';
 class StartWidget extends StatelessWidget {
   static const double kWideLayout = 860;
 
+  /// Past this the page stops growing: very wide windows keep a readable
+  /// column instead of stretching panels and pushing buttons far from titles.
+  static const double kMaxContentWidth = 1120;
+
   const StartWidget({super.key});
 
   @override
@@ -24,32 +28,38 @@ class StartWidget extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            48,
-            12,
-            48,
-            48 + GlassPlayerBar.kContentInset,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _header(context, t, colors),
-              const SizedBox(height: 28),
-              _overview(),
-              const SizedBox(height: 36),
-              Text(
-                t.addedRecently,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: colors.text,
-                  decoration: TextDecoration.none,
-                ),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: kMaxContentWidth),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                48,
+                12,
+                48,
+                48 + GlassPlayerBar.kContentInset,
               ),
-              const SizedBox(height: 16),
-              const RecentlyAddedWidget(),
-            ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _header(context, t, colors),
+                  const SizedBox(height: 28),
+                  _overview(),
+                  const SizedBox(height: 36),
+                  Text(
+                    t.addedRecently,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: colors.text,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const RecentlyAddedWidget(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -57,72 +67,76 @@ class StartWidget extends StatelessWidget {
   }
 
   Widget _header(BuildContext context, AppLocalizations t, TraxColors colors) {
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      crossAxisAlignment: WrapCrossAlignment.end,
-      runSpacing: 16,
-      spacing: 24,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              t.startLibrary,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.5,
-                color: colors.text,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            const SizedBox(height: 6),
-            DatabaseBuilder(
-              future: (database) => database.info(),
-              placeholder: const SizedBox(height: 18),
-              builder: (context, database, info) => Text(
-                t.startSubtitle(
-                  t.statsTracks(info.tracks),
-                  info.duration
-                      .formatDuration(
-                        skipSeconds: true,
-                        suffixHours: t.statsDurationHours,
-                        suffixMinutes: t.statsDurationMinutes,
-                      )
-                      .trim(),
-                  t.statsArtists(info.artists),
-                  t.statsAlbums(info.albums),
-                ),
+    // full width, or spaceBetween has nothing to spread over
+    return SizedBox(
+      width: double.infinity,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.end,
+        runSpacing: 16,
+        spacing: 24,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                t.startLibrary,
                 style: TextStyle(
-                  fontSize: 13,
-                  color: colors.muted,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                  color: colors.text,
                   decoration: TextDecoration.none,
                 ),
               ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PillButton(
-              label: t.menuFileImport,
-              icon: CupertinoIcons.add,
-              style: PillStyle.filled,
-              onPressed: () =>
-                  eventBus.fire(MenuActionEvent(MenuAction.fileImport)),
-            ),
-            const SizedBox(width: 8),
-            PillButton(
-              label: t.menuToolsTranscode,
-              icon: CupertinoIcons.arrow_right_arrow_left,
-              onPressed: () =>
-                  eventBus.fire(MenuActionEvent(MenuAction.toolsTranscode)),
-            ),
-          ],
-        ),
-      ],
+              const SizedBox(height: 6),
+              DatabaseBuilder(
+                future: (database) => database.info(),
+                placeholder: const SizedBox(height: 18),
+                builder: (context, database, info) => Text(
+                  t.startSubtitle(
+                    t.statsTracks(info.tracks),
+                    info.duration
+                        .formatDuration(
+                          skipSeconds: true,
+                          suffixHours: t.statsDurationHours,
+                          suffixMinutes: t.statsDurationMinutes,
+                        )
+                        .trim(),
+                    t.statsArtists(info.artists),
+                    t.statsAlbums(info.albums),
+                  ),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colors.muted,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PillButton(
+                label: t.menuFileImport,
+                icon: CupertinoIcons.add,
+                style: PillStyle.filled,
+                onPressed: () =>
+                    eventBus.fire(MenuActionEvent(MenuAction.fileImport)),
+              ),
+              const SizedBox(width: 8),
+              PillButton(
+                label: t.menuToolsTranscode,
+                icon: CupertinoIcons.arrow_right_arrow_left,
+                onPressed: () =>
+                    eventBus.fire(MenuActionEvent(MenuAction.toolsTranscode)),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -143,9 +157,9 @@ class StartWidget extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(flex: 14, child: tidy),
+                Expanded(flex: 1, child: tidy),
                 const SizedBox(width: 16),
-                const Expanded(flex: 10, child: drop),
+                const Expanded(flex: 1, child: drop),
               ],
             ),
           );
