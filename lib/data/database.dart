@@ -170,7 +170,8 @@ class TraxDatabase extends ChangeNotifier {
       if (a.isEmpty) return -1;
       if (b.isEmpty) return 1;
       return TrackUtils.getSortableArtist(a)
-          .compareTo(TrackUtils.getSortableArtist(b));
+          .toLowerCase()
+          .compareTo(TrackUtils.getSortableArtist(b).toLowerCase());
     });
     return artists;
   }

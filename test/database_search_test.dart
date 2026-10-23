@@ -23,6 +23,37 @@ Track t(String title, String album, String artist,
             trackIndex: i));
 
 void main() {
+  test('sidebar artists sort ignoring case and leading articles', () async {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+    final db =
+        TraxDatabase(logger: Logger(), databaseFile: inMemoryDatabasePath);
+    await db.init();
+    for (final artist in [
+      'zz top',
+      'The beatles',
+      'AC/DC',
+      'a-ha',
+      'The Cure',
+      'AaRON'
+    ]) {
+      db.insert(t('Song', 'Album', artist), notify: false);
+    }
+    final compilation = t('Hit', 'Hits', 'Various');
+    compilation.safeTags.compilation = true;
+    db.insert(compilation, notify: false);
+
+    expect(await db.artists(), [
+      Track.kArtistCompilations,
+      'a-ha',
+      'AaRON',
+      'AC/DC',
+      'The beatles',
+      'The Cure',
+      'zz top',
+    ]);
+  });
+
   test('search and review against a real sqlite', () async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
